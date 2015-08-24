@@ -118,7 +118,15 @@ router.delete('/:id',
  */
 router.get('/refreshDownloads',
   function (req, res) {
-
+    var db = req.db;
+    db.query('select * from download order by id',
+      function (err, rows) {
+        if (!err)
+          res.json(rows);
+        else
+          console.log('Error while performing Query.');
+      }
+    );
   }
 );
 
