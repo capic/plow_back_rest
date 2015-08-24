@@ -84,3 +84,5 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
+
+//TODO: fermer la connexion mysql
