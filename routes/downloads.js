@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var Download = require('../controllers/download');
 
 /**
  * get the list of download status
@@ -24,14 +25,15 @@ router.get('/status',
 router.get('/',
   function (req, res, next) {
     var db = req.db;
-    db.query('select * from download order by id',
+    Download.findAll(db, req, res);
+    /*db.query('select * from download order by id',
       function (err, rows) {
         if (!err)
           res.json(rows);
         else
           console.log('Error while performing Query.');
       }
-    );
+    );*/
   }
 );
 
