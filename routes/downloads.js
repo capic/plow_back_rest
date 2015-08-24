@@ -55,10 +55,12 @@ router.post('/',
 
         db.query('insert into download set ?', down,
             function(err, rows) {
-                if (err)
-                    res.send(err)
-                else
-                    res.json(rows)
+                if (err) {
+                    res.send(err);
+                } else {
+                    down.id = rows.insertId;
+                    res.json(down);
+                }
             }
         )
     }
@@ -72,10 +74,30 @@ router.put('/:id',
 
         db.query('update download set ? where id = ?', [down, id],
             function(err, rows) {
-                if (err)
-                    res.send(err)
-                else
-                    res.json(rows)
+                if (err) {
+                    res.send(err);
+                } else {
+                    res.json(down);
+                }
+            }
+        );
+    }
+);
+
+router.delete('/:id',
+    function(req, res) {
+        var db = req.db;
+        var id = req.params.id;
+
+        db.query('delete from download where id = ?', id,
+            function(err) {
+                if (err) {
+                    status = false;
+                } else {
+                    status = true;
+                }
+
+                res.json(status);
             }
         );
     }
