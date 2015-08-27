@@ -2,20 +2,14 @@ var express = require('express');
 var router = express.Router();
 var Download = require('../controllers/download');
 
+var download = new Download();
+
 /**
  * get the list of download status
  */
 router.get('/status',
   function (req, res, next) {
-    var db = req.db;
-    db.query('select id, name from download_status order by ord',
-      function (err, rows) {
-        if (!err)
-          res.json(rows);
-        else
-          console.log('Error while performing Query.');
-      }
-    );
+    download.findAllStatus(req, res);
   }
 );
 
@@ -24,16 +18,7 @@ router.get('/status',
  */
 router.get('/',
   function (req, res, next) {
-    var db = req.db;
-    Download.findAll(db, req, res);
-    /*db.query('select * from download order by id',
-      function (err, rows) {
-        if (!err)
-          res.json(rows);
-        else
-          console.log('Error while performing Query.');
-      }
-    );*/
+    download.findAll(req, res);
   }
 );
 
@@ -42,16 +27,7 @@ router.get('/',
  */
 router.get('/:id',
   function (req, res, next) {
-    var db = req.db;
-    var id = req.params.id;
-    db.query('select * from download where id=?', [id],
-      function (err, rows) {
-        if (!err)
-          res.json(rows);
-        else
-          console.log('Error while performing Query.');
-      }
-    );
+   download.findById(req, res);
   }
 );
 
@@ -60,19 +36,7 @@ router.get('/:id',
  */
 router.post('/',
   function (req, res) {
-    var db = req.db;
-    var down = JSON.parse(JSON.stringify(req.body));
-
-    db.query('insert into download set ?', down,
-      function (err, rows) {
-        if (err) {
-          res.send(err);
-        } else {
-          down.id = rows.insertId;
-          res.json(down);
-        }
-      }
-    );
+    download.save(req, res);
   }
 );
 
@@ -81,19 +45,7 @@ router.post('/',
  */
 router.put('/:id',
   function (req, res) {
-    var db = req.db;
-    var id = req.params.id;
-    var down = JSON.parse(JSON.stringify(req.body));
-
-    db.query('update download set ? where id = ?', [down, id],
-      function (err, rows) {
-        if (err) {
-          res.send(err);
-        } else {
-          res.json(down);
-        }
-      }
-    );
+    download.modify(req, res);
   }
 );
 
@@ -102,33 +54,16 @@ router.put('/:id',
  */
 router.delete('/:id',
   function (req, res) {
-    var db = req.db;
-    var id = req.params.id;
-
-    db.query('delete from download where id = ?', id,
-      function (err) {
-        var status = (err === null);
-
-        res.json(status);
-      }
-    );
+    download.delete(req, res);
   }
 );
 
 /**
  * refresh the list of downloads
  */
-router.get('/refreshDownloads',
+router.get('/refresh',
   function (req, res) {
-    var db = req.db;
-    db.query('select * from download order by id',
-      function (err, rows) {
-        if (!err)
-          res.json(rows);
-        else
-          console.log('Error while performing Query.');
-      }
-    );
+    download.findAll(req, res);
   }
 );
 
