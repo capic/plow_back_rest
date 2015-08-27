@@ -4,25 +4,6 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-// database
-var mysql = require('mysql');
-var db = mysql.createConnection(
-    {
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'plowshare'
-    }
-);
-db.connect(
-    function (err) {
-        if (!err) {
-            console.log("Database is connected ... \n\n");
-        } else {
-            console.log("Error connecting database ... \n\n");
-        }
-    }
-);
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -30,11 +11,7 @@ var downloads = require('./routes/downloads');
 
 var app = express();
 
-// Make our db accessible to our router
-app.use(function(req,res,next){
-    req.db = db;
-    next();
-});
+app.set('models', require('./models'));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

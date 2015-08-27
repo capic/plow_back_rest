@@ -1,15 +1,18 @@
+var models  = require('../models');
 var express = require('express');
 var router = express.Router();
-var Download = require('../controllers/download');
-
-var download = new Download();
+var exec = require('child_process').exec;
 
 /**
  * get the list of download status
  */
 router.get('/status',
   function (req, res, next) {
-    download.findAllStatus(req, res);
+    models.downloadStatus.findAll()
+      .then(function(downloadStatus) {
+        res.json(downloadStatus);
+      }
+    );
   }
 );
 
@@ -18,7 +21,11 @@ router.get('/status',
  */
 router.get('/',
   function (req, res, next) {
-    download.findAll(req, res);
+    models.download.findAll()
+      .then(function(downloads) {
+        res.json(downloads);
+      }
+    );
   }
 );
 
@@ -27,7 +34,24 @@ router.get('/',
  */
 router.get('/:id',
   function (req, res, next) {
-   download.findById(req, res);
+   models.download.findById(req.params.id)
+     .then(function(download) {
+      res.json(download);
+     }
+   );
+  }
+);
+
+/**
+ * search downloads by name
+ */
+router.get('/search/:name',
+  function(req, res) {
+    models.download.findAll({where: {name: {$like: '%' + req.params.name + '%'}}})
+      .then(function(downloads) {
+        res.json(downloads);
+      }
+    );
   }
 );
 
@@ -36,7 +60,11 @@ router.get('/:id',
  */
 router.post('/',
   function (req, res) {
-    download.save(req, res);
+    models.download.create(JSON.parse(JSON.stringify(req.body)))
+      .then(function(download) {
+        res.json(download);
+      }
+    );
   }
 );
 
@@ -45,7 +73,14 @@ router.post('/',
  */
 router.put('/:id',
   function (req, res) {
-    download.modify(req, res);
+    var down = JSON.parse(JSON.stringify(req.body))
+
+    models.download.update(down, {where: {id: req.params.id}})
+      .then(function() {
+        down.id = req.params.id;
+        res.json(down);
+      }
+    );
   }
 );
 
@@ -54,7 +89,11 @@ router.put('/:id',
  */
 router.delete('/:id',
   function (req, res) {
-    download.delete(req, res);
+    models.download.destroy({where: {id: req.params.id}})
+      .then(function(ret) {
+        res.json(ret == 1);
+      }
+    );
   }
 );
 
@@ -63,7 +102,68 @@ router.delete('/:id',
  */
 router.get('/refresh',
   function (req, res) {
-    download.findAll(req, res);
+    models.download.findAll()
+      .then(function(downloads) {
+        res.json(downloads);
+      }
+    );
+  }
+);
+
+/**
+ * refresh a download by id
+ */
+router.get('/refresh/:id',
+  function(req, res) {
+    models.download.findById(req.params.id)
+      .then(function(download) {
+        res.json(download);
+      }
+    );
+  }
+);
+
+router.get('/downloads/availability/:id',
+  function(req, res) {
+    models.download.findById(req.params.id)
+      .then(function(download) {
+        // TODO: utiliser les constantes
+        if (download.status != 2 && download.status != 3) {
+          var command = '/usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' . download.link;
+          exec(command,
+            function(error, stdout, stderr) {
+              if (stdout.startsWith('#')) {
+                stdout = stdout.replace('# ', '');
+                var infos = JSON.parse(stdout);
+                download.name = infos.name;
+                download.size = infos.size;
+                download.status = 1; // TODO: utiliser une constante
+              } else {
+                download.name = download.link;
+                download.size = 0;
+                download.status = 4; // TODO: utiliser une constante
+              }
+
+              models.download.update(download, {where: {id: download.id}})
+                .then(function() {
+                  res.json(download);
+                }
+              );
+            }
+          );
+        }
+      }
+    );
+  }
+);
+
+router.get('/infos/:id',
+  function(req, res) {
+    router.get('/:id',
+      function (req, res, next) {
+
+      }
+    );
   }
 );
 
