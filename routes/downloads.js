@@ -123,16 +123,16 @@ router.get('/refresh/:id',
   }
 );
 
-router.get('/downloads/availability/:id',
+router.get('/availability/:id',
   function(req, res) {
     models.download.findById(req.params.id)
       .then(function(download) {
         // TODO: utiliser les constantes
         if (download.status != 2 && download.status != 3) {
-          var command = '/usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' . download.link;
+          var command = '/usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' + download.link;
           exec(command,
             function(error, stdout, stderr) {
-              if (stdout.startsWith('#')) {
+              if (stdout.substring(0 , 1) == '#') {
                 stdout = stdout.replace('# ', '');
                 var infos = JSON.parse(stdout);
                 download.name = infos.name;
@@ -143,7 +143,7 @@ router.get('/downloads/availability/:id',
                 download.size = 0;
                 download.status = 4; // TODO: utiliser une constante
               }
-
+              console.log(download);
               models.download.update(download, {where: {id: download.id}})
                 .then(function() {
                   res.json(download);
