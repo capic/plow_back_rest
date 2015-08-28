@@ -136,13 +136,18 @@ router.get('/availability/:id',
               var downloadSize = 0;
               var downloadStatus = 4; // TODO: utiliser une constante
 
-              /*if (stdout.substring(0 , 1) == '#') {
+              if (stdout.substring(0 , 1) == '#') {
                 stdout = stdout.replace('# ', '');
                 var infos = JSON.parse(stdout);
-                downloadName = infos.name;
-                downloadSize = infos.size;
+                if (infos.name != "") {
+                  downloadName = infos.name;
+                }
+                if (infos.size != "") {
+                  downloadSize = infos.size;
+                }
+
                 downloadStatus = 1; // TODO: utiliser une constante
-              }*/
+              }
 
               download.updateAttributes({name: downloadName, size_file: downloadSize, status: downloadStatus})
                 .then(function() {
