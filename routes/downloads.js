@@ -132,20 +132,21 @@ router.get('/availability/:id',
           var command = '/usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' + download.link;
           exec(command,
             function(error, stdout, stderr) {
+              var downloadName = download.link;
+              var downloadSize = 0;
+              var downloadStatus = 4; // TODO: utiliser une constante
+
+
               if (stdout.substring(0 , 1) == '#') {
                 stdout = stdout.replace('# ', '');
                 var infos = JSON.parse(stdout);
-                download.name = infos.name;
-                download.size = infos.size;
-                download.status = 1; // TODO: utiliser une constante
-              } else {
-                download.name = download.link;
-                download.size = 0;
-                download.status = 4; // TODO: utiliser une constante
+                downloadName = infos.name;
+                downloadSize = infos.size;
+                downloadStatus = 1; // TODO: utiliser une constante
               }
-              console.log(download);
-              models.download.update(download, {where: {id: download.id}})
-                .then(function() {
+
+              download.updateAttributes({name: downloadName, size_file: downloadSize, status: downloadStatus})
+                .success(function() {
                   res.json(download);
                 }
               );
