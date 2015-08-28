@@ -145,7 +145,7 @@ router.get('/availability/:id',
                   if (infos.name != "") {
                     downloadName = infos.name;
                   }
-                  if (infos.size != "") {
+                  if (infos.size != undefined && infos.size != "") {
                     downloadSize = infos.size;
                   }
 
