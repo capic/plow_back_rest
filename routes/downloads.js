@@ -182,13 +182,9 @@ router.get('/availability/:id',
  */
 router.get('/logs/:id',
     function (req, res) {
-        router.get('/:id',
-            function (req, res, next) {
-                models.downloadLogs.findById(req.params.id)
-                    .then(function (downloadLogs) {
-                        res.json(downloadLogs);
-                    }
-                )
+        models.downloadLogs.findById(req.params.id)
+            .then(function (downloadLogs) {
+                res.json(downloadLogs);
             }
         );
     }
@@ -197,7 +193,7 @@ router.get('/logs/:id',
 /**
  * delete a download logs by id
  */
-router.delete('/:id',
+router.delete('/logs/:id',
     function (req, res) {
         models.downloadLogs.destroy({where: {id: req.params.id}})
             .then(function (ret) {
