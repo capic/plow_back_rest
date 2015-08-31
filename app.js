@@ -12,6 +12,7 @@ var downloads = require('./routes/downloads');
 var app = express();
 
 app.set('models', require('./models'));
+app.set('websocket', require('./websocket'));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
