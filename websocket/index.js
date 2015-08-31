@@ -16,4 +16,4 @@ websocket.onopen = function(session) {
 
 websocket.open();
 
-module.export = sessionWebsocket;
+module.exports = sessionWebsocket;
