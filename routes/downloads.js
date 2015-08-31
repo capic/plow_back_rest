@@ -24,19 +24,7 @@ router.get('/',
     function (req, res, next) {
         models.download.findAll()
             .then(function (downloads) {
-                console.log(websocket);
-                websocket.session.publish ('com.myapp.topic1', [ "aaaa" ], {}, { acknowledge: true}).then(
-
-                    function(publication) {
-                        console.log("published, publication ID is ", publication);
-                    },
-
-                    function(error) {
-                        console.log("publication error", error);
-                    }
-
-                );
-
+                websocket.session.publish ('plow.downloads.downloads', downloads, {}, { acknowledge: false});
                 res.json(downloads);
             }
         );
@@ -76,6 +64,7 @@ router.post('/',
     function (req, res) {
         models.download.create(JSON.parse(JSON.stringify(req.body)))
             .then(function (download) {
+                //websocket.session.publish ('plow.downloads.downloads', download, {}, { acknowledge: false});
                 res.json(download);
             }
         );
@@ -227,6 +216,7 @@ router.put('/logs/:id',
         models.downloadLogs.update(down, {where: {id: req.params.id}})
             .then(function () {
                 downLogs.id = req.params.id;
+                websocket.session.publish ('plow.downloads.download.' + downLogs.id, [ downLogs ], {}, { acknowledge: false});
                 res.json(downLogs);
             }
         );
