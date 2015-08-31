@@ -1,7 +1,7 @@
 var models = require('../models');
 var express = require('express');
 var router = express.Router();
-var websocket = require('../websocket');
+var sessionWebsocket = require('../websocket');
 var exec = require('child_process').exec;
 
 /**
@@ -24,6 +24,18 @@ router.get('/',
     function (req, res, next) {
         models.download.findAll()
             .then(function (downloads) {
+                sessionWebsocket.publish ('com.myapp.topic1', [ "aaaa" ], {}, { acknowledge: true}).then(
+
+                    function(publication) {
+                        console.log("published, publication ID is ", publication);
+                    },
+
+                    function(error) {
+                        console.log("publication error", error);
+                    }
+
+                );
+
                 res.json(downloads);
             }
         );
