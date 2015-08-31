@@ -1,6 +1,7 @@
 var models = require('../models');
 var express = require('express');
 var router = express.Router();
+var websocket = require('../websocket');
 var exec = require('child_process').exec;
 
 /**
@@ -185,6 +186,35 @@ router.get('/logs/:id',
         models.downloadLogs.findById(req.params.id)
             .then(function (downloadLogs) {
                 res.json(downloadLogs);
+            }
+        );
+    }
+);
+
+/**
+ * add a new download logs
+ */
+router.post('/',
+    function (req, res) {
+        models.downloadLogs.create(JSON.parse(JSON.stringify(req.body)))
+            .then(function (downloadLogs) {
+                res.json(downloadLogs);
+            }
+        );
+    }
+);
+
+/**
+ * update a download logs by id
+ */
+router.put('/logs/:id',
+    function (req, res) {
+        var downLogs = JSON.parse(JSON.stringify(req.body))
+
+        models.downloadLogs.update(down, {where: {id: req.params.id}})
+            .then(function () {
+                downLogs.id = req.params.id;
+                res.json(downLogs);
             }
         );
     }
