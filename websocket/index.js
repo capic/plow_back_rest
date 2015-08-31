@@ -3,7 +3,7 @@
  */
 var autobahn = require('autobahn');
 
-var sessionWebsocket = {};
+var websocket = {};
 
 var websocket = new  autobahn.Connection({
    url: 'ws://capic.hd.free.fr:8181/ws',
@@ -11,9 +11,9 @@ var websocket = new  autobahn.Connection({
 });
 
 websocket.onopen = function(session) {
-    sessionWebsocket = session;
+    sessionWebsocket.session = session;
 };
 
 websocket.open();
 
-module.export = sessionWebsocket;
+module.export = websocket;

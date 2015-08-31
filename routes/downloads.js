@@ -24,7 +24,7 @@ router.get('/',
     function (req, res, next) {
         models.download.findAll()
             .then(function (downloads) {
-                websocket.sessionWebsocket.publish ('com.myapp.topic1', [ "aaaa" ], {}, { acknowledge: true}).then(
+                websocket.session.publish ('com.myapp.topic1', [ "aaaa" ], {}, { acknowledge: true}).then(
 
                     function(publication) {
                         console.log("published, publication ID is ", publication);
