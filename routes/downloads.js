@@ -38,51 +38,6 @@ router.get('/',
     }
 );
 
-/**
- * get a download by id
- */
-router.get('/:id',
-    function (req, res, next) {
-        models.download.findById(req.params.id)
-            .then(function (download) {
-                res.json(download);
-            }
-        );
-    }
-);
-
-/**
- * search downloads by name
- */
-router.get('/name/:name',
-    function (req, res) {
-        models.download.findAll({where: {name: {$like: '%' + req.params.name + '%'}}})
-            .then(function (downloads) {
-                res.json(downloads);
-            }
-        );
-    }
-);
-
-/**
- * search downloads by link
- */
-router.get('/link/:link',
-    function (req, res) {
-        models.download.findAll({where: {link: req.params.link}})
-            .then(function (downloads) {
-                res.json(downloads);
-            }
-        );
-    }
-);
-
-router.get('/next/path/:filePath',
-    function (req, res) {
-
-    }
-);
-
 router.get('/next',
     function (req, res) {
         if (req.query.file_path) {
@@ -125,6 +80,46 @@ router.get('/next',
         }
     }
 );
+
+/**
+ * get a download by id
+ */
+router.get('/:id',
+    function (req, res, next) {
+        models.download.findById(req.params.id)
+            .then(function (download) {
+                res.json(download);
+            }
+        );
+    }
+);
+
+/**
+ * search downloads by name
+ */
+router.get('/name/:name',
+    function (req, res) {
+        models.download.findAll({where: {name: {$like: '%' + req.params.name + '%'}}})
+            .then(function (downloads) {
+                res.json(downloads);
+            }
+        );
+    }
+);
+
+/**
+ * search downloads by link
+ */
+router.get('/link/:link',
+    function (req, res) {
+        models.download.findAll({where: {link: req.params.link}})
+            .then(function (downloads) {
+                res.json(downloads);
+            }
+        );
+    }
+);
+
 
 /**
  * add a new download
