@@ -25,8 +25,13 @@ router.get('/',
             res.json(downloads);
         };
 
-        if (req.query.link) {
-            models.download.findAll({where: {link: req.query.link}}).then(callback);
+        var params = {}
+        for (prop in req.query) {
+            params[prop] = req.query[prop];
+        }
+
+        if (Object.keys(params).length !== 0) {
+            models.download.findAll({where: params}).then(callback);
         } else {
             models.download.findAll().then(callback);
         }
@@ -72,74 +77,52 @@ router.get('/link/:link',
     }
 );
 
-/**
-* search downloads by status
-*/
-router.get('/status/:status',
-    function (req, res) {
-        models.download.findAll({where: {status: req.params.status}})
-            .then(function (downloads) {
-                res.json(downloads);
-            }
-        );
-    }
-);
-
-/**
- * search downloads by link and filePath
- */
-router.get('/link/:link/path/:filePath',
-    function (req, res) {
-        models.download.findAll({where: {link: req.params.link, file_path: req.params.path}})
-            .then(function (downloads) {
-                res.json(downloads);
-            }
-        );
-    }
-);
-
 router.get('/next/path/:filePath',
     function (req, res) {
-        sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
-            'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
-            'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
-            'lifecycle_insert_date, lifecycle_update_date ' +
-            ' FROM download ' +
-            ' WHERE status = :status and file_path = :file_path and priority = ' +
-            '   (SELECT MAX(priority) ' +
-            '   FROM download ' +
-            '   where status = :status and file_path = :file_path)' +
-            ' HAVING MIN(id)', {
-            replacements: {
-                status: 1,
-                file_path: req.params.filePath
-            },
-            type: sequelize.QueryTypes.SELECT
-        }).then(function(downloads) {
-            res.json(downloads);
-        });
+
     }
 );
 
 router.get('/next',
     function (req, res) {
-        sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
-            'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
-            'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
-            'lifecycle_insert_date, lifecycle_update_date ' +
-            ' FROM download ' +
-            ' WHERE status = :status and priority = ' +
-            '   (SELECT MAX(priority) ' +
-            '   FROM download ' +
-            '   where status = :status)' +
-            ' HAVING MIN(id)', {
-            replacements: {
-                status: 1
-            },
-            type: sequelize.QueryTypes.SELECT
-        }).then(function(downloads) {
-            res.json(downloads);
-        });
+        if (req.query.file_path) {
+            sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
+                'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
+                'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
+                'lifecycle_insert_date, lifecycle_update_date ' +
+                ' FROM download ' +
+                ' WHERE status = :status and file_path = :file_path and priority = ' +
+                '   (SELECT MAX(priority) ' +
+                '   FROM download ' +
+                '   where status = :status and file_path = :file_path)' +
+                ' HAVING MIN(id)', {
+                replacements: {
+                    status: 1,
+                    file_path: req.query.file_path
+                },
+                type: sequelize.QueryTypes.SELECT
+            }).then(function(downloads) {
+                res.json(downloads);
+            });
+        } else {
+            sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
+                'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
+                'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
+                'lifecycle_insert_date, lifecycle_update_date ' +
+                ' FROM download ' +
+                ' WHERE status = :status and priority = ' +
+                '   (SELECT MAX(priority) ' +
+                '   FROM download ' +
+                '   where status = :status)' +
+                ' HAVING MIN(id)', {
+                replacements: {
+                    status: 1
+                },
+                type: sequelize.QueryTypes.SELECT
+            }).then(function (downloads) {
+                res.json(downloads);
+            });
+        }
     }
 );
 
