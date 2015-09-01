@@ -22,12 +22,16 @@ router.get('/status',
  */
 router.get('/',
     function (req, res, next) {
-        models.download.findAll()
-            .then(function (downloads) {
-                websocket.session.publish ('plow.downloads.downloads', downloads, {}, { acknowledge: false});
-                res.json(downloads);
-            }
-        );
+        var callback = function (downloads) {
+            websocket.session.publish('plow.downloads.downloads', downloads, {}, {acknowledge: false});
+            res.json(downloads);
+        };
+
+        if (req.query.link) {
+            models.download.findAll({where: {link: req.query.link}}).then(callback);
+        } else {
+            models.download.findAll().then(callback);
+        }
     }
 );
 
@@ -47,13 +51,97 @@ router.get('/:id',
 /**
  * search downloads by name
  */
-router.get('/search/:name',
+router.get('/name/:name',
     function (req, res) {
         models.download.findAll({where: {name: {$like: '%' + req.params.name + '%'}}})
             .then(function (downloads) {
                 res.json(downloads);
             }
         );
+    }
+);
+
+/**
+ * search downloads by link
+ */
+router.get('/link/:link',
+    function (req, res) {
+        models.download.findAll({where: {link: req.params.link}})
+            .then(function (downloads) {
+                res.json(downloads);
+            }
+        );
+    }
+);
+
+/**
+* search downloads by status
+*/
+router.get('/status/:status',
+    function (req, res) {
+        models.download.findAll({where: {status: req.params.status}})
+            .then(function (downloads) {
+                res.json(downloads);
+            }
+        );
+    }
+);
+
+/**
+ * search downloads by link and filePath
+ */
+router.get('/link/:link/path/:filePath',
+    function (req, res) {
+        models.download.findAll({where: {link: req.params.link, file_path: req.params.path}})
+            .then(function (downloads) {
+                res.json(downloads);
+            }
+        );
+    }
+);
+
+router.get('/next/path/:filePath',
+    function (req, res) {
+        sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
+            'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
+            'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
+            'lifecycle_insert_date, lifecycle_update_date ' +
+            ' FROM download ' +
+            ' WHERE status = :status and file_path = :file_path and priority = ' +
+            '   (SELECT MAX(priority) ' +
+            '   FROM download ' +
+            '   where status = :status and file_path = :file_path)' +
+            ' HAVING MIN(id)', {
+            replacements: {
+                status: 1,
+                file_path: req.params.filePath
+            },
+            type: sequelize.QueryTypes.SELECT
+        }).then(function(downloads) {
+            res.json(downloads);
+        });
+    }
+);
+
+router.get('/next',
+    function (req, res) {
+        sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
+            'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
+            'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
+            'lifecycle_insert_date, lifecycle_update_date ' +
+            ' FROM download ' +
+            ' WHERE status = :status and priority = ' +
+            '   (SELECT MAX(priority) ' +
+            '   FROM download ' +
+            '   where status = :status)' +
+            ' HAVING MIN(id)', {
+            replacements: {
+                status: 1
+            },
+            type: sequelize.QueryTypes.SELECT
+        }).then(function(downloads) {
+            res.json(downloads);
+        });
     }
 );
 
@@ -216,7 +304,7 @@ router.put('/logs/:id',
         models.downloadLogs.update(down, {where: {id: req.params.id}})
             .then(function () {
                 downLogs.id = req.params.id;
-                websocket.session.publish ('plow.downloads.download.' + downLogs.id, [ downLogs ], {}, { acknowledge: false});
+                websocket.session.publish('plow.downloads.download.' + downLogs.id, [downLogs], {}, {acknowledge: false});
                 res.json(downLogs);
             }
         );
