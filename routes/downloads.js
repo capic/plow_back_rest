@@ -41,7 +41,7 @@ router.get('/',
 router.get('/next',
     function (req, res) {
         if (req.query.file_path) {
-            sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
+            models.sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
                 'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
                 'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
                 'lifecycle_insert_date, lifecycle_update_date ' +
@@ -55,12 +55,12 @@ router.get('/next',
                     status: 1,
                     file_path: req.query.file_path
                 },
-                type: sequelize.QueryTypes.SELECT
+                type: models.sequelize.QueryTypes.SELECT
             }).then(function(downloads) {
                 res.json(downloads);
             });
         } else {
-            sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
+            models.sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
                 'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
                 'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
                 'lifecycle_insert_date, lifecycle_update_date ' +
@@ -73,7 +73,7 @@ router.get('/next',
                 replacements: {
                     status: 1
                 },
-                type: sequelize.QueryTypes.SELECT
+                type: models.sequelize.QueryTypes.SELECT
             }).then(function (downloads) {
                 res.json(downloads);
             });
@@ -139,7 +139,7 @@ router.post('/',
  */
 router.put('/:id',
     function (req, res) {
-        var down = JSON.parse(JSON.stringify(req.body))
+        var down = JSON.parse(JSON.stringify(req.body));
 
         models.download.update(down, {where: {id: req.params.id}})
             .then(function () {
@@ -276,12 +276,17 @@ router.put('/logs/:id',
     function (req, res) {
         var downLogs = JSON.parse(JSON.stringify(req.body))
 
-        models.downloadLogs.update(down, {where: {id: req.params.id}})
-            .then(function () {
-                downLogs.id = req.params.id;
-                res.json(downLogs);
-            }
-        );
+        models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
+            'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=VALUES(:id), logs=VALUES(:logs)',
+            {
+                replacements: {
+                    id: downLogs.id,
+                    logs: downLogs.logs
+                },
+            type: models.sequelize.QueryTypes.UPSERT
+        }).then(function (downloads) {
+            res.json(downloads);
+        });
     }
 );
 

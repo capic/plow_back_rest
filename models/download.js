@@ -22,9 +22,9 @@ module.exports = function(sequelize, DataTypes) {
     file_path: DataTypes.STRING(2048),
     priority: DataTypes.INTEGER,
     //infos_plowdown: DataTypes.TEXT,
-    theorical_start_datetime: DataTypes.DATE,
+    theorical_start_datetime: {type: DataTypes.DATE, allowNull: true},
     lifecycle_insert_date: DataTypes.DATE,
-    lifecycle_update_date: DataTypes.DATE
+    lifecycle_update_date: {type: DataTypes.DATE, allowNull: true}
   }, {
     freezeTableName: true,
     createdAt: false,
