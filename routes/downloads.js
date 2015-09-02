@@ -277,7 +277,7 @@ router.put('/logs/:id',
         var downLogs = JSON.parse(JSON.stringify(req.body))
 
         models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
-            'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=VALUES(:id), logs=VALUES(:logs)',
+            'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
             {
                 replacements: {
                     id: downLogs.id,
