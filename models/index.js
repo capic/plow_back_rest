@@ -5,7 +5,9 @@ var fs        = require("fs");
 var path      = require("path");
 var Sequelize = require("sequelize");
 var env       = process.env.NODE_ENV || "development";
-var sequelize = new Sequelize("plowshare", "root", "", {host: 'localhost', dialect: 'mysql'});
+var config    = require("../configuration");
+var dbConfig  = config.get('db');
+var sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {host: dbConfig.host, dialect: 'mysql'});
 var db        = {};
 
 fs
