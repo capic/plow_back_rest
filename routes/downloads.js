@@ -1,6 +1,7 @@
 var models = require('../models');
 var express = require('express');
 var router = express.Router();
+var websocket = require('../websocket');
 var exec = require('child_process').exec;
 
 /**
@@ -22,6 +23,7 @@ router.get('/status',
 router.get('/',
     function (req, res, next) {
         var callback = function (downloads) {
+            websocket.session.publish('plow.downloads.downloads', downloads, {}, {acknowledge: false});
             res.json(downloads);
         };
 
@@ -128,6 +130,7 @@ router.post('/',
     function (req, res) {
         models.download.create(JSON.parse(JSON.stringify(req.body)))
             .then(function (download) {
+                //websocket.session.publish ('plow.downloads.downloads', download, {}, { acknowledge: false});
                 res.json(download);
             }
         );
