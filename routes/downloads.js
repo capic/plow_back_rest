@@ -23,7 +23,6 @@ router.get('/status',
 router.get('/',
     function (req, res, next) {
         var callback = function (downloads) {
-            websocket.session.publish('plow.downloads.downloads', downloads, {}, {acknowledge: false});
             res.json(downloads);
         };
 
@@ -147,6 +146,9 @@ router.put('/:id',
         models.download.update(down, {where: {id: req.params.id}})
             .then(function () {
                 down.id = req.params.id;
+
+                websocket.session.publish('plow.downloads.downloads', down, {}, {acknowledge: false});
+                websocket.session.publish('plow.downloads.download.' + down.id, down, {}, {acknowledge: false});
                 res.json(down);
             }
         );
