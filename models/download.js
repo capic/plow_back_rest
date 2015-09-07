@@ -38,8 +38,12 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: true,
                 get: function() {
                     var val = this.getDataValue('theorical_start_datetime');
-                    var date = new Date(val);
-                    return date.getTime();
+                    if (val != null && val !== '') {
+                        var date = new Date(val);
+                        return date.getTime();
+                    } else {
+                        return 0;
+                    }
                 }
             },
             lifecycle_insert_date: DataTypes.DATE,
