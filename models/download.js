@@ -6,7 +6,19 @@ module.exports = function (sequelize, DataTypes) {
             name: DataTypes.STRING,
             package: DataTypes.STRING,
             link: DataTypes.STRING(512),
-            size_file: DataTypes.INTEGER,
+            /*size_file: {
+                type: DataTypes.INTEGER,
+                set: function(val) {
+                    var size_file = this.getDataValue('size_file');
+                    if (size_file == null || size_file == 0)
+                    {
+                        this.setDataValue('size_file', val);
+                    } else {
+                        this.setDataValue('size_file', size_file);
+                    }
+                }
+            },*/
+            size_file:DataTypes.INTEGER,
             size_part: DataTypes.INTEGER,
             size_file_downloaded: DataTypes.INTEGER,
             size_part_downloaded: DataTypes.INTEGER,

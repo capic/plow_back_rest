@@ -145,11 +145,13 @@ router.put('/:id',
 
         models.download.update(down, {where: {id: req.params.id}})
             .then(function () {
-                down.id = req.params.id;
-
-                websocket.session.publish('plow.downloads.downloads', [down], {}, {acknowledge: false});
-                websocket.session.publish('plow.downloads.download.' + down.id, [down], {}, {acknowledge: false});
-                res.json(down);
+                models.download.findById(req.params.id)
+                    .then(function (download) {
+                        websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
+                        websocket.session.publish('plow.downloads.download.' + download.id, [download], {}, {acknowledge: false});
+                        res.json(download);
+                    }
+                );
             }
         );
     }
@@ -289,9 +291,13 @@ router.put('/logs/:id',
                     logs: downLogs.logs
                 },
             type: models.sequelize.QueryTypes.UPSERT
-        }).then(function (logs) {
-            websocket.session.publish('plow.downloads.logs.' + logs.id, [logs], {}, {acknowledge: false});
-            res.json(logs);
+        }).then(function () {
+            models.downloadLogs.create(JSON.parse(JSON.stringify(req.body)))
+                .then(function (downloadLogs) {
+                    websocket.session.publish('plow.downloads.logs.' + downloadLogs.id, [downloadLogs], {}, {acknowledge: false});
+                    res.json(downloadLogs);
+                }
+            );
         });
     }
 );
