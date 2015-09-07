@@ -142,8 +142,6 @@ router.post('/',
 router.put('/:id',
     function (req, res) {
         var down = JSON.parse(JSON.stringify(req.body));
-        console.log(req.body);
-        console.log(down);
         models.download.update(down, {where: {id: req.params.id}})
             .then(function () {
                 models.download.findById(req.params.id)
