@@ -129,7 +129,7 @@ router.post('/',
     function (req, res) {
         models.download.create(JSON.parse(JSON.stringify(req.body)))
             .then(function (download) {
-                //websocket.session.publish ('plow.downloads.downloads', download, {}, { acknowledge: false});
+                websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
                 res.json(download);
             }
         );
