@@ -147,8 +147,8 @@ router.put('/:id',
             .then(function () {
                 down.id = req.params.id;
 
-                websocket.session.publish('plow.downloads.downloads', down, {}, {acknowledge: false});
-                websocket.session.publish('plow.downloads.download.' + down.id, down, {}, {acknowledge: false});
+                websocket.session.publish('plow.downloads.downloads', [down], {}, {acknowledge: false});
+                websocket.session.publish('plow.downloads.download.' + down.id, [down], {}, {acknowledge: false});
                 res.json(down);
             }
         );
@@ -289,8 +289,9 @@ router.put('/logs/:id',
                     logs: downLogs.logs
                 },
             type: models.sequelize.QueryTypes.UPSERT
-        }).then(function (downloads) {
-            res.json(downloads);
+        }).then(function (logs) {
+            websocket.session.publish('plow.downloads.logs.' + logs.id, [logs], {}, {acknowledge: false});
+            res.json(logs);
         });
     }
 );
