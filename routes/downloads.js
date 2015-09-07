@@ -142,7 +142,8 @@ router.post('/',
 router.put('/:id',
     function (req, res) {
         var down = JSON.parse(JSON.stringify(req.body));
-
+        console.log(req.body);
+        console.log(down);
         models.download.update(down, {where: {id: req.params.id}})
             .then(function () {
                 models.download.findById(req.params.id)
@@ -292,7 +293,7 @@ router.put('/logs/:id',
                 },
             type: models.sequelize.QueryTypes.UPSERT
         }).then(function () {
-            models.downloadLogs.create(JSON.parse(JSON.stringify(req.body)))
+                models.downloadLogs.findById(req.params.id)
                 .then(function (downloadLogs) {
                     websocket.session.publish('plow.downloads.logs.' + downloadLogs.id, [downloadLogs], {}, {acknowledge: false});
                     res.json(downloadLogs);

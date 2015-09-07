@@ -33,7 +33,6 @@ module.exports = function (sequelize, DataTypes) {
             pid_python: DataTypes.INTEGER,
             file_path: DataTypes.STRING(2048),
             priority: DataTypes.INTEGER,
-            //infos_plowdown: DataTypes.TEXT,
             theorical_start_datetime: {type: DataTypes.DATE, allowNull: true},
             lifecycle_insert_date: DataTypes.DATE,
             lifecycle_update_date: {type: DataTypes.DATE, allowNull: true}
@@ -41,7 +40,7 @@ module.exports = function (sequelize, DataTypes) {
          {
             freezeTableName: true,
             createdAt: false,
-            updatedAt: false,
+            updatedAt: false/*,
              getterMethods: {
                  progress_file: function () {
                      var progress = 0;
