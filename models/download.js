@@ -47,7 +47,7 @@ module.exports = function (sequelize, Sequelize) {
                 }
             },
             lifecycle_insert_date: Sequelize.DATE,
-            lifecycle_update_date: {type: Sequelize.DATE, defaultValue: Sequelize.NOW}
+            lifecycle_update_date: Sequelize.DATE
         },
         {
             freezeTableName: true,
