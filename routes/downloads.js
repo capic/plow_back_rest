@@ -26,7 +26,7 @@ router.get('/',
             res.json(downloads);
         };
 
-        var params = {}
+        var params = {};
         for (prop in req.query) {
             params[prop] = req.query[prop];
         }

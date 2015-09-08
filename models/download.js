@@ -1,67 +1,67 @@
 /**
  * Created by Vincent on 27/08/2015.
  */
-module.exports = function (sequelize, DataTypes) {
+module.exports = function (sequelize, Sequelize) {
     var Download = sequelize.define('download', {
-            name: DataTypes.STRING,
-            package: DataTypes.STRING,
-            link: DataTypes.STRING(512),
+            name: Sequelize.STRING,
+            package: Sequelize.STRING,
+            link: Sequelize.STRING(512),
             size_file: {
-                type: DataTypes.INTEGER,
-                set: function(val) {
+                type: Sequelize.INTEGER,
+                set: function (val) {
                     var size_file = this.getDataValue('size_file');
-                    if (size_file == null || size_file == 0)
-                    {
+                    if (size_file == null || size_file == 0) {
                         this.setDataValue('size_file', val);
                     } else {
                         this.setDataValue('size_file', size_file);
                     }
                 }
             },
-            //size_file:DataTypes.INTEGER,
-            size_part: DataTypes.INTEGER,
-            size_file_downloaded: DataTypes.INTEGER,
-            size_part_downloaded: DataTypes.INTEGER,
-            status: DataTypes.INTEGER,
-            progress_part: DataTypes.INTEGER,
-            average_speed: DataTypes.INTEGER,
-            current_speed: DataTypes.INTEGER,
-            time_spent: DataTypes.INTEGER,
-            time_left: DataTypes.INTEGER,
-            pid_plowdown: DataTypes.INTEGER,
-            pid_curl: DataTypes.INTEGER,
-            pid_python: DataTypes.INTEGER,
-            file_path: DataTypes.STRING(2048),
-            priority: DataTypes.INTEGER,
+            //size_file:Sequelize.INTEGER,
+            size_part: Sequelize.INTEGER,
+            size_file_downloaded: Sequelize.INTEGER,
+            size_part_downloaded: Sequelize.INTEGER,
+            status: Sequelize.INTEGER,
+            progress_part: Sequelize.INTEGER,
+            average_speed: Sequelize.INTEGER,
+            current_speed: Sequelize.INTEGER,
+            time_spent: Sequelize.INTEGER,
+            time_left: Sequelize.INTEGER,
+            pid_plowdown: Sequelize.INTEGER,
+            pid_curl: Sequelize.INTEGER,
+            pid_python: Sequelize.INTEGER,
+            file_path: Sequelize.STRING(2048),
+            priority: Sequelize.INTEGER,
             theorical_start_datetime: {
-                type: DataTypes.DATE,
+                type: Sequelize.DATE,
                 allowNull: true,
-                get: function() {
+                defaultValue: null,
+                get: function () {
                     var val = this.getDataValue('theorical_start_datetime');
-                    if (val != null && val !== '') {
+                    if (val === undefined && val === null && val === 'null' && val === '') {
+                        return 0;
+                    } else {
                         var date = new Date(val);
                         return date.getTime();
-                    } else {
-                        return 0;
                     }
                 }
             },
-            lifecycle_insert_date: DataTypes.DATE,
-            lifecycle_update_date: {type: DataTypes.DATE, allowNull: true}
+            lifecycle_insert_date: Sequelize.DATE,
+            lifecycle_update_date: {type: Sequelize.DATE, defaultValue: Sequelize.NOW}
         },
-         {
+        {
             freezeTableName: true,
             createdAt: false,
             updatedAt: false,
-             getterMethods: {
-                 progress_file: function () {
-                     var progress = 0;
-                     if (this.size_file > 0) {
-                         progress = parseInt((this.size_file_downloaded * 100) / this.size_file);
-                     }
-                     return progress
-                 }
-             }
+            getterMethods: {
+                progress_file: function () {
+                    var progress = 0;
+                    if (this.size_file > 0) {
+                        progress = parseInt((this.size_file_downloaded * 100) / this.size_file);
+                    }
+                    return progress
+                }
+            }
             /*,
              classMethods: {
              associate: function(models) {
