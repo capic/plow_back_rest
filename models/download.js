@@ -17,7 +17,6 @@ module.exports = function (sequelize, Sequelize) {
                     }
                 }
             },
-            //size_file:Sequelize.INTEGER,
             size_part: Sequelize.INTEGER,
             size_file_downloaded: Sequelize.INTEGER,
             size_part_downloaded: Sequelize.INTEGER,
@@ -32,20 +31,7 @@ module.exports = function (sequelize, Sequelize) {
             pid_python: Sequelize.INTEGER,
             file_path: Sequelize.STRING(2048),
             priority: Sequelize.INTEGER,
-            theorical_start_datetime: {
-                type: Sequelize.DATE,
-                allowNull: true,
-                defaultValue: null,
-                get: function () {
-                    var val = this.getDataValue('theorical_start_datetime');
-                    if (val === undefined && val === null && val === 'null' && val === '') {
-                        return 0;
-                    } else {
-                        var date = new Date(val);
-                        return date.getTime();
-                    }
-                }
-            },
+            theorical_start_datetime: Sequelize.DATE,
             lifecycle_insert_date: Sequelize.DATE,
             lifecycle_update_date: Sequelize.DATE
         },
