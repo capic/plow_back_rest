@@ -5,16 +5,16 @@ var autobahn = require('autobahn');
 
 var sessionWebsocket = {};
 
-var websocket = new  autobahn.Connection({
+var connection = new  autobahn.Connection({
    url: 'ws://capic.hd.free.fr:8181/ws',
     realm: 'realm1'
 });
-sessionWebsocket.websocket = websocket;
+sessionWebsocket.connection = connection;
 
-websocket.onopen = function(session) {
+connection.onopen = function(session) {
     sessionWebsocket.session = session;
 };
 
-websocket.open();
+connection.open();
 
 module.exports = sessionWebsocket;
