@@ -12,6 +12,7 @@ var websocket = new  autobahn.Connection({
 
 websocket.onopen = function(session) {
     sessionWebsocket.session = session;
+    sessionWebsocket.websocket = websocket;
 };
 
 websocket.open();
