@@ -129,7 +129,10 @@ router.post('/',
     function (req, res) {
         models.download.create(JSON.parse(JSON.stringify(req.body)))
             .then(function (download) {
-                websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
+                if (websocket.isConnected()) {
+                    websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
+                }
+
                 res.json(download);
             }
         );
@@ -146,8 +149,10 @@ router.put('/:id',
             .then(function () {
                 models.download.findById(req.params.id)
                     .then(function (download) {
-                        websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
-                        websocket.session.publish('plow.downloads.download.' + download.id, [download], {}, {acknowledge: false});
+                        if (websocket.isConnected()) {
+                            websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
+                            websocket.session.publish('plow.downloads.download.' + download.id, [download], {}, {acknowledge: false});
+                        }
                         res.json(download);
                     }
                 );
@@ -293,7 +298,9 @@ router.put('/logs/:id',
         }).then(function () {
                 models.downloadLogs.findById(req.params.id)
                 .then(function (downloadLogs) {
-                    websocket.session.publish('plow.downloads.logs.' + downloadLogs.id, [downloadLogs], {}, {acknowledge: false});
+                    if (websocket.isConnected()) {
+                        websocket.session.publish('plow.downloads.logs.' + downloadLogs.id, [downloadLogs], {}, {acknowledge: false});
+                    }
                     res.json(downloadLogs);
                 }
             );
