@@ -129,7 +129,7 @@ router.post('/',
     function (req, res) {
         models.download.create(JSON.parse(JSON.stringify(req.body)))
             .then(function (download) {
-                if (websocket.websocket.isConnected()) {
+                if (websocket.session.isOpen()) {
                     websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
                 }
 
@@ -149,7 +149,7 @@ router.put('/:id',
             .then(function () {
                 models.download.findById(req.params.id)
                     .then(function (download) {
-                        if (websocket.websocket.isConnected()) {
+                        if (websocket.session.isOpen()) {
                             websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
                             websocket.session.publish('plow.downloads.download.' + download.id, [download], {}, {acknowledge: false});
                         }
@@ -298,7 +298,7 @@ router.put('/logs/:id',
         }).then(function () {
                 models.downloadLogs.findById(req.params.id)
                 .then(function (downloadLogs) {
-                    if (websocket.websocket.isConnected()) {
+                    if (websocket.session.isOpen()) {
                         websocket.session.publish('plow.downloads.logs.' + downloadLogs.id, [downloadLogs], {}, {acknowledge: false});
                     }
                     res.json(downloadLogs);

@@ -9,10 +9,10 @@ var websocket = new  autobahn.Connection({
    url: 'ws://capic.hd.free.fr:8181/ws',
     realm: 'realm1'
 });
+sessionWebsocket.websocket = websocket;
 
 websocket.onopen = function(session) {
     sessionWebsocket.session = session;
-    sessionWebsocket.websocket = websocket;
 };
 
 websocket.open();
