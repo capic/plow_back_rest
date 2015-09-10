@@ -2,7 +2,9 @@
  * Created by Vincent on 31/08/2015.
  */
 var autobahn = require('autobahn');
+var config = require("../configuration");
 
+var websocketConfig  = config.get('notification');
 var sessionWebsocket = {};
 
 var connection = new  autobahn.Connection({
@@ -15,6 +17,8 @@ connection.onopen = function(session) {
     sessionWebsocket.session = session;
 };
 
-connection.open();
+if (websocketConfig.activated && !connection.isOpen) {
+    connection.open();
+}
 
 module.exports = sessionWebsocket;

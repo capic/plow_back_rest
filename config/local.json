@@ -4,5 +4,9 @@
     "database": "plowshare",
     "user": "root",
     "password": ""
+  },
+  "notification": {
+    "activate": "true",
+    "address": "ws://capic.hd.free.fr:8181/ws"
   }
 }
