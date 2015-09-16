@@ -10,8 +10,8 @@ var exec = require('child_process').exec;
 router.get('/status',
     function (req, res, next) {
         models.downloadStatus.findAll()
-            .then(function (downloadStatus) {
-                res.json(downloadStatus);
+            .then(function (downloadStatusModel) {
+                res.json(downloadStatusModel);
             }
         );
     }
@@ -22,8 +22,8 @@ router.get('/status',
  */
 router.get('/',
     function (req, res, next) {
-        var callback = function (downloads) {
-            res.json(downloads);
+        var callback = function (downloadsModel) {
+            res.json(downloadsModel);
         };
 
         var params = {};
@@ -39,6 +39,9 @@ router.get('/',
     }
 );
 
+/**
+ * get the next download
+ */
 router.get('/next',
     function (req, res) {
         if (req.query.file_path) {
@@ -57,8 +60,8 @@ router.get('/next',
                     file_path: req.query.file_path
                 },
                 type: models.sequelize.QueryTypes.SELECT
-            }).then(function(downloads) {
-                res.json(downloads);
+            }).then(function (downloadsModel) {
+                res.json(downloadsModel);
             });
         } else {
             models.sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
@@ -75,8 +78,8 @@ router.get('/next',
                     status: 1
                 },
                 type: models.sequelize.QueryTypes.SELECT
-            }).then(function (downloads) {
-                res.json(downloads);
+            }).then(function (downloadsModel) {
+                res.json(downloadsModel);
             });
         }
     }
@@ -88,8 +91,8 @@ router.get('/next',
 router.get('/:id',
     function (req, res, next) {
         models.download.findById(req.params.id)
-            .then(function (download) {
-                res.json(download);
+            .then(function (downloadModel) {
+                res.json(downloadModel);
             }
         );
     }
@@ -101,8 +104,8 @@ router.get('/:id',
 router.get('/name/:name',
     function (req, res) {
         models.download.findAll({where: {name: {$like: '%' + req.params.name + '%'}}})
-            .then(function (downloads) {
-                res.json(downloads);
+            .then(function (downloadsModel) {
+                res.json(downloadsModel);
             }
         );
     }
@@ -114,8 +117,8 @@ router.get('/name/:name',
 router.get('/link/:link',
     function (req, res) {
         models.download.findAll({where: {link: req.params.link}})
-            .then(function (downloads) {
-                res.json(downloads);
+            .then(function (downloadsModel) {
+                res.json(downloadsModel);
             }
         );
     }
@@ -128,12 +131,12 @@ router.get('/link/:link',
 router.post('/',
     function (req, res) {
         models.download.create(JSON.parse(JSON.stringify(req.body)))
-            .then(function (download) {
+            .then(function (downloadModel) {
                 if (websocket.connection.isOpen) {
-                    websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
+                    websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
                 }
 
-                res.json(download);
+                res.json(downloadModel);
             }
         );
     }
@@ -144,16 +147,16 @@ router.post('/',
  */
 router.put('/:id',
     function (req, res) {
-        var down = JSON.parse(JSON.stringify(req.body));
-        models.download.update(down, {where: {id: req.params.id}})
+        var downloadObject = JSON.parse(JSON.stringify(req.body));
+        models.download.update(downloadObject, {where: {id: req.params.id}})
             .then(function () {
                 models.download.findById(req.params.id)
-                    .then(function (download) {
+                    .then(function (downloadModel) {
                         if (websocket.connection.isOpen) {
-                            websocket.session.publish('plow.downloads.downloads', [download], {}, {acknowledge: false});
-                            websocket.session.publish('plow.downloads.download.' + download.id, [download], {}, {acknowledge: false});
+                            websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                            websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
                         }
-                        res.json(download);
+                        res.json(downloadModel);
                     }
                 );
             }
@@ -174,12 +177,25 @@ router.delete('/:id',
     }
 );
 
-//router.post('/priority',
-//    function(req, res) {
-//        var down = JSON.parse(JSON.stringify(req.body))
-//        models.download.update()
-//    }
-//);
+/**
+ * update the priority
+ */
+router.post('/priority',
+    function(req, res) {
+        var downloadObject = JSON.parse(JSON.stringify(req.body));
+
+        models.download.findById(downloadObject.id).then(
+            function(downloadModel) {
+                downloadModel.updateAttributes({
+                    priority: downloadObject.priority
+                }).then(function () {
+                        res.json(downloadModel);
+                    }
+                );
+            }
+        );
+    }
+);
 
 /**
  * refresh the list of downloads
@@ -187,8 +203,8 @@ router.delete('/:id',
 router.get('/refresh',
     function (req, res) {
         models.download.findAll()
-            .then(function (downloads) {
-                res.json(downloads);
+            .then(function (downloadsModel) {
+                res.json(downloadsModel);
             }
         );
     }
@@ -200,8 +216,8 @@ router.get('/refresh',
 router.get('/refresh/:id',
     function (req, res) {
         models.download.findById(req.params.id)
-            .then(function (download) {
-                res.json(download);
+            .then(function (downloadModel) {
+                res.json(downloadModel);
             }
         );
     }
@@ -210,17 +226,17 @@ router.get('/refresh/:id',
 router.get('/availability/:id',
     function (req, res) {
         models.download.findById(req.params.id)
-            .then(function (download) {
+            .then(function (downloadModel) {
                 // TODO: utiliser les constantes
-                if (download.status != 2 && download.status != 3) {
-                    var command = '/usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' + download.link;
+                if (downloadModel.status != 2 && downloadModel.status != 3) {
+                    var command = '/usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' + downloadModel.link;
                     exec(command,
                         function (error, stdout, stderr) {
                             if (error) {
                                 res.json(false);
                             } else {
-                                var downloadName = download.link;
-                                var downloadSize = download.size_file;
+                                var downloadName = downloadModel.link;
+                                var downloadSize = downloadModel.size_file;
                                 var downloadStatus = 4; // TODO: utiliser une constante
 
                                 if (stdout.substring(0, 1) == '#') {
@@ -236,13 +252,13 @@ router.get('/availability/:id',
                                     downloadStatus = 1; // TODO: utiliser une constante
                                 }
 
-                                download.updateAttributes({
+                                downloadModel.updateAttributes({
                                     name: downloadName,
                                     size_file: downloadSize,
                                     status: downloadStatus
                                 })
                                     .then(function () {
-                                        res.json(download);
+                                        res.json(downloadModel);
                                     }
                                 );
                             }
@@ -260,8 +276,8 @@ router.get('/availability/:id',
 router.get('/logs/:id',
     function (req, res) {
         models.downloadLogs.findById(req.params.id)
-            .then(function (downloadLogs) {
-                res.json(downloadLogs);
+            .then(function (downloadLogsModel) {
+                res.json(downloadLogsModel);
             }
         );
     }
@@ -273,8 +289,8 @@ router.get('/logs/:id',
 router.post('/',
     function (req, res) {
         models.downloadLogs.create(JSON.parse(JSON.stringify(req.body)))
-            .then(function (downloadLogs) {
-                res.json(downloadLogs);
+            .then(function (downloadLogsModel) {
+                res.json(downloadLogsModel);
             }
         );
     }
@@ -285,26 +301,26 @@ router.post('/',
  */
 router.put('/logs/:id',
     function (req, res) {
-        var downLogs = JSON.parse(JSON.stringify(req.body))
+        var downLogsObject = JSON.parse(JSON.stringify(req.body))
 
         models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
             'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
             {
                 replacements: {
-                    id: downLogs.id,
-                    logs: downLogs.logs
+                    id: downLogsObject.id,
+                    logs: downLogsObject.logs
                 },
-            type: models.sequelize.QueryTypes.UPSERT
-        }).then(function () {
+                type: models.sequelize.QueryTypes.UPSERT
+            }).then(function () {
                 models.downloadLogs.findById(req.params.id)
-                .then(function (downloadLogs) {
-                    if (websocket.connection.isOpen) {
-                        websocket.session.publish('plow.downloads.logs.' + downloadLogs.id, [downloadLogs], {}, {acknowledge: false});
+                    .then(function (downloadLogsModel) {
+                        if (websocket.connection.isOpen) {
+                            websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
+                        }
+                        res.json(downloadLogsModel);
                     }
-                    res.json(downloadLogs);
-                }
-            );
-        });
+                );
+            });
     }
 );
 

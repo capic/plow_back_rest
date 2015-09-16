@@ -17,6 +17,10 @@ connection.onopen = function(session) {
     sessionWebsocket.session = session;
 };
 
+connection.onclose = function(reason, details) {
+    console.log("Connection websocket fermée, raison: " + reason);
+}
+
 if (websocketConfig.activated && !connection.isOpen) {
     connection.open();
 }

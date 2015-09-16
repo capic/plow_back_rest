@@ -6,7 +6,7 @@
     "password": ""
   },
   "notification": {
-    "activate": "true",
+    "activated": true,
     "address": "ws://capic.hd.free.fr:8181/ws"
   }
 }
