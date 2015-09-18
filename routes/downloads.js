@@ -270,6 +270,36 @@ router.get('/availability/:id',
     }
 );
 
+router.post('/move',
+    function(req, res) {
+        var downloadObject = JSON.parse(JSON.stringify(req.body));
+
+        models.download.findById(downloadObject.id)
+            .then(function(downloadModel) {
+                // TODO: utiliser les constantes
+                if (downloadModel.status == 3) {
+                    var command = 'ssh root@192.168.1.200 cp ' + downloadModel.directory  + ' ' + downloadObject.directory;
+                    exec(command,
+                        function(error, stdout, stderr) {
+                            if (error) {
+                                res.json(false);
+                            } else {
+                                downloadModel.updateAttributes({
+                                    directory: downloadObject.directory
+                                })
+                                    .then(function () {
+                                        res.json(downloadModel);
+                                    }
+                                );
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    }
+);
+
 /**
  * get download logs by id
  */

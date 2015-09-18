@@ -26,6 +26,7 @@ module.exports = function (sequelize, Sequelize) {
             current_speed: Sequelize.INTEGER,
             time_spent: Sequelize.INTEGER,
             time_left: Sequelize.INTEGER,
+            directory: Sequelize.STRING,
             pid_plowdown: Sequelize.INTEGER,
             pid_curl: Sequelize.INTEGER,
             pid_python: Sequelize.INTEGER,
