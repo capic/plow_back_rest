@@ -278,7 +278,7 @@ router.post('/move',
             .then(function(downloadModel) {
                 // TODO: utiliser les constantes
                 if (downloadModel.status == 3) {
-                    var command = 'ssh root@192.168.1.200 cp ' + downloadModel.directory  + ' ' + downloadObject.directory;
+                    var command = 'ssh root@192.168.1.200 cp "' + downloadModel.directory  + '" "' + downloadObject.directory + '"';
                     exec(command,
                         function(error, stdout, stderr) {
                             if (error) {
