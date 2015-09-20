@@ -284,14 +284,18 @@ router.post('/move',
                             if (error) {
                                 res.json(false);
                             } else {
-                                downloadModel.updateAttributes({
-                                    directory: downloadObject.directory
-                                })
+                                downloadModel.updateAttributes({directory: downloadObject.directory})
                                     .then(function () {
                                         res.json(downloadModel);
                                     }
                                 );
                             }
+                        }
+                    );
+                } else {
+                    downloadModel.updateAttributes({directory: downloadObject.directory})
+                        .then(function () {
+                            res.json(downloadModel);
                         }
                     );
                 }

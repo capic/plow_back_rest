@@ -14,11 +14,12 @@ var connection = new  autobahn.Connection({
 sessionWebsocket.connection = connection;
 
 connection.onopen = function(session) {
+    console.log("Connexion websocket OK");
     sessionWebsocket.session = session;
 };
 
 connection.onclose = function(reason, details) {
-    console.log("Connection websocket fermée, raison: " + reason);
+    console.log("Connexion websocket fermée, raison: " + reason + ", details: " + details.reason + " " + details.message);
 }
 
 if (websocketConfig.activated && !connection.isOpen) {
