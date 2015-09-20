@@ -280,7 +280,7 @@ router.post('/move',
                 if (downloadModel.status == 3) {
                     var oldDirectory = downloadModel.directory.replace(/\s/g, "\\\\ ");
                     var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
-                    var command = 'ssh root@192.168.1.200 cp ' + oldDirectory + ' ' + newDirectory;
+                    var command = 'ssh root@192.168.1.200 cp ' + oldDirectory + downloadModel.name + ' ' + newDirectory;
                     exec(command,
                         function(error, stdout, stderr) {
                             if (error) {
