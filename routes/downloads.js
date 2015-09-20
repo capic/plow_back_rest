@@ -284,7 +284,7 @@ router.post('/move',
                     exec(command,
                         function(error, stdout, stderr) {
                             if (error) {
-                                res.json(false);
+                                res.send(error);
                             } else {
                                 downloadModel.updateAttributes({directory: downloadObject.directory})
                                     .then(function () {
