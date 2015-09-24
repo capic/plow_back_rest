@@ -287,10 +287,12 @@ router.post('/move',
                             exec(command,
                                 function (error, stdout, stderr) {
                                     var directory = downloadObject.directory;
-                                    var status = downloadModel.status;
+                                    // TODO: utiliser les constantes
+                                    var status = 11;
 
                                     if (error) {
                                         directory = downloadModel.directory;
+                                        // TODO: utiliser les constantes
                                         status = 10;
                                     }
 
