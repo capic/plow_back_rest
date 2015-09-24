@@ -278,22 +278,31 @@ router.post('/move',
             .then(function(downloadModel) {
                 // TODO: utiliser les constantes
                 if (downloadModel.status == 3) {
-                    var oldDirectory = downloadModel.directory.replace(/\s/g, "\\\\ ");
-                    var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
-                    var command = 'ssh root@192.168.1.200 mv ' + oldDirectory + downloadModel.name + ' ' + newDirectory;
-                    exec(command,
-                        function(error, stdout, stderr) {
-                            if (error) {
-                                res.send(error);
-                            } else {
-                                downloadModel.updateAttributes({directory: downloadObject.directory})
-                                    .then(function () {
-                                        res.json(downloadModel);
+                    // TODO: utiliser les constantes
+                    downloadModel.updateAttributes({status: 9})
+                        .then(function () {
+                            var oldDirectory = downloadModel.directory.replace(/\s/g, "\\\\ ");
+                            var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
+                            var command = 'ssh root@192.168.1.200 mv ' + oldDirectory + downloadModel.name + ' ' + newDirectory;
+                            exec(command,
+                                function (error, stdout, stderr) {
+                                    var directory = downloadObject.directory;
+                                    var status = downloadModel.status;
+
+                                    if (error) {
+                                        directory = downloadModel.directory;
+                                        status = 10;
                                     }
-                                );
-                            }
+
+                                    downloadModel.updateAttributes({directory: directory, status: status})
+                                        .then(function () {
+                                            res.json(downloadModel);
+                                        }
+                                    );
+                                }
+                            );
                         }
-                    );
+                    )
                 } else {
                     downloadModel.updateAttributes({directory: downloadObject.directory})
                         .then(function () {
@@ -301,6 +310,7 @@ router.post('/move',
                         }
                     );
                 }
+
             }
         );
     }
