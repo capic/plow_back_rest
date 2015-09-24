@@ -171,7 +171,7 @@ router.delete('/:id',
     function (req, res) {
         models.download.destroy({where: {id: req.params.id}})
             .then(function (ret) {
-                res.json(ret == 1);
+                res.json({'return': ret == 1});
             }
         );
     }
