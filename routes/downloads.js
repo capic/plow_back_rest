@@ -277,13 +277,14 @@ router.post('/move',
         models.download.findById(downloadObject.id)
             .then(function(downloadModel) {
                 // TODO: utiliser les constantes
-                if (downloadModel.status == 3) {
+                if (downloadModel.status == 3 || downloadModel.status == 10 || downloadModel.status == 11) {
                     // TODO: utiliser les constantes
                     downloadModel.updateAttributes({status: 9})
                         .then(function () {
                             var oldDirectory = downloadModel.directory.replace(/\s/g, "\\\\ ");
                             var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
-                            var command = 'ssh root@192.168.1.200 mv ' + oldDirectory + downloadModel.name + ' ' + newDirectory;
+                            var name = downloadModel.name.replace(/\s/g, "\\\\ ");
+                            var command = 'ssh root@192.168.1.200 mv ' + oldDirectory + name + ' ' + newDirectory;
                             exec(command,
                                 function (error, stdout, stderr) {
                                     var directory = downloadObject.directory;
