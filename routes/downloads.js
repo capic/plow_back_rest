@@ -4,6 +4,8 @@ var router = express.Router();
 var websocket = require('../websocket');
 var exec = require('child_process').exec;
 
+const SERVER = "192.168.1.200";
+
 /**
  * get the list of download status
  */
@@ -284,7 +286,7 @@ router.post('/move',
                             var oldDirectory = downloadModel.directory.replace(/\s/g, "\\\\ ");
                             var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
                             var name = downloadModel.name.replace(/\s/g, "\\\\ ");
-                            var command = 'ssh root@192.168.1.200 mv ' + oldDirectory + name + ' ' + newDirectory;
+                            var command = 'ssh root@' + SERVER + ' mv ' + oldDirectory + name + ' ' + newDirectory;
                             exec(command,
                                 function (error, stdout, stderr) {
                                     var directory = downloadObject.directory;
@@ -316,6 +318,25 @@ router.post('/move',
 
             }
         );
+    }
+);
+
+router.post('/unrar',
+    function(req, res) {
+        var downloadObject = JSON.parse(JSON.stringify(req.body));
+
+        var command = 'ssh root@' + SERVER + ' python /var/wwww/download_basic.py unrar ' + downloadObject.id;
+        var child = exec(command);
+
+        child.stdout.on('data', function(data) {
+            console.log('stdout: ' + data);
+        });
+        child.stderr.on('data', function(data) {
+            console.log('stdout: ' + data);
+        });
+        child.on('close', function(code) {
+            console.log('closing code: ' + code);
+        });
     }
 );
 
