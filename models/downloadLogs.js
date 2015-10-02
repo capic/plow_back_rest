@@ -2,7 +2,7 @@
  * Created by Vincent on 27/08/2015.
  */
 module.exports = function(sequelize, DataTypes) {
-  var DownloadLogs = sequelize.define('downloadLogs', {
+  var DownloadLogs = sequelize.define('DownloadLogs', {
     logs: DataTypes.STRING
   }, {
     freezeTableName: true,

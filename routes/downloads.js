@@ -11,7 +11,7 @@ const SERVER = "192.168.1.200";
  */
 router.get('/status',
     function (req, res, next) {
-        models.downloadStatus.findAll()
+        models.DownloadStatus.findAll()
             .then(function (downloadStatusModel) {
                 res.json(downloadStatusModel);
             }
@@ -34,9 +34,9 @@ router.get('/',
         }
 
         if (Object.keys(params).length !== 0) {
-            models.download.findAll({where: params}).then(callback);
+            models.Download.findAll({where: params, include: [{model: models.DownloadPackage, as:'download_package'}]}).then(callback);
         } else {
-            models.download.findAll().then(callback);
+            models.Download.findAll({include: [{model: models.DownloadPackage, as:'download_package'}]}).then(callback);
         }
     }
 );
@@ -92,7 +92,7 @@ router.get('/next',
  */
 router.get('/:id',
     function (req, res, next) {
-        models.download.findById(req.params.id)
+        models.Download.findById(req.params.id)
             .then(function (downloadModel) {
                 res.json(downloadModel);
             }
@@ -105,7 +105,7 @@ router.get('/:id',
  */
 router.get('/name/:name',
     function (req, res) {
-        models.download.findAll({where: {name: {$like: '%' + req.params.name + '%'}}})
+        models.Download.findAll({where: {name: {$like: '%' + req.params.name + '%'}}})
             .then(function (downloadsModel) {
                 res.json(downloadsModel);
             }
@@ -118,7 +118,7 @@ router.get('/name/:name',
  */
 router.get('/link/:link',
     function (req, res) {
-        models.download.findAll({where: {link: req.params.link}})
+        models.Download.findAll({where: {link: req.params.link}})
             .then(function (downloadsModel) {
                 res.json(downloadsModel);
             }
@@ -132,7 +132,8 @@ router.get('/link/:link',
  */
 router.post('/',
     function (req, res) {
-        models.download.create(JSON.parse(JSON.stringify(req.body)))
+        var a =JSON.parse(JSON.stringify(req.body));
+        models.Download.create(JSON.parse(JSON.stringify(req.body)))
             .then(function (downloadModel) {
                 if (websocket.connection.isOpen) {
                     websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
@@ -150,9 +151,9 @@ router.post('/',
 router.put('/:id',
     function (req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
-        models.download.update(downloadObject, {where: {id: req.params.id}})
+        models.Download.update(downloadObject, {where: {id: req.params.id}})
             .then(function () {
-                models.download.findById(req.params.id)
+                models.Download.findById(req.params.id)
                     .then(function (downloadModel) {
                         if (websocket.connection.isOpen) {
                             websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
@@ -171,7 +172,7 @@ router.put('/:id',
  */
 router.delete('/:id',
     function (req, res) {
-        models.download.destroy({where: {id: req.params.id}})
+        models.Download.destroy({where: {id: req.params.id}})
             .then(function (ret) {
                 res.json({'return': ret == 1});
             }
@@ -186,7 +187,7 @@ router.post('/priority',
     function(req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
-        models.download.findById(downloadObject.id).then(
+        models.Download.findById(downloadObject.id).then(
             function(downloadModel) {
                 downloadModel.updateAttributes({
                     priority: downloadObject.priority
@@ -204,7 +205,7 @@ router.post('/priority',
  */
 router.get('/refresh',
     function (req, res) {
-        models.download.findAll()
+        models.Download.findAll()
             .then(function (downloadsModel) {
                 res.json(downloadsModel);
             }
@@ -217,7 +218,7 @@ router.get('/refresh',
  */
 router.get('/refresh/:id',
     function (req, res) {
-        models.download.findById(req.params.id)
+        models.Download.findById(req.params.id)
             .then(function (downloadModel) {
                 res.json(downloadModel);
             }
@@ -227,7 +228,7 @@ router.get('/refresh/:id',
 
 router.get('/availability/:id',
     function (req, res) {
-        models.download.findById(req.params.id)
+        models.Download.findById(req.params.id)
             .then(function (downloadModel) {
                 // TODO: utiliser les constantes
                 if (downloadModel.status != 2 && downloadModel.status != 3) {
@@ -276,7 +277,7 @@ router.post('/move',
     function(req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
-        models.download.findById(downloadObject.id)
+        models.Download.findById(downloadObject.id)
             .then(function(downloadModel) {
                 // TODO: utiliser les constantes
                 if (downloadModel.status == 3 || downloadModel.status == 10 || downloadModel.status == 11) {
@@ -345,7 +346,7 @@ router.post('/unrar',
  */
 router.get('/logs/:id',
     function (req, res) {
-        models.downloadLogs.findById(req.params.id)
+        models.DownloadLogs.findById(req.params.id)
             .then(function (downloadLogsModel) {
                 res.json(downloadLogsModel);
             }
@@ -358,7 +359,7 @@ router.get('/logs/:id',
  */
 router.post('/',
     function (req, res) {
-        models.downloadLogs.create(JSON.parse(JSON.stringify(req.body)))
+        models.DownloadLogs.create(JSON.parse(JSON.stringify(req.body)))
             .then(function (downloadLogsModel) {
                 res.json(downloadLogsModel);
             }
@@ -382,7 +383,7 @@ router.put('/logs/:id',
                 },
                 type: models.sequelize.QueryTypes.UPSERT
             }).then(function () {
-                models.downloadLogs.findById(req.params.id)
+                models.DownloadLogs.findById(req.params.id)
                     .then(function (downloadLogsModel) {
                         if (websocket.connection.isOpen) {
                             websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
@@ -399,12 +400,22 @@ router.put('/logs/:id',
  */
 router.delete('/logs/:id',
     function (req, res) {
-        models.downloadLogs.destroy({where: {id: req.params.id}})
+        models.DownloadLogs.destroy({where: {id: req.params.id}})
             .then(function (ret) {
                 res.json(ret == 1);
             }
         );
     }
+);
+
+router.post('/package',
+  function (req, res) {
+      models.DownloadPackage.create(JSON.parse(JSON.stringify(req.body)))
+        .then(function (downloadPackageModel) {
+            res.json(downloadPackageModel);
+        }
+      );
+  }
 );
 
 module.exports = router;

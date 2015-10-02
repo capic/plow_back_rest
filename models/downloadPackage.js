@@ -2,20 +2,20 @@
  * Created by Vincent on 27/08/2015.
  */
 module.exports = function(sequelize, DataTypes) {
-  var DownloadStatus = sequelize.define('DownloadStatus', {
+  var DownloadPackage = sequelize.define('DownloadPackage', {
     name: DataTypes.STRING,
-    ord: DataTypes.INTEGER
+    unrar_progress: DataTypes.INTEGER
   }, {
     freezeTableName: true,
     createdAt: false,
     updatedAt: false,
-    tableName: 'download_status'/*,
+    tableName: 'download_package',
     classMethods: {
       associate: function(models) {
-        DownloadStatus.hasMany(models.download)
+        DownloadPackage.hasMany(models.Download, {foreignKey: 'package_id', as:'download_package'})
       }
-    }*/
+    }
   });
 
-  return DownloadStatus;
+  return DownloadPackage;
 };
