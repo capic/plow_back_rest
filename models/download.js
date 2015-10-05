@@ -38,7 +38,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         {
             freezeTableName: true,
-            tablename: 'download',
+            tableName: 'download',
             createdAt: false,
             updatedAt: false,
             getterMethods: {
