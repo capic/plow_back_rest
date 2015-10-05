@@ -4,7 +4,10 @@
 module.exports = function (sequelize, DataTypes) {
     var Download = sequelize.define('Download', {
             name: DataTypes.STRING,
-            package_id: DataTypes.INTEGER,
+            package_id: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
             link: DataTypes.STRING(512),
             size_file: {
                 type: DataTypes.INTEGER,
