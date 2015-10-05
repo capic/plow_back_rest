@@ -37,7 +37,7 @@ module.exports = function (sequelize, DataTypes) {
             lifecycle_update_date: DataTypes.DATE
         },
         {
-            freezeTableName: true,
+            //freezeTableName: true,
             tablename: 'download',
             createdAt: false,
             updatedAt: false,

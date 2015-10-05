@@ -69,6 +69,10 @@ router.get('/next',
                     status: 1,
                     file_path: req.query.file_path
                 },
+                include: [{
+                    model: models.DownloadPackage,
+                    as: 'download_package'
+                }],
                 type: models.sequelize.QueryTypes.SELECT
             }).then(function (downloadsModel) {
                 res.json(downloadsModel);
@@ -87,6 +91,10 @@ router.get('/next',
                 replacements: {
                     status: 1
                 },
+                include: [{
+                    model: models.DownloadPackage,
+                    as: 'download_package'
+                }],
                 type: models.sequelize.QueryTypes.SELECT
             }).then(function (downloadsModel) {
                 res.json(downloadsModel);
