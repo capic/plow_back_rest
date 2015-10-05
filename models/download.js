@@ -38,6 +38,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         {
             freezeTableName: true,
+            tablename: 'download',
             createdAt: false,
             updatedAt: false,
             getterMethods: {

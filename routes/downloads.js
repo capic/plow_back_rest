@@ -34,9 +34,17 @@ router.get('/',
         }
 
         if (Object.keys(params).length !== 0) {
-            models.Download.findAll({where: params, include: [{model: models.DownloadPackage, as:'download_package'}]}).then(callback);
+            models.Download.findAll({
+                where: params,
+                include: [{model: models.DownloadPackage, as: 'download_package'}]
+            }).then(callback);
         } else {
-            models.Download.findAll({include: [{model: models.DownloadPackage, as:'download_package'}]}).then(callback);
+            models.Download.findAll({
+                include: [{
+                    model: models.DownloadPackage,
+                    as: 'download_package'
+                }]
+            }).then(callback);
         }
     }
 );
@@ -132,8 +140,13 @@ router.get('/link/:link',
  */
 router.post('/',
     function (req, res) {
-        var a =JSON.parse(JSON.stringify(req.body));
-        models.Download.create(JSON.parse(JSON.stringify(req.body)))
+        var a = JSON.parse(JSON.stringify(req.body));
+        models.Download.create(JSON.parse(JSON.stringify(req.body)), {
+            include: [{
+                model: models.DownloadPackage,
+                as: 'download_package'
+            }]
+        })
             .then(function (downloadModel) {
                 if (websocket.connection.isOpen) {
                     websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
@@ -151,7 +164,10 @@ router.post('/',
 router.put('/:id',
     function (req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
-        models.Download.update(downloadObject, {where: {id: req.params.id}})
+        models.Download.update(downloadObject, {
+            where: {id: req.params.id},
+            include: [{model: models.DownloadPackage, as: 'download_package'}]
+        })
             .then(function () {
                 models.Download.findById(req.params.id)
                     .then(function (downloadModel) {
@@ -184,11 +200,11 @@ router.delete('/:id',
  * update the priority
  */
 router.post('/priority',
-    function(req, res) {
+    function (req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
         models.Download.findById(downloadObject.id).then(
-            function(downloadModel) {
+            function (downloadModel) {
                 downloadModel.updateAttributes({
                     priority: downloadObject.priority
                 }).then(function () {
@@ -274,11 +290,11 @@ router.get('/availability/:id',
 );
 
 router.post('/move',
-    function(req, res) {
+    function (req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
         models.Download.findById(downloadObject.id)
-            .then(function(downloadModel) {
+            .then(function (downloadModel) {
                 // TODO: utiliser les constantes
                 if (downloadModel.status == 3 || downloadModel.status == 10 || downloadModel.status == 11) {
                     // TODO: utiliser les constantes
@@ -323,19 +339,19 @@ router.post('/move',
 );
 
 router.post('/unrar',
-    function(req, res) {
+    function (req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
         var command = 'ssh root@' + SERVER + ' python /var/wwww/download_basic.py unrar ' + downloadObject.id;
         var child = exec(command);
 
-        child.stdout.on('data', function(data) {
+        child.stdout.on('data', function (data) {
             console.log('stdout: ' + data);
         });
-        child.stderr.on('data', function(data) {
+        child.stderr.on('data', function (data) {
             console.log('stdout: ' + data);
         });
-        child.on('close', function(code) {
+        child.on('close', function (code) {
             console.log('closing code: ' + code);
         });
     }
@@ -409,13 +425,13 @@ router.delete('/logs/:id',
 );
 
 router.post('/package',
-  function (req, res) {
-      models.DownloadPackage.create(JSON.parse(JSON.stringify(req.body)))
-        .then(function (downloadPackageModel) {
-            res.json(downloadPackageModel);
-        }
-      );
-  }
+    function (req, res) {
+        models.DownloadPackage.create(JSON.parse(JSON.stringify(req.body)))
+            .then(function (downloadPackageModel) {
+                res.json(downloadPackageModel);
+            }
+        );
+    }
 );
 
 module.exports = router;
