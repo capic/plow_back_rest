@@ -55,7 +55,7 @@ router.get('/',
 router.get('/next',
     function (req, res) {
         if (req.query.file_path) {
-            models.sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
+            models.sequelize.query('SELECT  download.id, name, package_id, link, size_file, size_part, size_file_downloaded, ' +
                 'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
                 'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
                 'lifecycle_insert_date, lifecycle_update_date ' +
@@ -74,7 +74,7 @@ router.get('/next',
                 res.json(downloadsModel);
             });
         } else {
-            models.sequelize.query('SELECT  download.id, name, package, link, size_file, size_part, size_file_downloaded, ' +
+            models.sequelize.query('SELECT  download.id, name, package_id, link, size_file, size_part, size_file_downloaded, ' +
                 'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
                 'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
                 'lifecycle_insert_date, lifecycle_update_date ' +
