@@ -55,16 +55,16 @@ router.get('/',
 router.get('/next',
     function (req, res) {
         if (req.query.file_path) {
-            models.sequelize.query('SELECT  download.id, name, package_id, link, size_file, size_part, size_file_downloaded, ' +
-                'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
+            models.sequelize.query('SELECT  download.id, download.name, download.package_id, download.link, download.size_file, download.size_part, download.size_file_downloaded, ' +
+                'download.size_part_downloaded, download.status, download.progress_part, download.average_speed, download.current_speed, download.time_spent, ' +
                 'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
-                'lifecycle_insert_date, lifecycle_update_date ' +
+                'download.lifecycle_insert_date, download.lifecycle_update_date ' +
                 ' FROM download ' +
-                ' WHERE status = :status and file_path = :file_path and priority = ' +
-                '   (SELECT MAX(priority) ' +
+                ' WHERE download.status = :status and download.file_path = :file_path and priority = ' +
+                '   (SELECT MAX(download.priority) ' +
                 '   FROM download ' +
-                '   where status = :status and file_path = :file_path)' +
-                ' HAVING MIN(id)', {
+                '   where download.status = :status and download.file_path = :file_path)' +
+                ' HAVING MIN(download.id)', {
                 replacements: {
                     status: 1,
                     file_path: req.query.file_path
@@ -74,16 +74,16 @@ router.get('/next',
                 res.json(downloadsModel);
             });
         } else {
-            models.sequelize.query('SELECT  download.id, name, package_id, link, size_file, size_part, size_file_downloaded, ' +
-                'size_part_downloaded, status, progress_part, average_speed, current_speed, time_spent, ' +
-                'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
-                'lifecycle_insert_date, lifecycle_update_date ' +
+            models.sequelize.query('SELECT  download.id, download.name, download.package_id, download.link, download.size_file, download.size_part, download.size_file_downloaded, ' +
+                'download.size_part_downloaded, download.status, download.progress_part, download.average_speed, download.current_speed, download.time_spent, ' +
+                'download.time_left, download.pid_plowdown, download.pid_curl, download.pid_python, download.file_path, download.priority, download.theorical_start_datetime,' +
+                'download.lifecycle_insert_date, download.lifecycle_update_date ' +
                 ' FROM download ' +
-                ' WHERE status = :status and priority = ' +
-                '   (SELECT MAX(priority) ' +
+                ' WHERE download.status = :status and download.priority = ' +
+                '   (SELECT MAX(download.priority) ' +
                 '   FROM download ' +
-                '   where status = :status)' +
-                ' HAVING MIN(id)', {
+                '   where download.status = :status)' +
+                ' HAVING MIN(download.id)', {
                 replacements: {
                     status: 1
                 },
