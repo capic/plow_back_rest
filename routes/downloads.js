@@ -434,7 +434,9 @@ router.delete('/logs/:id',
 
 router.post('/package',
     function (req, res) {
-        models.DownloadPackage.create(JSON.parse(JSON.stringify(req.body)))
+        var downloadObject = JSON.parse(JSON.stringify(req.body));
+
+        models.DownloadPackage.fondOrCreate({ where: {name: downloadObject.name}, defaults: downloadObject})
             .then(function (downloadPackageModel) {
                 res.json(downloadPackageModel);
             }
