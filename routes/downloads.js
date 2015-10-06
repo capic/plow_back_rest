@@ -437,8 +437,8 @@ router.post('/package',
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
         models.DownloadPackage.findOrCreate({ where: {name: downloadObject.name}, defaults: downloadObject})
-            .then(function (downloadPackageModel) {
-                res.json(downloadPackageModel);
+            .spread(function (downloadPackageModel, created) {
+                res.json(downloadPackageModel.get({plain: true}));
             }
         );
     }
