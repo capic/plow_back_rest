@@ -73,7 +73,9 @@ router.get('/next',
                         model: models.DownloadPackage,
                         as: 'download_package'
                     }]
-                }).then(callback);
+                }).then(function (downloadsModel) {
+                    res.json(downloadsModel);
+                });
             });
 
         } else {
@@ -94,7 +96,9 @@ router.get('/next',
                             model: models.DownloadPackage,
                             as: 'download_package'
                         }]
-                    }).then(callback);
+                    }).then(function (downloadsModel) {
+                        res.json(downloadsModel);
+                    });
                 });
         }
     }
