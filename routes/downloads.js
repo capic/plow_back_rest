@@ -3,8 +3,7 @@ var express = require('express');
 var router = express.Router();
 var websocket = require('../websocket');
 var exec = require('child_process').exec;
-
-const SERVER = "192.168.1.200";
+var downloadServerConfig  = config.get('download_server');
 
 /**
  * get the list of download status
@@ -231,7 +230,7 @@ router.get('/availability/:id',
             .then(function (downloadModel) {
                 // TODO: utiliser les constantes
                 if (downloadModel.status != 2 && downloadModel.status != 3) {
-                    var command = '/usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' + downloadModel.link;
+                    var command = 'ssh root@' + downloadServerConfig.address + ' /usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' + downloadModel.link;
                     exec(command,
                         function (error, stdout, stderr) {
                             if (error) {
@@ -286,7 +285,7 @@ router.post('/move',
                             var oldDirectory = downloadModel.directory.replace(/\s/g, "\\\\ ");
                             var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
                             var name = downloadModel.name.replace(/\s/g, "\\\\ ");
-                            var command = 'ssh root@' + SERVER + ' mv ' + oldDirectory + name + ' ' + newDirectory;
+                            var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
                             exec(command,
                                 function (error, stdout, stderr) {
                                     var directory = downloadObject.directory;
@@ -325,7 +324,7 @@ router.post('/unrar',
     function (req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
-        var command = 'ssh root@' + SERVER + ' python /var/wwww/download_basic.py unrar ' + downloadObject.id;
+        var command = 'ssh root@' + downloadServerConfig.address + ' python /var/wwww/download_basic.py unrar ' + downloadObject.id;
         var child = exec(command);
 
         child.stdout.on('data', function (data) {
