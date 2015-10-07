@@ -227,7 +227,7 @@ router.get('/refresh/:id',
 
 router.get('/availability/:id',
     function (req, res) {
-        models.Download.findById(req.params.id)
+        models.Download.findById(req.params.id,{include: [{model: models.DownloadPackage, as: 'download_package'}]})
             .then(function (downloadModel) {
                 // TODO: utiliser les constantes
                 if (downloadModel.status != 2 && downloadModel.status != 3) {
