@@ -55,7 +55,7 @@ router.get('/',
 router.get('/next',
     function (req, res) {
         if (req.query.file_path) {
-            models.sequelize.query('SELECT MAX(download.priority) ' +
+            models.sequelize.query('SELECT MAX(download.priority) as download_priority' +
                 '   FROM download ' +
                 '   where download.status = :status and download.file_path = :file_path)' +
                 ' HAVING MIN(download.id)',
@@ -68,7 +68,7 @@ router.get('/next',
                 }
             ).then(function(result) {
                 models.Download.findAll({
-                    where: {priority: result, status: 1, file_path: req.query.file_path},
+                    where: {priority: result.download_priority, status: 1, file_path: req.query.file_path},
                     include: [{
                         model: models.DownloadPackage,
                         as: 'download_package'
@@ -79,7 +79,7 @@ router.get('/next',
             });
 
         } else {
-            models.sequelize.query('SELECT MAX(download.priority) ' +
+            models.sequelize.query('SELECT MAX(download.priority) as download_priority' +
                 '   FROM download ' +
                 '   where download.status = :status' +
                 ' HAVING MIN(download.id)',
@@ -91,7 +91,7 @@ router.get('/next',
                 }
             ).then(function(result) {
                     models.Download.findAll({
-                        where: {priority: result, status: 1},
+                        where: {priority: result.download_priority, status: 1},
                         include: [{
                             model: models.DownloadPackage,
                             as: 'download_package'
