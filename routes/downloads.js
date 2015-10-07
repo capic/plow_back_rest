@@ -68,7 +68,7 @@ router.get('/next',
                 }
             ).then(function(result) {
                 models.Download.findAll({
-                    where: {priority: result.download_priority, status: 1, file_path: req.query.file_path},
+                    where: {priority: result[0].download_priority, status: 1, file_path: req.query.file_path},
                     include: [{
                         model: models.DownloadPackage,
                         as: 'download_package'
@@ -91,7 +91,7 @@ router.get('/next',
                 }
             ).then(function(result) {
                     models.Download.findAll({
-                        where: {priority: result.download_priority, status: 1},
+                        where: {priority: result[0].download_priority, status: 1},
                         include: [{
                             model: models.DownloadPackage,
                             as: 'download_package'
