@@ -81,7 +81,7 @@ router.get('/next',
         } else {
             models.sequelize.query('SELECT MAX(download.priority) ' +
                 '   FROM download ' +
-                '   where download.status = :status and download.file_path = :file_path)' +
+                '   where download.status = :status' +
                 ' HAVING MIN(download.id)',
                 {
                     replacements: {
