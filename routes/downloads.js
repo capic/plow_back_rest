@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 var websocket = require('../websocket');
 var exec = require('child_process').exec;
+var config = require("../configuration");
 var downloadServerConfig  = config.get('download_server');
 
 /**
