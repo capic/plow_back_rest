@@ -55,50 +55,47 @@ router.get('/',
 router.get('/next',
     function (req, res) {
         if (req.query.file_path) {
-            models.sequelize.query('SELECT  download.id, download.name, download.package_id, download.link, download.size_file, download.size_part, download.size_file_downloaded, ' +
-                'download.size_part_downloaded, download.status, download.progress_part, download.average_speed, download.current_speed, download.time_spent, ' +
-                'time_left, pid_plowdown, pid_curl, pid_python, file_path, priority, theorical_start_datetime,' +
-                'download.lifecycle_insert_date, download.lifecycle_update_date ' +
-                ' FROM download LEFT OUTER JOIN download_package on (download.package_id = download_package.id) ' +
-                ' WHERE download.status = :status and download.file_path = :file_path and priority = ' +
-                '   (SELECT MAX(download.priority) ' +
+            models.sequelize.query('SELECT MAX(download.priority) ' +
                 '   FROM download ' +
                 '   where download.status = :status and download.file_path = :file_path)' +
-                ' HAVING MIN(download.id)', {
-                replacements: {
-                    status: 1,
-                    file_path: req.query.file_path
-                },
-                include: [{
-                    model: models.DownloadPackage,
-                    as: 'download_package'
-                }],
-                type: models.sequelize.QueryTypes.SELECT
-            }).then(function (downloadsModel) {
-                res.json(downloadsModel);
+                ' HAVING MIN(download.id)',
+                {
+                    replacements: {
+                        status: 1,
+                        file_path: req.query.file_path
+                    },
+                    type: models.sequelize.QueryTypes.SELECT
+                }
+            ).then(function(result) {
+                models.Download.findAll({
+                    where: {priority: result, status: 1, file_path: req.query.file_path},
+                    include: [{
+                        model: models.DownloadPackage,
+                        as: 'download_package'
+                    }]
+                }).then(callback);
             });
+
         } else {
-            models.sequelize.query('SELECT  download.id, download.name, download.package_id, download.link, download.size_file, download.size_part, download.size_file_downloaded, ' +
-                'download.size_part_downloaded, download.status, download.progress_part, download.average_speed, download.current_speed, download.time_spent, ' +
-                'download.time_left, download.pid_plowdown, download.pid_curl, download.pid_python, download.file_path, download.priority, download.theorical_start_datetime,' +
-                'download.lifecycle_insert_date, download.lifecycle_update_date ' +
-                ' FROM download LEFT OUTER JOIN download_package on (download.package_id = download_package.id) ' +
-                ' WHERE download.status = :status and download.priority = ' +
-                '   (SELECT MAX(download.priority) ' +
+            models.sequelize.query('SELECT MAX(download.priority) ' +
                 '   FROM download ' +
-                '   where download.status = :status)' +
-                ' HAVING MIN(download.id)', {
-                replacements: {
-                    status: 1
-                },
-                include: [{
-                    model: models.DownloadPackage,
-                    as: 'download_package'
-                }],
-                type: models.sequelize.QueryTypes.SELECT
-            }).then(function (downloadsModel) {
-                res.json(downloadsModel);
-            });
+                '   where download.status = :status and download.file_path = :file_path)' +
+                ' HAVING MIN(download.id)',
+                {
+                    replacements: {
+                        status: 1
+                    },
+                    type: models.sequelize.QueryTypes.SELECT
+                }
+            ).then(function(result) {
+                    models.Download.findAll({
+                        where: {priority: result, status: 1},
+                        include: [{
+                            model: models.DownloadPackage,
+                            as: 'download_package'
+                        }]
+                    }).then(callback);
+                });
         }
     }
 );
