@@ -231,7 +231,7 @@ router.get('/availability/:id',
             .then(function (downloadModel) {
                 // TODO: utiliser les constantes
                 if (downloadModel.status != 2 && downloadModel.status != 3) {
-                    var command = 'ssh root@' + downloadServerConfig.address + ' /usr/bin/plowprobe --printf \'# {"name":"%f","sizeFile":"%s"}\' ' + downloadModel.link;
+                    var command = 'ssh root@' + downloadServerConfig.address + ' /usr/bin/plowprobe --printf \'"\'"\'# {"name":"%f","sizeFile":"%s"}\'"\'"\' ' + downloadModel.link;
                     exec(command,
                         function (error, stdout, stderr) {
                             if (error) {
