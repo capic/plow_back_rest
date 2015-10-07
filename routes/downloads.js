@@ -54,51 +54,27 @@ router.get('/',
  */
 router.get('/next',
     function (req, res) {
-        if (req.query.file_path) {
-            models.sequelize.query('SELECT MAX(download.priority) as download_priority' +
-                '   FROM download ' +
-                '   where download.status = :status and download.file_path = :file_path)',
-                {
-                    replacements: {
-                        status: 1,
-                        file_path: req.query.file_path
-                    },
-                    type: models.sequelize.QueryTypes.SELECT
-                }
-            ).then(function(result) {
-                models.Download.min('id', {
-                    where: {priority: result[0].download_priority, status: 1, file_path: req.query.file_path},
-                    include: [{
-                        model: models.DownloadPackage,
-                        as: 'download_package'
-                    }]
-                }).then(function (downloadsModel) {
-                    res.json(downloadsModel);
-                });
-            });
+        var conditions = {};
 
-        } else {
-            models.sequelize.query('SELECT MAX(download.priority) as download_priority' +
-                '   FROM download ' +
-                '   where download.status = :status',
-                {
-                    replacements: {
-                        status: 1
-                    },
-                    type: models.sequelize.QueryTypes.SELECT
-                }
-            ).then(function(result) {
-                    models.Download.min('id', {
-                        where: {priority: result[0].download_priority, status: 1},
-                        include: [{
-                            model: models.DownloadPackage,
-                            as: 'download_package'
-                        }]
-                    }).then(function (downloadsModel) {
-                        res.json(downloadsModel);
-                    });
-                });
+        conditions.status = 1;
+        if (req.query.file_path) {
+            conditions.file_path = req.query.file_path;
         }
+
+        models.Download.max('priority', {where: conditions})
+            .then(function(downloadModel) {
+                conditions.priority = downloadModel.priority
+                models.Download.min('id', {where:conditions})
+                    .then(function(downloadModel2) {
+                        models.Download.find({where: {id: downloadModel2.id}, include: [{model: models.DownloadPackage, as: 'download_package'}]})
+                            .then(function(downloadModel3) {
+                                res.json(downloadModel3);
+                            }
+                        );
+                    }
+                );
+            }
+        );
     }
 );
 
