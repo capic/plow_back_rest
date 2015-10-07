@@ -62,11 +62,11 @@ router.get('/next',
         }
 
         models.Download.max('priority', {where: conditions})
-            .then(function(downloadModel) {
-                conditions.priority = downloadModel.priority
+            .then(function(download_priority) {
+                conditions.priority = download_priority;
                 models.Download.min('id', {where:conditions})
-                    .then(function(downloadModel2) {
-                        models.Download.find({where: {id: downloadModel2.id}, include: [{model: models.DownloadPackage, as: 'download_package'}]})
+                    .then(function(download_id) {
+                        models.Download.find({where: {id: download_id}, include: [{model: models.DownloadPackage, as: 'download_package'}]})
                             .then(function(downloadModel3) {
                                 res.json(downloadModel3);
                             }
