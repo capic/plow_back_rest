@@ -68,7 +68,6 @@ router.get('/next',
             ).then(function(result) {
                 models.Download.min('id', {
                     where: {priority: result[0].download_priority, status: 1, file_path: req.query.file_path},
-                    having: {models.sequelize.fn('MIN', sequelize.col('id'))},
                     include: [{
                         model: models.DownloadPackage,
                         as: 'download_package'
