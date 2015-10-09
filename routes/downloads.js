@@ -401,7 +401,7 @@ router.delete('/logs/:id',
     function (req, res) {
         models.DownloadLogs.destroy({where: {id: req.params.id}})
             .then(function (ret) {
-                res.json(ret == 1);
+                res.json({'return': ret == 1});
             }
         );
     }
