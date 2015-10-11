@@ -420,7 +420,7 @@ router.post('/package',
     }
 );
 
-router.get('/file/exist/:id',
+router.get('/file/exists/:id',
     function(res, req) {
         models.Download.findById(req.params.id)
             .then(function (downloadModel) {
