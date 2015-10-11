@@ -61,6 +61,7 @@ router.get('/next',
             conditions.file_path = req.query.file_path;
         }
 
+        //TODO : ne pas faire si la table est vide
         models.Download.max('priority', {where: conditions})
             .then(function(download_priority) {
                 conditions.priority = download_priority;
@@ -414,6 +415,21 @@ router.post('/package',
         models.DownloadPackage.findOrCreate({ where: {name: downloadObject.name}, defaults: downloadObject})
             .spread(function (downloadPackageModel, created) {
                 res.json(downloadPackageModel.get({plain: true}));
+            }
+        );
+    }
+);
+
+router.get('/file/exist/:id',
+    function(res, req) {
+        models.Download.findById(req.params.id)
+            .then(function (downloadModel) {
+                var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory  + downloadModel.name + ' && echo true || echo false';
+                exec(command,
+                    function (error, stdout, stderr) {
+                       res.json({'return': stdout == 'true'});
+                    }
+                );
             }
         );
     }
