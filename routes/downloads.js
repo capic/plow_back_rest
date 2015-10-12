@@ -421,7 +421,7 @@ router.post('/package',
 );
 
 router.get('/file/exists/:id',
-    function(req, req) {
+    function(req, res) {
         models.Download.findById(req.params.id)
             .then(function (downloadModel) {
                 var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory  + downloadModel.name + ' && echo true || echo false';
