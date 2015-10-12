@@ -424,7 +424,7 @@ router.get('/file/exists/:id',
     function(req, res) {
         models.Download.findById(req.params.id)
             .then(function (downloadModel) {
-                var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory  + downloadModel.name + ' && echo true || echo false';
+                var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory  + downloadModel.name + '" && echo true || echo false';
                 exec(command,
                     function (error, stdout, stderr) {
                        res.json({'return': stdout == 'true'});
