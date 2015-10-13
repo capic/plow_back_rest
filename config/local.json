@@ -11,5 +11,18 @@
   "notification": {
     "activated": true,
     "address": "ws://capic.hd.free.fr:8181/ws"
+  },
+  "download_status": {
+    "WAITING": 1,
+    "IN_PROGRESS": 2,
+    "FINISHED": 3,
+    "ERROR": 4,
+    "PAUSE": 5,
+    "CANCEL": 6,
+    "UNDEFINED": 7,
+    "STARTING": 8,
+    "MOVING": 9,
+    "MOVED": 10,
+    "ERROR_MOVING": 11
   }
 }
