@@ -8,8 +8,8 @@ var websocketConfig  = config.get('notification');
 var sessionWebsocket = {};
 
 var connection = new  autobahn.Connection({
-   url: 'ws://capic.hd.free.fr:8181/ws',
-    realm: 'realm1'
+   url: websocketConfig.address,
+    realm: websocketConfig.realm
 });
 sessionWebsocket.connection = connection;
 

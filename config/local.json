@@ -6,11 +6,13 @@
     "password": ""
   },
   "download_server": {
-    "address": "192.168.1.200"
+    "address": "192.168.1.200",
+    "unrar_command": "python /var/wwww/download_basic.py unrar"
   },
   "notification": {
     "activated": true,
-    "address": "ws://capic.hd.free.fr:8181/ws"
+    "address": "ws://capic.hd.free.fr:8181/ws",
+    "realm": "realm1"
   },
   "download_status": {
     "WAITING": 1,

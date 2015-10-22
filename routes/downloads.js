@@ -64,7 +64,7 @@ router.get('/next',
 
     models.Download.max('priority', {where: conditions})
       .then(function (download_priority) {
-        if (download_priority != undefined && download_priority != null) {
+        if (download_priority != undefined && download_priority != null && download_priority != NaN) {
           conditions.priority = download_priority;
           models.Download.min('id', {where: conditions})
             .then(function (download_id) {
@@ -330,7 +330,7 @@ router.post('/unrar',
   function (req, res) {
     var downloadObject = JSON.parse(JSON.stringify(req.body));
 
-    var command = 'ssh root@' + downloadServerConfig.address + ' python /var/wwww/download_basic.py unrar ' + downloadObject.id;
+    var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + downloadObject.id;
     var child = exec(command);
 
     child.stdout.on('data', function (data) {
