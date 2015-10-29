@@ -285,192 +285,207 @@ router.post('/move',
   function (req, res) {
     var downloadObject = JSON.parse(JSON.stringify(req.body));
 
+    // on recupère le download sur lequel on fait le traitement
     models.Download.findById(downloadObject.id)
       .then(function (downloadModel) {
-        var downloadModelList = [];
-        if (downloadObject.withPackage == true) {
-          models.Download.findAll({where: });
-        } else {
-          downloadModelList.push(downloadModel);
-        }
+        // fonction de traitement
+        var treatment = function (downloadModelList) {
+          var i = 0;
 
-        downloadModelList.forEach(
-          function (downloadModelListElement) {
-            var downloadLogsObject = {};
-            if (downloadModelListElement.status == downloadStatusConfig.FINISHED || downloadModelListElement.status == downloadStatusConfig.MOVED || downloadModelListElement.status == downloadStatusConfig.ERROR_MOVING) {
-              downloadLogsObject.id = downloadObject.id;
-              downloadLogsObject.logs = "Moving action ...";
-              models.DownloadLogs.update(downloadLogsObject, {
-                where: {id: req.params.id}
-              });
+          // on parcourt la liste des downloads
+          downloadModelList.forEach(
+            function (downloadModelListElement) {
+              var downloadLogsObject = {};
 
-              downloadModelListElement.updateAttributes({status: downloadStatusConfig.MOVING})
-                .then(function () {
-                  var oldDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
-                  var newDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
-                  var name = downloadModelListElement.name.replace(/\s/g, "\\\\ ");
-                  var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
-                  exec(command,
-                    function (error, stdout, stderr) {
-                      var directory = downloadObject.directory;
-                      var status = downloadStatusConfig.ERROR_MOVING;
-                      downloadLogsObject.logs = "Moving to " + directory + " OK !!!";
+              if (downloadModelListElement.status == downloadStatusConfig.FINISHED || downloadModelListElement.status == downloadStatusConfig.MOVED || downloadModelListElement.status == downloadStatusConfig.ERROR_MOVING) {
+                downloadLogsObject.id = downloadObject.id;
+                downloadLogsObject.logs = "Moving action ...";
+                models.DownloadLogs.update(downloadLogsObject, {
+                  where: {id: req.params.id}
+                });
 
-                      if (!error) {
-                        directory = downloadModelListElement.directory;
-                        status = downloadStatusConfig.MOVED;
-                        downloadLogsObject.logs = "Moving to " + directory + " ERROR !!!";
-                      }
+                downloadModelListElement.updateAttributes({status: downloadStatusConfig.MOVING})
+                  .then(function () {
+                    var oldDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
+                    var newDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
+                    var name = downloadModelListElement.name.replace(/\s/g, "\\\\ ");
+                    var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
+                    exec(command,
+                      function (error, stdout, stderr) {
+                        var directory = downloadObject.directory;
+                        var status = downloadStatusConfig.ERROR_MOVING;
+                        downloadLogsObject.logs = "Moving to " + directory + " OK !!!";
 
-                      downloadModelListElement.updateAttributes({directory: directory, status: status})
-                        .then(function () {
-                          downloadLogsObject.id = downloadObject.id;
-
-                          models.DownloadLogs.update(downloadLogsObject, {
-                            where: {id: req.params.id}
-                          });
-
-                          if
-                          res.json(downloadModel);
+                        if (!error) {
+                          directory = downloadModelListElement.directory;
+                          status = downloadStatusConfig.MOVED;
+                          downloadLogsObject.logs = "Moving to " + directory + " ERROR !!!";
                         }
-                      );
-                    }
-                  );
-                }
-              )
-            } else {
-              downloadModel.updateAttributes({directory: downloadObject.directory})
-                .then(function () {
-                  downloadLogsObject.id = downloadObject.id;
-                  downloadLogsObject.logs = "No moving just update the directory";
-                  models.DownloadLogs.update(downloadLogsObject, {
-                    where: {id: req.params.id}
-                  });
 
-                  res.json(downloadModel);
-                }
-              );
+                        downloadModelListElement.updateAttributes({directory: directory, status: status})
+                          .then(function () {
+                            downloadLogsObject.id = downloadObject.id;
+
+                            models.DownloadLogs.update(downloadLogsObject, {
+                              where: {id: req.params.id}
+                            });
+
+                            if (i == downloadModelList.length - 1) {
+                              res.json(downloadModel);
+                            }
+                          }
+                        );
+                      }
+                    );
+                  }
+                )
+              } else {
+                downloadModel.updateAttributes({directory: downloadObject.directory})
+                  .then(function () {
+                    downloadLogsObject.id = downloadObject.id;
+                    downloadLogsObject.logs = "No moving just update the directory";
+                    models.DownloadLogs.update(downloadLogsObject, {
+                      where: {id: req.params.id}
+                    });
+
+                    res.json(downloadModel);
+                  }
+                );
+              }
+              i++;
+            }
+          );
+        };
+
+        if (downloadObject.withPackage == true) {
+          models.Download.findAll({where: {'package_id': downloadModel.package_id}})
+            .then(function (list) {
+              treatment(list);
+            }
+          );
+        } else {
+          treatment([downloadModel]);
+        }
+      }
+    );
+  }
+);
+
+router.post('/unrar',
+  function (req, res) {
+    var downloadObject = JSON.parse(JSON.stringify(req.body));
+
+    var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + downloadObject.id;
+    var child = exec(command);
+
+    child.stdout.on('data', function (data) {
+      console.log('stdout: ' + data);
+    });
+    child.stderr.on('data', function (data) {
+      console.log('stdout: ' + data);
+    });
+    child.on('close', function (code) {
+      console.log('closing code: ' + code);
+    });
+  }
+);
+
+/**
+ * get download logs by id
+ */
+router.get('/logs/:id',
+  function (req, res) {
+    models.DownloadLogs.findById(req.params.id)
+      .then(function (downloadLogsModel) {
+        res.json(downloadLogsModel);
+      }
+    );
+  }
+);
+
+/**
+ * add a new download logs
+ */
+router.post('/',
+  function (req, res) {
+    models.DownloadLogs.create(JSON.parse(JSON.stringify(req.body)))
+      .then(function (downloadLogsModel) {
+        res.json(downloadLogsModel);
+      }
+    );
+  }
+);
+
+/**
+ * update a download logs by id
+ */
+router.put('/logs/:id',
+  function (req, res) {
+    var downLogsObject = JSON.parse(JSON.stringify(req.body))
+
+    models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
+      'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
+      {
+        replacements: {
+          id: downLogsObject.id,
+          logs: downLogsObject.logs
+        },
+        type: models.sequelize.QueryTypes.UPSERT
+      }).then(function () {
+        models.DownloadLogs.findById(req.params.id)
+          .then(function (downloadLogsModel) {
+            if (websocket.connection.isOpen) {
+              websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
+            }
+            res.json(downloadLogsModel);
+          }
+        );
+      });
+  }
+);
+
+/**
+ * delete a download logs by id
+ */
+router.delete('/logs/:id',
+  function (req, res) {
+    models.DownloadLogs.destroy({where: {id: req.params.id}})
+      .then(function (ret) {
+        res.json({'return': ret == 1});
+      }
+    );
+  }
+);
+
+router.post('/package',
+  function (req, res) {
+    var downloadObject = JSON.parse(JSON.stringify(req.body));
+
+    models.DownloadPackage.findOrCreate({where: {name: downloadObject.name}, defaults: downloadObject})
+      .spread(function (downloadPackageModel, created) {
+        res.json(downloadPackageModel.get({plain: true}));
+      }
+    );
+  }
+);
+
+router.get('/file/exists/:id',
+  function (req, res) {
+    models.Download.findById(req.params.id)
+      .then(function (downloadModel) {
+        var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory + downloadModel.name + '" && echo true || echo false';
+        exec(command,
+          function (error, stdout, stderr) {
+            if (error) {
+              res.json({'return': false});
+            } else {
+              res.json({'return': stdout == 'true'});
             }
           }
         );
       }
     );
+  }
+);
 
-    router.post('/unrar',
-      function (req, res) {
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
-
-        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + downloadObject.id;
-        var child = exec(command);
-
-        child.stdout.on('data', function (data) {
-          console.log('stdout: ' + data);
-        });
-        child.stderr.on('data', function (data) {
-          console.log('stdout: ' + data);
-        });
-        child.on('close', function (code) {
-          console.log('closing code: ' + code);
-        });
-      }
-    );
-
-    /**
-     * get download logs by id
-     */
-    router.get('/logs/:id',
-      function (req, res) {
-        models.DownloadLogs.findById(req.params.id)
-          .then(function (downloadLogsModel) {
-            res.json(downloadLogsModel);
-          }
-        );
-      }
-    );
-
-    /**
-     * add a new download logs
-     */
-    router.post('/',
-      function (req, res) {
-        models.DownloadLogs.create(JSON.parse(JSON.stringify(req.body)))
-          .then(function (downloadLogsModel) {
-            res.json(downloadLogsModel);
-          }
-        );
-      }
-    );
-
-    /**
-     * update a download logs by id
-     */
-    router.put('/logs/:id',
-      function (req, res) {
-        var downLogsObject = JSON.parse(JSON.stringify(req.body))
-
-        models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
-          'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
-          {
-            replacements: {
-              id: downLogsObject.id,
-              logs: downLogsObject.logs
-            },
-            type: models.sequelize.QueryTypes.UPSERT
-          }).then(function () {
-            models.DownloadLogs.findById(req.params.id)
-              .then(function (downloadLogsModel) {
-                if (websocket.connection.isOpen) {
-                  websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
-                }
-                res.json(downloadLogsModel);
-              }
-            );
-          });
-      }
-    );
-
-    /**
-     * delete a download logs by id
-     */
-    router.delete('/logs/:id',
-      function (req, res) {
-        models.DownloadLogs.destroy({where: {id: req.params.id}})
-          .then(function (ret) {
-            res.json({'return': ret == 1});
-          }
-        );
-      }
-    );
-
-    router.post('/package',
-      function (req, res) {
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
-
-        models.DownloadPackage.findOrCreate({where: {name: downloadObject.name}, defaults: downloadObject})
-          .spread(function (downloadPackageModel, created) {
-            res.json(downloadPackageModel.get({plain: true}));
-          }
-        );
-      }
-    );
-
-    router.get('/file/exists/:id',
-      function (req, res) {
-        models.Download.findById(req.params.id)
-          .then(function (downloadModel) {
-            var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory + downloadModel.name + '" && echo true || echo false';
-            exec(command,
-              function (error, stdout, stderr) {
-                if (error) {
-                  res.json({'return': false});
-                } else {
-                  res.json({'return': stdout == 'true'});
-                }
-              }
-            );
-          }
-        );
-      }
-    );
-
-    module.exports = router;
+module.exports = router;
