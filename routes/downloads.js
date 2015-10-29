@@ -330,6 +330,7 @@ router.post('/move',
                               where: {id: req.params.id}
                             });
 
+                            // on ne renvoit le model que quand on a fini le traitement
                             if (i == downloadModelList.length - 1) {
                               res.json(downloadModel);
                             }
