@@ -334,6 +334,8 @@ router.post('/move',
                             if (i == downloadModelList.length - 1) {
                               res.json(downloadModel);
                             }
+
+                            i++;
                           }
                         );
                       }
@@ -352,10 +354,11 @@ router.post('/move',
                     if (i == downloadModelList.length - 1) {
                       res.json(downloadModel);
                     }
+
+                    i++;
                   }
                 );
               }
-              i++;
             }
           );
         };
