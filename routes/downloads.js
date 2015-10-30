@@ -307,7 +307,7 @@ router.post('/move',
                 downloadModelListElement.updateAttributes({status: downloadStatusConfig.MOVING})
                   .then(function () {
                     var oldDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
-                    var newDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
+                    var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
                     var name = downloadModelListElement.name.replace(/\s/g, "\\\\ ");
                     var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
                     exec(command,
