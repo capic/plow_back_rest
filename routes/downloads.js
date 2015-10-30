@@ -292,90 +292,130 @@ router.post('/move',
         var treatment = function (downloadModelList) {
           var i = 0;
 
-          // on parcourt la liste des downloads
-          downloadModelList.forEach(
-            function (downloadModelListElement) {
-              var downloadLogsObject = {};
+          var updateInfos = function (downloadModelListElement, param, message) {
+            // on met à jour le download avec le nouveau directory et le nouveau status
+            downloadModelListElement.updateAttributes(param)
+              .then(function () {
+                var downloadLogsObject = {};
 
-              if (downloadModelListElement.status == downloadStatusConfig.FINISHED || downloadModelListElement.status == downloadStatusConfig.MOVED || downloadModelListElement.status == downloadStatusConfig.ERROR_MOVING) {
                 downloadLogsObject.id = downloadObject.id;
-                downloadLogsObject.logs = "Moving action ...";
+                downloadLogsObject.logs += message;
+
+                // on met a jour les logs du download
                 models.DownloadLogs.update(downloadLogsObject, {
                   where: {id: downloadLogsObject.id}
                 });
 
-                downloadModelListElement.updateAttributes({status: downloadStatusConfig.MOVING})
-                  .then(function () {
-                    var oldDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
-                    var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
-                    var name = downloadModelListElement.name.replace(/\s/g, "\\\\ ");
-                    var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
-                    exec(command,
-                      function (error, stdout, stderr) {
-                        var directory = downloadObject.directory;
-                        var status = downloadStatusConfig.ERROR_MOVING;
-                        downloadLogsObject.logs = "Moving to " + directory + " OK !!!";
+                // on ne renvoit le model que quand on a fini le traitement
+                if (i == downloadModelList.length - 1) {
+                  res.json(downloadModel);
+                }
+                i++;
+              }
+            )
+          };
+        }
 
-                        if (!error) {
-                          directory = downloadModelListElement.directory;
-                          status = downloadStatusConfig.MOVED;
-                          downloadLogsObject.logs = "Moving to " + directory + " ERROR !!!";
+        // on parcourt la liste des downloads
+        downloadModelList.forEach(
+          function (downloadModelListElement) {
+            var downloadLogsObject = {};
+
+            if (downloadModelListElement.status == downloadStatusConfig.FINISHED || downloadModelListElement.status == downloadStatusConfig.MOVED || downloadModelListElement.status == downloadStatusConfig.ERROR_MOVING) {
+              downloadLogsObject.id = downloadObject.id;
+              downloadLogsObject.logs = "Moving action ...";
+              models.DownloadLogs.update(downloadLogsObject, {
+                where: {id: downloadLogsObject.id}
+              });
+
+              downloadModelListElement.updateAttributes({status: downloadStatusConfig.MOVING})
+                .then(function () {
+                  var oldDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
+                  var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
+                  var name = downloadModelListElement.name.replace(/\s/g, "\\\\ ");
+
+                  // on teste l'existence du fichier
+                  var command = 'ssh root@' + downloadServerConfig.address + ' if [ -f ' + oldDirectory + name + ' ]; then echo true; else echo false; fi'
+                  var execFileExists = exec(command);
+
+                  // pas d'erreur
+                  execFileExists.stdout.on('data', function (data) {
+                    // si le fichier existe
+                    if (data == "true") {
+                      // on deplace le fichier
+                      var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
+                      var execMoveFile = exec(command);
+
+                      // pas d'erreur de deplacement
+                      execMoveFile.stdout.on('data',
+                        function (data) {
+                          var param = {directory: downloadObject.directory, status: downloadStatusConfig.MOVED};
+                          var message = "Moving to " + downloadObject.directory + " OK !!!\r\n";
+                          updateInfos(downloadModelListElement, param, message);
                         }
+                      );
 
-                        downloadModelListElement.updateAttributes({directory: directory, status: status})
-                          .then(function () {
-                            downloadLogsObject.id = downloadObject.id;
+                      execMoveFile.stderr.on('data',
+                        function (data) {
+                          var param = {status: downloadStatusConfig.ERROR_MOVING};
+                          var message = "Moving to " + downloadObject.directory + " ERROR !!!\r\n";
+                          updateInfos(downloadModelListElement, param, message);
+                        }
+                      );
+                    } else {
+                      // on met à jour le download  le nouveau status
+                      downloadModelListElement.updateAttributes({status: downloadStatusConfig.ERROR_MOVING})
+                        .then(function () {
+                          var param = {status: downloadStatusConfig.ERROR_MOVING};
+                          var message = "Moving to " + downloadObject.directory + " ERROR => file does not exist !!!\r\n";
+                          updateInfos(downloadModelListElement, param, message);
 
-                            models.DownloadLogs.update(downloadLogsObject, {
-                              where: {id: downloadLogsObject.id}
-                            });
-
-                            // on ne renvoit le model que quand on a fini le traitement
-                            if (i == downloadModelList.length - 1) {
-                              res.json(downloadModel);
-                            }
-
-                            i++;
-                          }
-                        );
-                      }
-                    );
-                  }
-                )
-              } else {
-                downloadModelListElement.updateAttributes({directory: downloadObject.directory})
-                  .then(function () {
-                    downloadLogsObject.id = downloadObject.id;
-                    downloadLogsObject.logs = "No moving just update the directory";
-                    models.DownloadLogs.update(downloadLogsObject, {
-                      where: {id: downloadLogsObject.id}
-                    });
-
-                    if (i == downloadModelList.length - 1) {
-                      res.json(downloadModel);
+                        }
+                      );
                     }
 
-                    i++;
-                  }
-                );
-              }
-            }
-          );
-        };
+                    execFileExists.stderr.on('data',
+                    var param = {status: downloadStatusConfig.ERROR_MOVING};
+                    var message = "Moving to " + downloadObject.directory + " ERROR => file exists check error !!!\r\n";
+                    updateInfos(downloadModelListElement, param, message);
+                  });
+                }
+              )
+            } else {
+              downloadModelListElement.updateAttributes({directory: downloadObject.directory})
+                .then(function () {
+                  downloadLogsObject.id = downloadObject.id;
+                  downloadLogsObject.logs += "No moving just update the directory\r\n";
+                  models.DownloadLogs.update(downloadLogsObject, {
+                    where: {id: downloadLogsObject.id}
+                  });
 
-        if (downloadObject.withPackage == true) {
-          models.Download.findAll({where: {'package_id': downloadModel.package_id}})
-            .then(function (list) {
-              treatment(list);
+                  if (i == downloadModelList.length - 1) {
+                    res.json(downloadModel);
+                  }
+
+                  i++;
+                }
+              );
             }
-          );
-        } else {
-          treatment([downloadModel]);
+          }
+        );
+      };
+
+    if (downloadObject.withPackage == true) {
+      models.Download.findAll({where: {'package_id': downloadModel.package_id}})
+        .then(function (list) {
+          treatment(list);
         }
-      }
-    );
+      );
+    } else {
+      treatment([downloadModel]);
+    }
   }
 );
+}
+)
+;
 
 router.post('/unrar',
   function (req, res) {
