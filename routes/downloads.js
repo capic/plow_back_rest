@@ -301,7 +301,7 @@ router.post('/move',
                 downloadLogsObject.id = downloadObject.id;
                 downloadLogsObject.logs = "Moving action ...";
                 models.DownloadLogs.update(downloadLogsObject, {
-                  where: {id: req.params.id}
+                  where: {id: downloadLogsObject.id}
                 });
 
                 downloadModelListElement.updateAttributes({status: downloadStatusConfig.MOVING})
@@ -327,7 +327,7 @@ router.post('/move',
                             downloadLogsObject.id = downloadObject.id;
 
                             models.DownloadLogs.update(downloadLogsObject, {
-                              where: {id: req.params.id}
+                              where: {id: downloadLogsObject.id}
                             });
 
                             // on ne renvoit le model que quand on a fini le traitement
@@ -346,7 +346,7 @@ router.post('/move',
                     downloadLogsObject.id = downloadObject.id;
                     downloadLogsObject.logs = "No moving just update the directory";
                     models.DownloadLogs.update(downloadLogsObject, {
-                      where: {id: downloadModelListElement.id}
+                      where: {id: downloadLogsObject.id}
                     });
 
                     if (i == downloadModelList.length - 1) {
