@@ -341,15 +341,17 @@ router.post('/move',
                   }
                 )
               } else {
-                downloadModel.updateAttributes({directory: downloadObject.directory})
+                downloadModelListElement.updateAttributes({directory: downloadObject.directory})
                   .then(function () {
                     downloadLogsObject.id = downloadObject.id;
                     downloadLogsObject.logs = "No moving just update the directory";
                     models.DownloadLogs.update(downloadLogsObject, {
-                      where: {id: req.params.id}
+                      where: {id: downloadModelListElement.id}
                     });
 
-                    res.json(downloadModel);
+                    if (i == downloadModelList.length - 1) {
+                      res.json(downloadModel);
+                    }
                   }
                 );
               }
