@@ -485,7 +485,7 @@ router.get('/file/exists/:id',
             if (error) {
               res.json({'return': false});
             } else {
-              res.json({'return': stdout == 'true'});
+              res.json({'return': stdout == 'true\n'});
             }
           }
         );
