@@ -334,13 +334,13 @@ router.post('/move',
                                         var name = downloadModelListElement.name.replace(/\s/g, "\\\\ ");
 
                                         // on teste l'existence du fichier
-                                        var command = 'ssh root@' + downloadServerConfig.address + ' if [ -f ' + oldDirectory + name + ' ]; then echo true; else echo false; fi';
+                                        var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory + downloadModel.name + '" && echo true || echo false';
                                         var execFileExists = exec(command);
 
                                         // pas d'erreur
                                         execFileExists.stdout.on('data', function (data) {
                                             // si le fichier existe
-                                            if (data == "true") {
+                                            if (data == "true\n") {
                                                 // on deplace le fichier
                                                 var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
                                                 var execMoveFile = exec(command);
