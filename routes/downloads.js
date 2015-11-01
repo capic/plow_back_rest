@@ -353,6 +353,7 @@ router.post('/move',
                                                             status: downloadStatusConfig.MOVED
                                                         };
                                                         var message = "Moving to " + downloadObject.directory + " OK !!!\r\n";
+                                                        message += data;
                                                         updateInfos(downloadModelListElement, param, message);
                                                     }
                                                 );
@@ -361,6 +362,7 @@ router.post('/move',
                                                     function (data) {
                                                         var param = {status: downloadStatusConfig.ERROR_MOVING};
                                                         var message = "Moving to " + downloadObject.directory + " ERROR !!!\r\n";
+                                                        message += data;
                                                         updateInfos(downloadModelListElement, param, message);
                                                     }
                                                 );
@@ -380,6 +382,7 @@ router.post('/move',
                                                 function(data) {
                                                     var param = {status: downloadStatusConfig.ERROR_MOVING};
                                                     var message = "Moving to " + downloadObject.directory + " ERROR => file exists check error !!!\r\n";
+                                                    message += data;
                                                     updateInfos(downloadModelListElement, param, message);
                                                 }
                                             );
