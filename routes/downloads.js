@@ -168,7 +168,10 @@ router.put('/:id',
     var downloadObject = JSON.parse(JSON.stringify(req.body));
     models.Download.update(downloadObject, {
       where: {id: req.params.id},
-      include: [{model: models.DownloadPackage, as: 'download_package'}]
+      include: [
+          {model: models.DownloadPackage, as: 'download_package'},
+          {model: models.DownloadDirectory, as: 'download_directory'}
+      ]
     })
       .then(function () {
         models.Download.findById(req.params.id)
