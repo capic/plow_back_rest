@@ -351,8 +351,17 @@ router.post('/move',
 
                                                             execMoveFile.stderr.on('data',
                                                                 function (data) {
-                                                                    var param = {status: downloadStatusConfig.ERROR_MOVING};
-                                                                    logs += "Moving to " + downloadObject.directory + " ERROR !!!\r\n";
+                                                                    // même si ça s'est bien passé on peut avoir cette erreur donc on considere que c'est ok
+                                                                    if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
+                                                                        var param = {
+                                                                            directory: downloadObject.directory,
+                                                                            status: downloadStatusConfig.MOVED
+                                                                        };
+                                                                        logs += "Moving to " + downloadObject.directory + " OK !!!\r\n";
+                                                                    } else {
+                                                                        var param = {status: downloadStatusConfig.ERROR_MOVING};
+                                                                        logs += "Moving to " + downloadObject.directory + " ERROR !!!\r\n";
+                                                                    }
                                                                     logs += data + "\r\n";
                                                                     updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
                                                                 }
