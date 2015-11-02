@@ -46,7 +46,7 @@ router.post('/',
   function (req, res) {
     var downloadDirectoryObject = JSON.parse(JSON.stringify(req.body));
 
-    models.DownloadPackage.findOrCreate({where: {path: downloadDirectoryObject.path}, defaults: downloadDirectoryObject})
+    models.DownloadDirectory.findOrCreate({where: {path: downloadDirectoryObject.path}, defaults: downloadDirectoryObject})
       .spread(function (downloadDirectoryModel, created) {
         res.json(downloadDirectoryModel.get({plain: true}));
       }
