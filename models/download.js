@@ -56,10 +56,8 @@ module.exports = function (sequelize, DataTypes) {
           classMethods: {
               associate: function (models) {
                 Download.belongsTo(models.DownloadPackage, {foreignKey: 'package_id', as:'download_package'});
-              },
-            associate: function (models) {
-              Download.belongsTo(models.DownloadDirectory, {foreignKey: 'directory_id', as:'download_directory'});
-            }
+                Download.belongsTo(models.DownloadDirectory, {foreignKey: 'directory_id', as:'download_directory'});
+              }
           }
       });
 
