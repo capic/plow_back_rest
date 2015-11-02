@@ -135,6 +135,9 @@ router.post('/',
             include: [{
                 model: models.DownloadPackage,
                 as: 'download_package'
+            }, {
+                model: models.DownloadDirectory,
+                as: 'download_directory'
             }]
         })
             .then(function (downloadModel) {
