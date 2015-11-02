@@ -43,9 +43,11 @@ router.get('/:id',
  */
 router.post('/',
   function (req, res) {
-    models.DownloadDirectory.create(JSON.parse(JSON.stringify(req.body)))
-      .then(function (downloadDirectoryModel) {
-        res.json(downloadDirectoryModel);
+    var downloadDirectoryObject = JSON.parse(JSON.stringify(req.body));
+
+    models.DownloadPackage.findOrCreate({where: {path: downloadDirectoryObject.path}, defaults: downloadDirectoryObject})
+      .spread(function (downloadDirectoryModel, created) {
+        res.json(downloadDirectoryModel.get({plain: true}));
       }
     );
   }
