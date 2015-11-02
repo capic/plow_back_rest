@@ -76,7 +76,10 @@ router.get('/next',
             .then(function (download_id) {
               models.Download.find({
                 where: {id: download_id},
-                include: [{model: models.DownloadPackage, as: 'download_package'}]
+                include: [{model: models.DownloadPackage, as: 'download_package'}, {
+                  model: models.DownloadDirectory,
+                  as: 'download_directory'
+                }]
               })
                 .then(function (downloadModel3) {
                   res.json(downloadModel3);
