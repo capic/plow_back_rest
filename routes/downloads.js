@@ -297,7 +297,7 @@ router.post('/move',
                         downloadModelListElement.updateAttributes(param)
                             .then(function () {
                                 // on met a jour les logs du download
-                                downloadLogsModel.updateAttributes({logs: message});
+                                downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
 
                                 // on ne renvoit le model que quand on a fini le traitement
                                 if (i == downloadModelList.length - 1) {
