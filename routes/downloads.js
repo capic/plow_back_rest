@@ -301,7 +301,12 @@ router.post('/move',
     var downloadObject = JSON.parse(JSON.stringify(req.body));
 
     // on recupere le download sur lequel on fait le traitement
-    models.Download.findById(downloadObject.id)
+    models.Download.findById(downloadObject.id, {
+      include: [{model: models.DownloadPackage, as: 'download_package'}, {
+        model: models.DownloadDirectory,
+        as: 'download_directory'
+      }]
+    })
       .then(function (downloadModel) {
         // fonction de traitement
         var treatment = function (downloadModelList) {
@@ -326,7 +331,7 @@ router.post('/move',
           // on parcourt la liste des downloads
           downloadModelList.forEach(
             function (downloadModelListElement) {
-              if (downloadModelListElement.directory != downloadObject.directory) {
+              if (downloadModelListElement.directory_id != downloadObject.directory_id) {
                 var logs = "";
                 models.DownloadLogs.findById(downloadObject.id)
                   .then(function (downloadLogsModel) {
@@ -335,86 +340,95 @@ router.post('/move',
 
                       downloadModelListElement.updateAttributes({status: downloadStatusConfig.MOVING})
                         .then(function () {
-                          var oldDirectory = downloadModelListElement.directory.replace(/\s/g, "\\\\ ");
-                          var newDirectory = downloadObject.directory.replace(/\s/g, "\\\\ ");
-                          var name = downloadModelListElement.name.replace(/\s/g, "\\\\ ");
+                          models.DownloadDirectories.findById(downloadObject.directory_id)
+                            .then(function (downloadDirectoryModel) {
+                              var oldDirectory = downloadModelListElement.download_directory.path.replace(/\s/g, "\\\\ ");
+                              var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
+                              var name = downloadModelListElement.name.replace(/\s/g, "\\\\ ");
 
-                          // on teste l'existence du fichier
-                          var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory + downloadModel.name + '" && echo true || echo false';
-                          var execFileExists = exec(command);
+                              // on teste l'existence du fichier
+                              var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + oldDirectory + name + '" && echo true || echo false';
+                              var execFileExists = exec(command);
 
-                          // pas d'erreur
-                          execFileExists.stdout.on('data', function (data) {
-                            // si le fichier existe
-                            if (data == "true\n") {
-                              // on deplace le fichier
-                              var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
-                              var execMoveFile = exec(command);
+                              // pas d'erreur
+                              execFileExists.stdout.on('data', function (data) {
+                                // si le fichier existe
+                                if (data == "true\n") {
+                                  // on deplace le fichier
+                                  var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
+                                  var execMoveFile = exec(command);
 
-                              // pas d'erreur de deplacement
-                              execMoveFile.stdout.on('data',
-                                function (data) {
-                                  var param = {
-                                    directory: downloadObject.directory,
-                                    status: downloadStatusConfig.MOVED
-                                  };
-                                  logs += "Moving to " + downloadObject.directory + " OK !!!\r\n";
-                                  logs += data + "\r\n";
-                                  updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
+                                  // pas d'erreur de deplacement
+                                  execMoveFile.stdout.on('data',
+                                    function (data) {
+                                      var param = {
+                                        directory: newDirectory,
+                                        status: downloadStatusConfig.MOVED
+                                      };
+                                      logs += "Moving to " + newDirectory + " OK !!!\r\n";
+                                      logs += data + "\r\n";
+                                      updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
+                                    }
+                                  );
+
+                                  execMoveFile.stderr.on('data',
+                                    function (data) {
+                                      // même si ça s'est bien passé on peut avoir cette erreur donc on considere que c'est ok
+                                      if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
+                                        var param = {
+                                          directory: newDirectory,
+                                          status: downloadStatusConfig.MOVED
+                                        };
+                                        logs += "Moving to " + newDirectory + " OK !!!\r\n";
+                                      } else {
+                                        var param = {status: downloadStatusConfig.ERROR_MOVING};
+                                        logs += "Moving to " + newDirectory + " ERROR !!!\r\n";
+                                      }
+                                      logs += data + "\r\n";
+                                      updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
+                                    }
+                                  );
+                                } else {
+                                  // on met à jour le download  le nouveau status
+                                  downloadModelListElement.updateAttributes({status: downloadStatusConfig.ERROR_MOVING})
+                                    .then(function () {
+                                      var param = {status: downloadStatusConfig.ERROR_MOVING};
+                                      logs += "Moving to " + newDirectory + " ERROR => file does not exist !!!\r\n";
+                                      updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
+
+                                    }
+                                  );
                                 }
-                              );
 
-                              execMoveFile.stderr.on('data',
-                                function (data) {
-                                  // même si ça s'est bien passé on peut avoir cette erreur donc on considere que c'est ok
-                                  if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
-                                    var param = {
-                                      directory: downloadObject.directory,
-                                      status: downloadStatusConfig.MOVED
-                                    };
-                                    logs += "Moving to " + downloadObject.directory + " OK !!!\r\n";
-                                  } else {
+                                execFileExists.stderr.on('data',
+                                  function (data) {
                                     var param = {status: downloadStatusConfig.ERROR_MOVING};
-                                    logs += "Moving to " + downloadObject.directory + " ERROR !!!\r\n";
+                                    logs += "Moving to " + newDirectory + " ERROR => file exists check error !!!\r\n";
+                                    logs += data + "\r\n";
+                                    updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
                                   }
-                                  logs += data + "\r\n";
-                                  updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
-                                }
-                              );
-                            } else {
-                              // on met à jour le download  le nouveau status
-                              downloadModelListElement.updateAttributes({status: downloadStatusConfig.ERROR_MOVING})
-                                .then(function () {
-                                  var param = {status: downloadStatusConfig.ERROR_MOVING};
-                                  logs += "Moving to " + downloadObject.directory + " ERROR => file does not exist !!!\r\n";
-                                  updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
-
-                                }
-                              );
+                                );
+                              });
                             }
-
-                            execFileExists.stderr.on('data',
-                              function (data) {
-                                var param = {status: downloadStatusConfig.ERROR_MOVING};
-                                logs += "Moving to " + downloadObject.directory + " ERROR => file exists check error !!!\r\n";
-                                logs += data + "\r\n";
-                                updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
-                              }
-                            );
-                          });
+                          );
                         }
                       )
                     } else {
-                      downloadModelListElement.updateAttributes({directory: downloadObject.directory})
-                        .then(function () {
-                          logs = "No moving just update the directory\r\n";
-                          downloadLogsModel.updateAttributes({logs: message});
+                      models.DownloadDirectories.findById(downloadObject.directory_id)
+                        .then(function (downloadDirectoryModel) {
+                          var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
+                          downloadModelListElement.updateAttributes({directory: newDirectory})
+                            .then(function () {
+                              logs = "No moving just update the directory\r\n";
+                              downloadLogsModel.updateAttributes({logs: message});
 
-                          if (i == downloadModelList.length - 1) {
-                            res.json(downloadModel);
-                          }
+                              if (i == downloadModelList.length - 1) {
+                                res.json(downloadModel);
+                              }
 
-                          i++;
+                              i++;
+                            }
+                          );
                         }
                       );
                     }
