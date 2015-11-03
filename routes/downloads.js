@@ -313,10 +313,11 @@ router.post('/move',
                     var i = 0;
                     var listDownloadReturned = [];
 
-                    var updateInfos = function (downloadModelListElement, downloadLogsModel, param, message) {
+                    var updateInfos = function (downloadModelListElement, downloadLogsModel, downloadDirectoryModel, param, message) {
                         // on met à jour le download avec le nouveau directory et le nouveau status
                         downloadModelListElement.updateAttributes(param)
                             .then(function () {
+                                downloadModelListElement.download_directory = downloadDirectoryModel;
                                 // on met a jour les logs du download
                                 downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
 
@@ -369,7 +370,7 @@ router.post('/move',
                                                                             };
                                                                             logs += "Moving to " + newDirectory + " OK !!!\r\n";
                                                                             logs += data + "\r\n";
-                                                                            updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
+                                                                            updateInfos(downloadModelListElement, downloadLogsModel, downloadDirectoryModel, param, logs);
                                                                         }
                                                                     );
 
@@ -387,7 +388,7 @@ router.post('/move',
                                                                                 logs += "Moving to " + newDirectory + " ERROR !!!\r\n";
                                                                             }
                                                                             logs += data + "\r\n";
-                                                                            updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
+                                                                            updateInfos(downloadModelListElement, downloadLogsModel, downloadDirectoryModel, param, logs);
                                                                         }
                                                                     );
                                                                 } else {
@@ -396,7 +397,7 @@ router.post('/move',
                                                                         .then(function () {
                                                                             var param = {status: downloadStatusConfig.ERROR_MOVING};
                                                                             logs += "Moving to " + newDirectory + " ERROR => file does not exist !!!\r\n";
-                                                                            updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
+                                                                            updateInfos(downloadModelListElement, downloadLogsModel, downloadDirectoryModel, param, logs);
 
                                                                         }
                                                                     );
@@ -407,7 +408,7 @@ router.post('/move',
                                                                         var param = {status: downloadStatusConfig.ERROR_MOVING};
                                                                         logs += "Moving to " + newDirectory + " ERROR => file exists check error !!!\r\n";
                                                                         logs += data + "\r\n";
-                                                                        updateInfos(downloadModelListElement, downloadLogsModel, param, logs);
+                                                                        updateInfos(downloadModelListElement, downloadLogsModel, downloadDirectoryModel, param, logs);
                                                                     }
                                                                 );
                                                             });
@@ -421,6 +422,7 @@ router.post('/move',
 
                                                     downloadModelListElement.updateAttributes({directory_id: downloadDirectoryModel.id})
                                                         .then(function () {
+                                                            downloadModelListElement.download_directory = downloadDirectoryModel;
                                                             // a ce moment les logs ne sont peut etre pas creee en bdd
                                                             if (downloadLogsModel != null)
                                                             {
