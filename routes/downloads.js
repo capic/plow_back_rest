@@ -430,7 +430,7 @@ router.post('/move',
 
                                                             listDownloadReturned.push(downloadModelListElement);
                                                             if (i == downloadModelList.length - 1) {
-                                                                res.json(downloadModel);
+                                                                res.json(listDownloadReturned);
                                                             }
 
                                                             i++;
