@@ -441,7 +441,13 @@ router.post('/move',
         };
 
         if (downloadObject.withPackage == true) {
-          models.Download.findAll({where: {'package_id': downloadModel.package_id}})
+          models.Download.findAll({
+            where: {'package_id': downloadModel.package_id},
+            include: [{model: models.DownloadPackage, as: 'download_package'}, {
+              model: models.DownloadDirectory,
+              as: 'download_directory'
+            }]
+          })
             .then(function (list) {
               treatment(list);
             }
