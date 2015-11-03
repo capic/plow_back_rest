@@ -340,7 +340,7 @@ router.post('/move',
 
                       downloadModelListElement.updateAttributes({status: downloadStatusConfig.MOVING})
                         .then(function () {
-                          models.DownloadDirectories.findById(downloadObject.directory_id)
+                          models.DownloadDirectory.findById(downloadObject.directory_id)
                             .then(function (downloadDirectoryModel) {
                               var oldDirectory = downloadModelListElement.download_directory.path.replace(/\s/g, "\\\\ ");
                               var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
@@ -414,7 +414,7 @@ router.post('/move',
                         }
                       )
                     } else {
-                      models.DownloadDirectories.findById(downloadObject.directory_id)
+                      models.DownloadDirectory.findById(downloadObject.directory_id)
                         .then(function (downloadDirectoryModel) {
                           var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
                           downloadModelListElement.updateAttributes({directory: newDirectory})
