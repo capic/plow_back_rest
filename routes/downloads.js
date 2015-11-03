@@ -311,6 +311,7 @@ router.post('/move',
         // fonction de traitement
         var treatment = function (downloadModelList) {
           var i = 0;
+          var listDownloadReturned = [];
 
           var updateInfos = function (downloadModelListElement, downloadLogsModel, param, message) {
             // on met à jour le download avec le nouveau directory et le nouveau status
@@ -319,9 +320,10 @@ router.post('/move',
                 // on met a jour les logs du download
                 downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
 
+                listDownloadReturned.push(downloadModelListElement)
                 // on ne renvoit le model que quand on a fini le traitement
                 if (i == downloadModelList.length - 1) {
-                  res.json(downloadModel);
+                  res.json(listDownloadReturned);
                 }
                 i++;
               }
