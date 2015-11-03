@@ -317,7 +317,8 @@ router.post('/move',
                         // on met à jour le download avec le nouveau directory et le nouveau status
                         downloadModelListElement.updateAttributes(param)
                             .then(function () {
-                                downloadModelListElement.download_directory = downloadDirectoryModel;
+                                downloadModelListElement.download_directory.id = downloadDirectoryModel.id;
+                                downloadModelListElement.download_directory.path = downloadDirectoryModel.path;
                                 // on met a jour les logs du download
                                 downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
 
@@ -422,7 +423,8 @@ router.post('/move',
 
                                                     downloadModelListElement.updateAttributes({directory_id: downloadDirectoryModel.id})
                                                         .then(function () {
-                                                            downloadModelListElement.download_directory = downloadDirectoryModel;
+                                                            downloadModelListElement.download_directory.id = downloadDirectoryModel.id;
+                                                            downloadModelListElement.download_directory.path = downloadDirectoryModel.path;
                                                             // a ce moment les logs ne sont peut etre pas creee en bdd
                                                             if (downloadLogsModel != null)
                                                             {
