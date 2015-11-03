@@ -420,7 +420,7 @@ router.post('/move',
                           downloadModelListElement.updateAttributes({directory: newDirectory})
                             .then(function () {
                               logs = "No moving just update the directory\r\n";
-                              downloadLogsModel.updateAttributes({logs: message});
+                              downloadLogsModel.updateAttributes({logs: logs});
 
                               if (i == downloadModelList.length - 1) {
                                 res.json(downloadModel);
