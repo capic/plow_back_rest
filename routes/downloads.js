@@ -421,8 +421,12 @@ router.post('/move',
                                                     var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
                                                     downloadModelListElement.updateAttributes({directory: newDirectory})
                                                         .then(function () {
-                                                            logs = "No moving just update the directory\r\n";
-                                                            downloadLogsModel.updateAttributes({logs: logs});
+                                                            // a ce moment les logs ne sont peut etre pas creee en bdd
+                                                            if (downloadLogsModel != null)
+                                                            {
+                                                                logs = "No moving just update the directory\r\n";
+                                                                downloadLogsModel.updateAttributes({logs: logs});
+                                                            }
 
                                                             listDownloadReturned.push(downloadModelListElement);
                                                             if (i == downloadModelList.length - 1) {
