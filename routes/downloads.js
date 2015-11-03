@@ -169,8 +169,8 @@ router.put('/:id',
     models.Download.update(downloadObject, {
       where: {id: req.params.id},
       include: [
-          {model: models.DownloadPackage, as: 'download_package'},
-          {model: models.DownloadDirectory, as: 'download_directory'}
+        {model: models.DownloadPackage, as: 'download_package'},
+        {model: models.DownloadDirectory, as: 'download_directory'}
       ]
     })
       .then(function () {
@@ -540,9 +540,14 @@ router.post('/package',
 
 router.get('/file/exists/:id',
   function (req, res) {
-    models.Download.findById(req.params.id)
+    models.Download.findById(req.params.id, {
+      include: [{model: models.DownloadPackage, as: 'download_package'}, {
+        model: models.DownloadDirectory,
+        as: 'download_directory'
+      }]
+    })
       .then(function (downloadModel) {
-        var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory + downloadModel.name + '" && echo true || echo false';
+        var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + downloadModel.directory.path + downloadModel.name + '" && echo true || echo false';
         exec(command,
           function (error, stdout, stderr) {
             if (error) {
