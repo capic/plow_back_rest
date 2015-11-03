@@ -418,8 +418,8 @@ router.post('/move',
                                         } else {
                                             models.DownloadDirectory.findById(downloadObject.directory_id)
                                                 .then(function (downloadDirectoryModel) {
-                                                    var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
-                                                    downloadModelListElement.updateAttributes({directory: newDirectory})
+
+                                                    downloadModelListElement.updateAttributes({directory_id: downloadDirectoryModel.id})
                                                         .then(function () {
                                                             // a ce moment les logs ne sont peut etre pas creee en bdd
                                                             if (downloadLogsModel != null)
