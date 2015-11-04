@@ -12,6 +12,7 @@ var downloadStatusConfig = config.get('download_status');
  */
 router.get('/status',
   function (req, res, next) {
+    console.log(res.__('Hello i18n'));
     models.DownloadStatus.findAll()
       .then(function (downloadStatusModel) {
         res.json(downloadStatusModel);
