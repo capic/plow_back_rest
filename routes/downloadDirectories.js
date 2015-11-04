@@ -64,11 +64,7 @@ router.delete('/:id',
     models.Download.findAndCountAll({
         where: {
           directory_id: req.params.id,
-          $or: [{
-            status: downloadStatusConfig.WAITING,
-            status: downloadStatusConfig.IN_PROGRESS
-          }
-          ]
+          $or: [{status: downloadStatusConfig.WAITING}, {status: downloadStatusConfig.IN_PROGRESS}]
         }
     })
       .then(function(result) {
