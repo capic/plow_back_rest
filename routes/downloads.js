@@ -12,9 +12,9 @@ var downloadStatusConfig = config.get('download_status');
  */
 router.get('/status',
   function (req, res, next) {
+    console.log(res.__('downloadDirectories.error'));
     models.DownloadStatus.findAll()
       .then(function (downloadStatusModel) {
-        console.log(res.__('downloadDirectories.error.DELETE_DIRECTORY'));
         res.json(downloadStatusModel);
       }
     );
