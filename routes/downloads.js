@@ -318,7 +318,6 @@ router.post('/move',
             downloadModelListElement.updateAttributes(param)
               .then(function () {
                 var element = downloadModelListElement;
-                element.download_directory = downloadDirectoryModel;
 
                 // on met a jour les logs du download
                 downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
@@ -367,7 +366,8 @@ router.post('/move',
                                   execMoveFile.stdout.on('data',
                                     function (data) {
                                       var param = {
-                                        directory: newDirectory,
+                                        directory_id: downloadDirectoryModel.id,
+                                        download_directory: downloadDirectoryModel,
                                         status: downloadStatusConfig.MOVED
                                       };
                                       logs += "Moving to " + newDirectory + " OK !!!\r\n";
@@ -381,7 +381,8 @@ router.post('/move',
                                       // même si ça s'est bien passé on peut avoir cette erreur donc on considere que c'est ok
                                       if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
                                         var param = {
-                                          directory: newDirectory,
+                                          directory_id: downloadDirectoryModel.id,
+                                          download_directory: downloadDirectoryModel,
                                           status: downloadStatusConfig.MOVED
                                         };
                                         logs += "Moving to " + newDirectory + " OK !!!\r\n";
@@ -427,9 +428,6 @@ router.post('/move',
                             download_directory: downloadDirectoryModel
                           })
                             .then(function () {
-                              var element = downloadModelListElement;
-                              element.download_directory = downloadDirectoryModel;
-
                               // a ce moment les logs ne sont peut etre pas creee en bdd
                               if (downloadLogsModel != null) {
                                 logs = "No moving just update the directory\r\n";
