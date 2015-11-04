@@ -322,7 +322,7 @@ router.post('/move',
                 // on met a jour les logs du download
                 downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
 
-                listDownloadReturned.push(element);
+                listDownloadReturned.push(downloadModelListElement);
                 // on ne renvoit le model que quand on a fini le traitement
                 if (i == downloadModelList.length - 1) {
                   res.json(listDownloadReturned);
@@ -434,7 +434,7 @@ router.post('/move',
                                 downloadLogsModel.updateAttributes({logs: logs});
                               }
 
-                              listDownloadReturned.push(element);
+                              listDownloadReturned.push(downloadModelListElement);
                               if (i == downloadModelList.length - 1) {
                                 res.json(listDownloadReturned);
                               }
