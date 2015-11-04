@@ -1,7 +1,12 @@
 {
-	"downloadDirectories": {
-		"error": {
-			"DELETE_DIRECTORY": "Erreur de suppression du repertoire de telechargement"
-		}
-	}
+  "downloadDirectories": {
+    "error": {
+      "DELETE_DIRECTORY": "Erreur de suppression du repertoire de telechargement"
+    }
+  },
+  "downloads": {
+    "error": {
+      "FILE_EXISTS": "Le fichier téléchargé n'éxiste pas"
+    }
+  }
 }

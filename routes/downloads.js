@@ -298,7 +298,7 @@ router.get('/availability/:id',
 );
 
 router.post('/move',
-  function (req, res) {
+  function (req, res, next) {
     var downloadObject = JSON.parse(JSON.stringify(req.body));
 
     // on recupere le download sur lequel on fait le traitement
@@ -313,6 +313,7 @@ router.post('/move',
         var treatment = function (downloadModelList) {
           var i = 0;
           var listDownloadReturned = [];
+          var listErrors = [];
 
           var updateInfos = function (downloadModelListElement, downloadLogsModel, downloadDirectoryModel, param, message) {
             // on met à jour le download avec le nouveau directory et le nouveau status
@@ -326,7 +327,11 @@ router.post('/move',
                 listDownloadReturned.push(downloadModelListElement);
                 // on ne renvoit le model que quand on a fini le traitement
                 if (i == downloadModelList.length - 1) {
-                  res.json(listDownloadReturned);
+                  if (listErrors.length > 0) {
+                    return next(listErrors);
+                  } else {
+                    res.json(listDownloadReturned);
+                  }
                 }
                 i++;
               }
@@ -409,6 +414,9 @@ router.post('/move',
 
                                 execFileExists.stderr.on('data',
                                   function (data) {
+                                    var error = new Error(res.__(errorConfig.download.fileExists.message));
+                                    error.status = errorConfig.download.fileExists.code;
+
                                     var param = {status: downloadStatusConfig.ERROR_MOVING};
                                     logs += "Moving to " + newDirectory + " ERROR => file exists check error !!!\r\n";
                                     logs += data + "\r\n";
@@ -437,9 +445,12 @@ router.post('/move',
 
                               listDownloadReturned.push(downloadModelListElement);
                               if (i == downloadModelList.length - 1) {
-                                res.json(listDownloadReturned);
+                                if (listErrors.length > 0) {
+                                  return next(listErrors);
+                                } else {
+                                  res.json(listDownloadReturned);
+                                }
                               }
-
                               i++;
                             }
                           );
@@ -573,7 +584,7 @@ router.post('/package',
 );
 
 router.get('/file/exists/:id',
-  function (req, res) {
+  function (req, res, next) {
     models.Download.findById(req.params.id, {
       include: [{model: models.DownloadPackage, as: 'download_package'}, {
         model: models.DownloadDirectory,
@@ -585,7 +596,10 @@ router.get('/file/exists/:id',
         exec(command,
           function (error, stdout, stderr) {
             if (error) {
-              res.json({'return': false});
+              var error = new Error(res.__(errorConfig.download.fileExists.message));
+              error.status = errorConfig.download.fileExists.code;
+
+              return next(error);
             } else {
               res.json({'return': stdout == 'true\n'});
             }

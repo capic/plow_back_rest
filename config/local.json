@@ -28,9 +28,17 @@
     "ERROR_MOVING": 11
   },
   "errors": {
+    "downloads": {
+      "fileExists": {
+        "code": 10000,
+        "message": "downloads.error.FILE_EXISTS"
+      }
+    },
     "downloadDirectories": {
-      "code": 10000,
-      "message": "downloadDirectories.error.DELETE_DIRECTORY"
+      "deleteDirectory": {
+        "code": 20000,
+        "message": "downloadDirectories.error.DELETE_DIRECTORY"
+      }
     }
   }
 }
