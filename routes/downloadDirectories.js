@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 var config = require("../configuration");
 var downloadStatusConfig = config.get('download_status');
+var errorConfig = config.get('errors');
 
 /**
  * get the list of download directories
@@ -76,7 +77,9 @@ router.delete('/:id',
             }
           );
         } else {
-          return next(new Error(res.__('downloadDirectories.error.DELETE_DIRECTORY')));
+          var error = new Error(res.__(errorConfig.downloadDirectories.message));
+          error.statusCode = errorConfig.downloadDirectories.code;
+          return next(error);
         }
       });
   }

@@ -6,6 +6,7 @@ var exec = require('child_process').exec;
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
 var downloadStatusConfig = config.get('download_status');
+var errorConfig = config.get('errors');
 
 /**
  * get the list of download status

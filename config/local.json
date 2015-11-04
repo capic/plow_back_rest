@@ -26,5 +26,11 @@
     "MOVING": 9,
     "MOVED": 10,
     "ERROR_MOVING": 11
+  },
+  "errors": {
+    "downloadDirectories": {
+      "code": 10000,
+      "message": "downloadDirectories.error.DELETE_DIRECTORY"
+    }
   }
 }
