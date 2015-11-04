@@ -1,6 +1,8 @@
 var models = require('../models');
 var express = require('express');
 var router = express.Router();
+var config = require("../configuration");
+var downloadStatusConfig = config.get('download_status');
 
 /**
  * get the list of download directories
@@ -58,8 +60,17 @@ router.post('/',
  * delete a download by id
  */
 router.delete('/:id',
-  function (req, res) {
-    models.Download.findAndCountAll({where: {directory_id: req.params.id}})
+  function (req, res, next) {
+    models.Download.findAndCountAll({
+        where: {
+          directory_id: req.params.id,
+          $or: [{
+            status: downloadStatusConfig.WAITING,
+            status: downloadStatusConfig.IN_PROGRESS
+          }
+          ]
+        }
+    })
       .then(function(result) {
         // on supprime le directory seulement si il n'est pas utilise autre part
         if (result.count <= 1) {
