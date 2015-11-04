@@ -59,11 +59,19 @@ router.post('/',
  */
 router.delete('/:id',
   function (req, res) {
-    models.DownloadDirectory.destroy({where: {id: req.params.id}})
-      .then(function (ret) {
-        res.json({'return': ret == 1});
-      }
-    );
+    models.Download.findAndCountAll({where: {directory_id: req.params.id}})
+      .then(function(result) {
+        // on supprime le directory seulement si il n'est pas utilise autre part
+        if (result.count <= 1) {
+          models.DownloadDirectory.destroy({where: {id: req.params.id}})
+            .then(function (ret) {
+              res.json({'return': ret == 1});
+            }
+          );
+        } else {
+          return next(new Error('aaaaaaaaaaaaaa'));
+        }
+      });
   }
 );
 
