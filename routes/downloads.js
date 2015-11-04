@@ -422,7 +422,10 @@ router.post('/move',
                       models.DownloadDirectory.findById(downloadObject.directory_id)
                         .then(function (downloadDirectoryModel) {
 
-                          downloadModelListElement.updateAttributes({directory_id: downloadDirectoryModel.id})
+                          downloadModelListElement.updateAttributes({
+                            directory_id: downloadDirectoryModel.id,
+                            download_directory: downloadDirectoryModel
+                          })
                             .then(function () {
                               var element = downloadModelListElement;
                               element.download_directory = downloadDirectoryModel;
