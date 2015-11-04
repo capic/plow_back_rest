@@ -14,6 +14,7 @@ router.get('/status',
   function (req, res, next) {
     models.DownloadStatus.findAll()
       .then(function (downloadStatusModel) {
+        console.log(res.__('downloadDirectories.error.DELETE_DIRECTORY'));
         res.json(downloadStatusModel);
       }
     );
