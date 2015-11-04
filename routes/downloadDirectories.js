@@ -78,7 +78,7 @@ router.delete('/:id',
           );
         } else {
           var error = new Error(res.__(errorConfig.downloadDirectories.message));
-          error.statusCode = errorConfig.downloadDirectories.code;
+          error.status = errorConfig.downloadDirectories.code;
           return next(error);
         }
       });
