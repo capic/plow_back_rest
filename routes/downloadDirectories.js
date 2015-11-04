@@ -76,6 +76,7 @@ router.delete('/:id',
             }
           );
         } else {
+          console.log(res.__('downloadDirectories.error.DELETE_DIRECTORY'));
           return next(new Error(res.__('downloadDirectories.error.DELETE_DIRECTORY')));
         }
       });
