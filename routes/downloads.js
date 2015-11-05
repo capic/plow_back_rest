@@ -601,7 +601,15 @@ router.get('/file/exists/:id',
 
               return next(error);
             } else {
-              res.json({'return': stdout == 'true\n'});
+              if (stdout == 'true\n') {
+                res.json({'return': true});
+              } else {
+                var error = new Error(res.__(errorConfig.download.fileExists.message));
+                error.status = errorConfig.download.fileExists.code;
+
+                return next(error);
+              }
+
             }
           }
         );
