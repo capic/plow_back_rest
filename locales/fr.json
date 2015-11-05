@@ -1,7 +1,7 @@
 {
   "downloadDirectories": {
     "error": {
-      "DELETE_DIRECTORY": "Erreur de suppression du repertoire de telechargement"
+      "DELETE_DIRECTORY": "Suppression du repertoire impossible, il est utilisé dans une autre téléchargement"
     }
   },
   "downloads": {
