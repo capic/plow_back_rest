@@ -597,7 +597,7 @@ router.get('/file/exists/:id',
           function (error, stdout, stderr) {
             if (error) {
               var error = new Error(res.__(errorConfig.downloads.fileExists.message));
-              error.status = errorConfig.download.fileExists.code;
+              error.status = errorConfig.downloads.fileExists.code;
 
               return next(error);
             } else {
@@ -605,7 +605,7 @@ router.get('/file/exists/:id',
                 res.json({'return': true});
               } else {
                 var error = new Error(res.__(errorConfig.downloads.fileExists.message));
-                error.status = errorConfig.download.fileExists.code;
+                error.status = errorConfig.downloads.fileExists.code;
 
                 return next(error);
               }
