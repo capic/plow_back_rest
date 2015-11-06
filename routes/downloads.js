@@ -163,7 +163,7 @@ router.post('/',
 
 router.post('/remove',
   function(req, res, next) {
-    var listDownloadId = JSON.parse(JSON.stringify(req.body));
+    var listDownloadId = JSON.parse(JSON.stringify(req.body)).ListId;
 
     var listDownloadIdDeleted = [];
     var i = 0;
