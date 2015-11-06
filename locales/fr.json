@@ -6,7 +6,7 @@
   },
   "downloads": {
     "error": {
-      "FILE_EXISTS": "Le fichier téléchargé n'éxiste pas"
+      "FILE_EXISTS": "Le fichier téléchargé %s n'éxiste pas"
     }
   }
 }
