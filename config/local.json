@@ -32,6 +32,10 @@
       "fileExists": {
         "code": 10000,
         "message": "downloads.error.FILE_EXISTS"
+      },
+      "deleteDownload": {
+        "code": 10001,
+        "message": "downloads.error.DELETE_DOWNLOAD"
       }
     },
     "downloadDirectories": {

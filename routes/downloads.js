@@ -161,6 +161,38 @@ router.post('/',
   }
 );
 
+router.post('/remove',
+  function(req, res, next) {
+    var listDownloadId = JSON.parse(JSON.stringify(req.body));
+
+    var listDownloadIdDeleted = [];
+    var i = 0;
+    listDownloadId.forEach(
+      function(downloadId) {
+        models.Download.destroy({where: {id: downloadId}})
+          .then(function(ret){
+            if (ret != 1) {
+              var error = new Error(res.__(errorConfig.downloads.deleteDownload.message, downloadId));
+              error.status = errorConfig.downloads.deleteDownload.code;
+
+              return next(error);
+            } else {
+              listDownloadIdDeleted.push(downloadId);
+            }
+            if (i == listDownloadId.length - 1) {
+              res.json({'listDownloadIdDeleted': listDownloadIdDeleted});
+            }
+
+            i++;
+          }
+        );
+      }
+    );
+
+
+  }
+);
+
 /**
  * update a download by id
  */

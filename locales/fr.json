@@ -6,7 +6,8 @@
   },
   "downloads": {
     "error": {
-      "FILE_EXISTS": "Le fichier téléchargé %s n'éxiste pas"
+      "FILE_EXISTS": "Le fichier téléchargé %s n'éxiste pas",
+      "DELETE_DOWNLOAD": "Impossible de supprimer le download avec l'id: %s"
     }
   }
 }
