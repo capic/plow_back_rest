@@ -655,7 +655,7 @@ router.get('/file/exists/:id',
 router.post('/reset',
   function (req, res, next) {
     var downloadObject = JSON.parse(JSON.stringify(req.body));
-console.log(downloadObject);
+
     models.Download.findById(downloadObject.id,
       {
         include: [
@@ -664,7 +664,7 @@ console.log(downloadObject);
         ]
       })
       .then(function (downloadModel) {
-        downloadModel.updateAttributes({status: downloadStatusConfig.IN_PROGRESS})
+        downloadModel.updateAttributes({status: downloadStatusConfig.WAITING})
           .then(function () {
             if (downloadObject.deleteFile) {
               var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
