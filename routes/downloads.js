@@ -656,7 +656,7 @@ router.post('/reset',
   function (req, res, next) {
     var downloadObject = JSON.parse(JSON.stringify(req.body));
 
-    models.Download.findById(req.params.id,
+    models.Download.findById(downloadObject.id,
       {
         include: [
           {model: models.DownloadPackage, as: 'download_package'},
