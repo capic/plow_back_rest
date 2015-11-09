@@ -652,4 +652,48 @@ router.get('/file/exists/:id',
   }
 );
 
+router.post('/reset',
+  function(req, res, next) {
+    var downloadObject = JSON.parse(JSON.stringify(req.body));
+
+    models.Download.update(downloadObject, {
+      where: {id: downloadObject.id},
+      include: [
+        {model: models.DownloadPackage, as: 'download_package'},
+        {model: models.DownloadDirectory, as: 'download_directory'}
+      ]
+    })
+      .then(function () {
+        models.Download.findById(req.params.id)
+          .then(function (downloadModel) {
+            if (websocket.connection.isOpen) {
+              websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+              websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+            }
+
+            if (downloadObject.deleteFile) {
+              var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
+              var name = downloadModel.name.replace(/\s/g, "\\\\ ");
+
+              // on teste l'existence du fichier
+              var command = 'ssh root@' + downloadServerConfig.address + ' rm "' + directory + name + '"';
+              var execDeleteFile = exec(command);
+
+              execDeleteFile.stdout.on('data', function (data) {
+                console.log(data);
+              });
+
+              execDeleteFile.stderr.on('data', function (data) {
+                console.log(data);
+              });
+            }
+
+            res.json(downloadModel);
+          }
+        );
+      }
+    );
+  }
+);
+
 module.exports = router;
