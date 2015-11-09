@@ -162,15 +162,15 @@ router.post('/',
 );
 
 router.post('/remove',
-  function(req, res, next) {
+  function (req, res, next) {
     var listDownloadId = JSON.parse(JSON.stringify(req.body)).ListId;
 
     var listDownloadIdDeleted = [];
     var i = 0;
     listDownloadId.forEach(
-      function(downloadId) {
+      function (downloadId) {
         models.Download.destroy({where: {id: downloadId}})
-          .then(function(ret){
+          .then(function (ret) {
             if (ret != 1) {
               var error = new Error(res.__(errorConfig.downloads.deleteDownload.message, downloadId));
               error.status = errorConfig.downloads.deleteDownload.code;
@@ -653,24 +653,19 @@ router.get('/file/exists/:id',
 );
 
 router.post('/reset',
-  function(req, res, next) {
+  function (req, res, next) {
     var downloadObject = JSON.parse(JSON.stringify(req.body));
 
-    models.Download.update(downloadObject, {
-      where: {id: downloadObject.id},
-      include: [
-        {model: models.DownloadPackage, as: 'download_package'},
-        {model: models.DownloadDirectory, as: 'download_directory'}
-      ]
-    })
-      .then(function () {
-        models.Download.findById(req.params.id)
-          .then(function (downloadModel) {
-            if (websocket.connection.isOpen) {
-              websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-              websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
-            }
-
+    models.Download.findById(req.params.id,
+      {
+        include: [
+          {model: models.DownloadPackage, as: 'download_package'},
+          {model: models.DownloadDirectory, as: 'download_directory'}
+        ]
+      })
+      .then(function (downloadModel) {
+        downloadModel.updateAttributes({status: downloadStatusConfig.IN_PROGRESS})
+          .then(function () {
             if (downloadObject.deleteFile) {
               var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
               var name = downloadModel.name.replace(/\s/g, "\\\\ ");
