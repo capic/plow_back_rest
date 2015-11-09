@@ -655,7 +655,7 @@ router.get('/file/exists/:id',
 router.post('/reset',
   function (req, res, next) {
     var downloadObject = JSON.parse(JSON.stringify(req.body));
-
+console.log(downloadObject);
     models.Download.findById(downloadObject.id,
       {
         include: [
