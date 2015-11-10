@@ -233,6 +233,18 @@ router.delete('/:id',
   function (req, res) {
     models.Download.destroy({where: {id: req.params.id}})
       .then(function (ret) {
+        if (websocket.connection.isOpen) {
+          models.Download.findAll({
+            include: [{model: models.DownloadPackage, as: 'download_package'}, {
+              model: models.DownloadDirectory,
+              as: 'download_directory'
+            }]
+          }).then(function(downloadsModel) {
+            websocket.session.publish('plow.downloads.downloads', [downloadsModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
+            //websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
+          });
+        }
+
         res.json({'return': ret == 1});
       }
     );
@@ -689,8 +701,8 @@ router.post('/reset',
             }
 
             if (websocket.connection.isOpen) {
-              websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-              websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+              websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false, exclude: [downloadObject.wampId]});
+              websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [downloadObject.wampId]});
             }
 
             res.json(downloadModel);
