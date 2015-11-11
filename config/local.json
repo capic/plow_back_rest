@@ -27,6 +27,10 @@
     "MOVED": 10,
     "ERROR_MOVING": 11
   },
+  "from": {
+    "IHM_CLIENT": 1,
+    "PYTHON_CLIENT": 2
+  },
   "errors": {
     "downloads": {
       "fileExists": {
