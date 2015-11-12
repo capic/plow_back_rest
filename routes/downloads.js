@@ -372,8 +372,6 @@ router.post('/move',
                         // on met à jour le download avec le nouveau directory et le nouveau status
                         downloadModelListElement.updateAttributes(param)
                             .then(function () {
-                                var element = downloadModelListElement;
-
                                 // on met a jour les logs du download
                                 downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
 
