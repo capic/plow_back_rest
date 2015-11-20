@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     freezeTableName: true,
     createdAt: false,
     updatedAt: false,
-    tableName: 'download_directory',
+    tableName: 'download_host',
     classMethods: {
       associate: function(models) {
         DownloadHost.hasMany(models.Download, {foreignKey: 'host_id', as:'download_host'})
