@@ -48,7 +48,7 @@ router.post('/',
   function (req, res) {
     var downloadHostObject = JSON.parse(JSON.stringify(req.body));
 
-    models.DownloadHost.findOrCreate({where: {path: downloadHostObject.name}, defaults: downloadHostObject})
+    models.DownloadHost.findOrCreate({where: {name: downloadHostObject.name}, defaults: downloadHostObject})
       .spread(function (downloadHostModel, created) {
         res.json(downloadHostModel.get({plain: true}));
       }
