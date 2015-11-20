@@ -39,10 +39,19 @@ router.get('/',
         if (Object.keys(params).length !== 0) {
             models.Download.findAll({
                 where: params,
-                include: [{model: models.DownloadPackage, as: 'download_package'}, {
-                    model: models.DownloadDirectory,
-                    as: 'download_directory'
-                }]
+                include: [
+                    {
+                        model: models.DownloadPackage,
+                        as: 'download_package'
+                    }, {
+                        model: models.DownloadDirectory,
+                        as: 'download_directory'
+                    },
+                    {
+                        model: models.DownloadHost,
+                        as: 'download_host'
+                    }
+                ]
             }).then(callback);
         } else {
             models.Download.findAll({
@@ -52,11 +61,15 @@ router.get('/',
                 }, {
                     model: models.DownloadDirectory,
                     as: 'download_directory'
+                }, {
+                    model: models.DownloadHost,
+                    as: 'download_host'
                 }]
             }).then(callback);
         }
     }
-);
+)
+;
 
 /**
  * get the next download
@@ -83,6 +96,8 @@ router.get('/next',
                                         model: models.DownloadPackage, as: 'download_package'
                                     }, {
                                         model: models.DownloadDirectory, as: 'download_directory'
+                                    }, {
+                                        model: models.DownloadHost, as: 'download_host'
                                     }
                                 ]
                             })
@@ -108,7 +123,8 @@ router.get('/:id',
         models.Download.findById(req.params.id, {
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
-                {model: models.DownloadDirectory, as: 'download_directory'}
+                {model: models.DownloadDirectory, as: 'download_directory'},
+                {model: models.DownloadHost, as: 'download_host'}
             ]
         })
             .then(function (downloadModel) {
