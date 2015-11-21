@@ -36,7 +36,7 @@ router.get('/:id',
         models.DownloadHostPicture.findById(req.params.id)
             .then(function (downloadHostPictureModel) {
                 res.writeHead(200, {'Content-Type': 'image/png'});
-                res.end(downloadHostPictureModel.logo, 'binary');
+                res.end(downloadHostPictureModel.picture, 'binary');
             }
         );
     }
