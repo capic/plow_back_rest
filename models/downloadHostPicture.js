@@ -3,7 +3,7 @@
  */
 module.exports = function(sequelize, DataTypes) {
   var DownloadHostPicture = sequelize.define('DownloadHostPicture', {
-    logo: DataTypes.BLOB
+    picture: DataTypes.BLOB
   }, {
     freezeTableName: true,
     createdAt: false,
