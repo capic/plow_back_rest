@@ -4,7 +4,7 @@
 module.exports = function(sequelize, DataTypes) {
   var DownloadHost = sequelize.define('DownloadHost', {
     name: DataTypes.STRING,
-    logo: DataTypes.STRING
+    logo: DataTypes.BLOB
   }, {
     freezeTableName: true,
     createdAt: false,
