@@ -865,6 +865,19 @@ router.post('/reset',
                             });
                         }
 
+                        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.reset_command + ' ' + downloadObject.id;
+                        var execReset = exec(command);
+
+                        execReset.stdout.on('data', function (data) {
+                            console.log('stdout: ' + data);
+                        });
+                        execReset.stderr.on('data', function (data) {
+                            console.log('stdout: ' + data);
+                        });
+                        execReset.on('close', function (code) {
+                            console.log('closing code: ' + code);
+                        });
+
                         if (websocket.connection.isOpen) {
                             websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {
                                 acknowledge: false,
