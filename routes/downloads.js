@@ -394,7 +394,7 @@ router.post('/moveOne',
             }]
         })
             .then(function (downloadModel) {
-                if (downloadObject.from == fromConfig.PYTHON_CLIENT || (downloadObject.from == fromConfig.IHM_CLIENT && downloadModelListElement.directory_id != downloadObject.directory_id)) {
+                if (downloadObject.from == fromConfig.PYTHON_CLIENT || (downloadObject.from == fromConfig.IHM_CLIENT && downloadModel.directory_id != downloadObject.directory_id)) {
                     var logs = "";
                     models.DownloadLogs.findById(downloadObject.id)
                         .then(function (downloadLogsModel) {
