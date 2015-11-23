@@ -47,6 +47,9 @@ router.get('/',
                     }, {
                         model: models.DownloadDirectory,
                         as: 'download_directory'
+                    }, {
+                        model: models.DownloadDirectory,
+                        as: 'old_download_directory'
                     },
                     {
                         model: models.DownloadHost,
