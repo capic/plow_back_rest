@@ -8,7 +8,7 @@ var downloadStatusConfig = config.get('download_status');
 
 var utils = {};
 
-var move = function (oldDirectory, newDirectory, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback) {
+var move = function (oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback) {
     var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
     var execMoveFile = exec(command);
 
@@ -60,7 +60,7 @@ utils.moveDownload = function (logs, downloadModel, downloadLogsModel, downloadD
         function (data) {
             // si le fichier existe
             if (data == "true\n") {
-                move(oldDirectory, newDirectory, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
+                move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
             }
         }
     );
@@ -68,7 +68,7 @@ utils.moveDownload = function (logs, downloadModel, downloadLogsModel, downloadD
     execFileExists.stderr.on('data',
         function (data) {
             if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
-                move(oldDirectory, newDirectory, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
+                move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
             } else {
                 var param = {status: downloadStatusConfig.ERROR_MOVING};
                 logs += "Moving to " + newDirectory + " ERROR => file exists check error !!!\r\n";
