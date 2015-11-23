@@ -53,14 +53,27 @@ module.exports = function (sequelize, DataTypes) {
                     return progress
                 }
             },
-          classMethods: {
-              associate: function (models) {
-                Download.belongsTo(models.DownloadPackage, {foreignKey: 'package_id', as:'download_package'});
-                Download.belongsTo(models.DownloadDirectory, {foreignKey: 'directory_id', as:'download_directory'});
-                Download.belongsTo(models.DownloadHost, {foreignKey: 'host_id', as:'download_host'});
-              }
-          }
-      });
+            classMethods: {
+                associate: function (models) {
+                    Download.belongsTo(models.DownloadPackage, {
+                        foreignKey: 'package_id',
+                        as: 'download_package'
+                    });
+                    Download.belongsTo(models.DownloadDirectory, {
+                        foreignKey: 'directory_id',
+                        as: 'download_directory'
+                    });
+                    Download.belongsTo(models.DownloadDirectory, {
+                        foreignKey: 'old_directory_id',
+                        as: 'old_download_directory'
+                    });
+                    Download.belongsTo(models.DownloadHost, {
+                        foreignKey: 'host_id',
+                        as: 'download_host'
+                    });
+                }
+            }
+        });
 
     return Download;
 };

@@ -12,6 +12,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         DownloadDirectory.hasMany(models.Download, {foreignKey: 'directory_id', as:'download_directory'})
+        DownloadDirectory.hasMany(models.Download, {foreignKey: 'old_directory_id', as:'old_download_directory'})
       }
     }
   });
