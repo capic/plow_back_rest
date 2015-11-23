@@ -399,10 +399,11 @@ router.post('/moveOne',
 
         // on recupere le download sur lequel on fait le traitement
         models.Download.findById(downloadObject.id, {
-            include: [{model: models.DownloadPackage, as: 'download_package'}, {
-                model: models.DownloadDirectory,
-                as: 'download_directory'
-            }]
+            include: [
+                {model: models.DownloadPackage, as: 'download_package'},
+                {model: models.DownloadDirectory, as: 'download_directory'},
+                {model: models.DownloadDirectory, as: 'old_download_directory'}
+            ]
         })
             .then(function (downloadModel) {
                 if (downloadObject.from == fromConfig.PYTHON_CLIENT || (downloadObject.from == fromConfig.IHM_CLIENT && downloadModel.directory_id != downloadObject.directory_id)) {
