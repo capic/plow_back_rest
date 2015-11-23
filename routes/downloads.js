@@ -429,7 +429,7 @@ router.post('/moveOne',
                                         downloadModel.updateAttributes({
                                             directory_id: downloadDirectoryModel.id,
                                             download_directory: downloadDirectoryModel,
-                                            old_directory_id: downloadObject.old_download_id
+                                            old_directory_id: downloadObject.old_directory_id
                                         })
                                             .then(function () {
                                                 // a ce moment les logs ne sont peut etre pas creee en bdd
