@@ -399,7 +399,7 @@ router.post('/moveOne',
                     models.DownloadLogs.findById(downloadObject.id)
                         .then(function (downloadLogsModel) {
                             if (downloadModel.status == downloadStatusConfig.FINISHED || downloadModel.status == downloadStatusConfig.MOVED || downloadModel.status == downloadStatusConfig.ERROR_MOVING) {
-                                logs = "Moving action ...";
+                                logs = "Moving action ...\r\n";
 
                                 downloadModel.updateAttributes({status: downloadStatusConfig.MOVING})
                                     .then(function () {
@@ -464,19 +464,19 @@ router.post('/moveOne',
                                                             }
                                                         );
                                                     }
-
-                                                    execFileExists.stderr.on('data',
-                                                        function (data) {
-                                                            var error = new Error(res.__(errorConfig.downloads.fileExists.message));
-                                                            error.status = errorConfig.downloads.fileExists.code;
-
-                                                            var param = {status: downloadStatusConfig.ERROR_MOVING};
-                                                            logs += "Moving to " + newDirectory + " ERROR => file exists check error !!!\r\n";
-                                                            logs += data + "\r\n";
-                                                            updateInfos(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
-                                                        }
-                                                    );
                                                 });
+
+                                                execFileExists.stderr.on('data',
+                                                    function (data) {
+                                                        var error = new Error(res.__(errorConfig.downloads.fileExists.message));
+                                                        error.status = errorConfig.downloads.fileExists.code;
+
+                                                        var param = {status: downloadStatusConfig.ERROR_MOVING};
+                                                        logs += "Moving to " + newDirectory + " ERROR => file exists check error !!!\r\n";
+                                                        logs += data + "\r\n";
+                                                        updateInfos(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
+                                                    }
+                                                );
                                             }
                                         );
                                     }
