@@ -38,7 +38,11 @@ var move = function (oldDirectory, newDirectory, name, logs, downloadModel, down
                 };
                 logs += "Moving from " + oldDirectory + " to " + newDirectory + " OK !!!\r\n";
             } else {
-                var param = {status: downloadStatusConfig.ERROR_MOVING};
+                var param = {
+                    status: downloadStatusConfig.ERROR_MOVING,
+                    directory_id: downloadModel.old_directory_id,
+                    old_directory_id: downloadModel.directory_id
+                };
                 logs += "Moving from " + oldDirectory + " to " + newDirectory + " ERROR !!!\r\n";
             }
             logs += data + "\r\n";
@@ -71,7 +75,11 @@ utils.moveDownload = function (logs, downloadModel, downloadLogsModel, downloadD
             if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
                 move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
             } else {
-                var param = {status: downloadStatusConfig.ERROR_MOVING};
+                var param = {
+                    status: downloadStatusConfig.ERROR_MOVING,
+                    directory_id: downloadModel.old_directory_id,
+                    old_directory_id: downloadModel.directory_id
+                };
                 logs += "File " + oldDirectory + name + " ERROR => file exists check error !!!\r\n";
                 logs += data + "\r\n";
                 callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
