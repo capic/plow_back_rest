@@ -18,6 +18,7 @@ var move = function (oldDirectory, newDirectory, name, logs, downloadModel, down
             var param = {
                 directory_id: downloadDirectoryModel.id,
                 download_directory: downloadDirectoryModel,
+                old_download_directory: downloadMode.directory_id,
                 status: downloadStatusConfig.MOVED
             };
             logs += "Moving from " + oldDirectory + " to " + newDirectory + " OK !!!\r\n";
