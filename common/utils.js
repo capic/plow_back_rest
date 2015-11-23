@@ -20,7 +20,7 @@ var move = function (oldDirectory, newDirectory, name, logs, downloadModel, down
                 download_directory: downloadDirectoryModel,
                 status: downloadStatusConfig.MOVED
             };
-            logs += "Moving to " + newDirectory + " OK !!!\r\n";
+            logs += "Moving from " + oldDirectory + " to " + newDirectory + " OK !!!\r\n";
             logs += data + "\r\n";
             callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
         }
@@ -35,10 +35,10 @@ var move = function (oldDirectory, newDirectory, name, logs, downloadModel, down
                     download_directory: downloadDirectoryModel,
                     status: downloadStatusConfig.MOVED
                 };
-                logs += "Moving to " + newDirectory + " OK !!!\r\n";
+                logs += "Moving from " + oldDirectory + " to " + newDirectory + " OK !!!\r\n";
             } else {
                 var param = {status: downloadStatusConfig.ERROR_MOVING};
-                logs += "Moving to " + newDirectory + " ERROR !!!\r\n";
+                logs += "Moving from " + oldDirectory + " to " + newDirectory + " ERROR !!!\r\n";
             }
             logs += data + "\r\n";
             callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
@@ -71,7 +71,7 @@ utils.moveDownload = function (logs, downloadModel, downloadLogsModel, downloadD
                 move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
             } else {
                 var param = {status: downloadStatusConfig.ERROR_MOVING};
-                logs += "Moving to " + newDirectory + " ERROR => file exists check error !!!\r\n";
+                logs += "File " + oldDirectory + name + " ERROR => file exists check error !!!\r\n";
                 logs += data + "\r\n";
                 callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
             }
