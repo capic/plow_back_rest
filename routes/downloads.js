@@ -103,6 +103,9 @@ router.get('/next',
                                         model: models.DownloadPackage, as: 'download_package'
                                     }, {
                                         model: models.DownloadDirectory, as: 'download_directory'
+                                    },  {
+                                        model: models.DownloadDirectory,
+                                        as: 'old_download_directory'
                                     }, {
                                         model: models.DownloadHost, as: 'download_host'
                                     }
@@ -131,6 +134,7 @@ router.get('/:id',
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
                 {model: models.DownloadDirectory, as: 'download_directory'},
+                {model: models.DownloadDirectory, as: 'old_download_directory'},
                 {model: models.DownloadHost, as: 'download_host'}
             ]
         })
