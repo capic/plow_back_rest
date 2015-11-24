@@ -434,8 +434,8 @@ router.post('/moveOne',
                                             .then(function () {
                                                 // a ce moment les logs ne sont peut etre pas creee en bdd
                                                 if (downloadLogsModel != null) {
-                                                    logs = "No moving just update the directory\r\n";
-                                                    downloadLogsModel.updateAttributes({logs: logs});
+                                                    logs += "No moving just update the directory\r\n";
+                                                    downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + logs});
                                                 }
 
                                                 res.json(downloadModel);
@@ -716,7 +716,10 @@ router.put('/logs/:id',
  */
 router.delete('/logs/:id',
     function (req, res) {
-        models.DownloadLogs.destroy({where: {id: req.params.id}})
+        var downloadObject = JSON.parse(JSON.stringify(req.body));
+        downloadObject.logs = '';
+
+        models.DownloadLogs.update(downloadObject, {where: {id: req.params.id}})
             .then(function (ret) {
                 res.json({'return': ret == 1});
             }
