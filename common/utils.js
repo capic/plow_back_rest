@@ -56,7 +56,7 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     var oldDirectory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
     var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
 
-    if (downloadObject == fromConfig.PYTHON_CLIENT) {
+    if (downloadObject.from == fromConfig.PYTHON_CLIENT) {
         oldDirectory = downloadModel.old_download_directory.path.replace(/\s/g, "\\\\ ");
         newDirectory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
     }
