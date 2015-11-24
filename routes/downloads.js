@@ -717,7 +717,7 @@ router.put('/logs/:id',
 router.delete('/logs/:id',
     function (req, res) {
         models.DownloadLogs.findById(req.params.id)
-            .then(function(donwloadLogsModel) {
+            .then(function(downloadLogsModel) {
                 downloadLogsModel.updateAttributes({logs: ''})
                     .then(function(ret) {
                         res.json({'return': ret == 1});
