@@ -417,7 +417,7 @@ router.post('/moveOne',
                                     .then(function () {
                                         models.DownloadDirectory.findById(downloadObject.directory_id)
                                             .then(function (downloadDirectoryModel) {
-                                                utils.moveDownload(logs, downloadModel, downloadLogsModel, downloadDirectoryModel, updateInfos)
+                                                utils.moveDownload(logs, downloadObject, downloadModel, downloadLogsModel, downloadDirectoryModel, updateInfos)
                                             }
                                         );
                                     }

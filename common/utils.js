@@ -5,6 +5,7 @@ var exec = require('child_process').exec;
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
 var downloadStatusConfig = config.get('download_status');
+var fromConfig = config.get('from');
 
 var utils = {};
 
@@ -51,9 +52,14 @@ var move = function (oldDirectory, newDirectory, name, logs, downloadModel, down
     );
 };
 
-utils.moveDownload = function (logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback) {
+utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogsModel, downloadDirectoryModel, callback) {
     var oldDirectory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
     var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
+
+    if (downloadObject == fromConfig.PYTHON_CLIENT) {
+        oldDirectory = downloadModel.old_download_directory.path.replace(/\s/g, "\\\\ ");
+        newDirectory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
+    }
     var name = downloadModel.name.replace(/\s/g, "\\\\ ");
 
     // on teste l'existence du fichier
