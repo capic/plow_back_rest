@@ -716,12 +716,13 @@ router.put('/logs/:id',
  */
 router.delete('/logs/:id',
     function (req, res) {
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
-        downloadObject.logs = '';
-
-        models.DownloadLogs.update(downloadObject, {where: {id: req.params.id}})
-            .then(function (ret) {
-                res.json({'return': ret == 1});
+        models.DownloadLogs.findById(req.params.id)
+            .then(function(donwloadLogsModel) {
+                downloadLogsModel.updateAttributes({logs: ''})
+                    .then(function(ret) {
+                        res.json({'return': ret == 1});
+                    }
+                );
             }
         );
     }
