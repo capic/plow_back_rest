@@ -30,7 +30,7 @@ var move = function (oldDirectory, newDirectory, name, logs, downloadModel, down
 
     execMoveFile.stderr.on('data',
         function (data) {
-            // même si ça s'est bien passé on peut avoir cette erreur donc on considere que c'est ok
+            // meme si tout s'est bien passe on peut avoir cette erreur donc on considere que c'est ok
             if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
                 var param = {
                     directory_id: downloadDirectoryModel.id,
@@ -71,7 +71,17 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
         function (data) {
             // si le fichier existe
             if (data == "true\n") {
+                logs += "File exists\r\n";
                 move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
+            } else {
+                var param = {
+                    status: downloadStatusConfig.ERROR_MOVING,
+                    directory_id: downloadModel.old_directory_id,
+                    old_directory_id: downloadModel.directory_id
+                };
+                logs += "File does not exist\r\n";
+                logs += data + '\r\n';
+                callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
             }
         }
     );
@@ -79,6 +89,8 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     execFileExists.stderr.on('data',
         function (data) {
             if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
+                logs += "Error in file exists but the file really exists";
+                logs += data + "\r\n";
                 move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
             } else {
                 var param = {
