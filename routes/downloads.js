@@ -719,8 +719,8 @@ router.delete('/logs/:id',
         models.DownloadLogs.findById(req.params.id)
             .then(function(downloadLogsModel) {
                 downloadLogsModel.updateAttributes({logs: ''})
-                    .then(function(ret) {
-                        res.json({'return': ret == 1});
+                    .then(function(downloadLogsModelUpdated) {
+                        res.json(downloadLogsModelUpdated);
                     }
                 );
             }
