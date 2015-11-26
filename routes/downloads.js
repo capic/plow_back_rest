@@ -381,21 +381,21 @@ router.get('/availability/:id',
     }
 );
 
+var updateInfos = function (downloadModel, downloadLogsModel, downloadDirectoryModel, param, message) {
+    // on met à jour le download avec le nouveau directory et le nouveau status
+    downloadModel.updateAttributes(param)
+        .then(function () {
+            // on met a jour les logs du download
+            downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
+            console.log("AAAAAAAAAAAAAAAAAA");
+            res.json(downloadModel);
+        }
+    )
+};
+
 router.post('/moveOne',
     function (req, res, next) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
-
-        var updateInfos = function (downloadModel, downloadLogsModel, downloadDirectoryModel, param, message) {
-            // on met à jour le download avec le nouveau directory et le nouveau status
-            downloadModel.updateAttributes(param)
-                .then(function () {
-                    // on met a jour les logs du download
-                    downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
-
-                    res.json(downloadModel);
-                }
-            )
-        };
 
         // on recupere le download sur lequel on fait le traitement
         models.Download.findById(downloadObject.id, {

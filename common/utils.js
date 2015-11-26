@@ -89,7 +89,7 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     execFileExists.stderr.on('data',
         function (data) {
             if (data == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
-                logs += "Error in file exists but the file really exists";
+                logs += "Error in file exists but the file really exists\r\n";
                 logs += data + "\r\n";
                 move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
             } else {
