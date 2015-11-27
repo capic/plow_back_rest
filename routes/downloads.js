@@ -92,7 +92,7 @@ router.get('/next',
 
         models.Download.max('priority', {where: conditions})
             .then(function (download_priority) {
-                if (download_priority != undefined && download_priority != null && !isNan(download_priority) && download_priority != 'NaN') {
+                if (download_priority != undefined && download_priority != null && !isNaN(download_priority) && download_priority != 'NaN') {
                     conditions.priority = download_priority;
                     models.Download.min('id', {where: conditions})
                         .then(function (download_id) {
