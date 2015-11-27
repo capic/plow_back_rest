@@ -553,7 +553,7 @@ router.post('/package/unrarPercent',
 
         models.DownloadPackage.findById(downloadPackageObject.id)
             .then(function (downloadPackageModel) {
-                downloadPackageModel.updateAttributes({unrar_progress: downloadPackageObject.percent})
+                downloadPackageModel.updateAttributes({unrar_progress: downloadPackageObject.unrar_progress})
                     .then(function () {
                         res.json(downloadPackageModel);
                     }
