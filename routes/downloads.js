@@ -549,13 +549,13 @@ router.post('/package',
 
 router.post('/package/unrarPercent',
     function (req, res) {
-        var downloadDirectoryObject = JSON.parse(JSON.stringify(req.body));
+        var downloadPackageObject = JSON.parse(JSON.stringify(req.body));
 
-        models.DownloadDirectory.findById(downloadDirectoryObject.id)
-            .then(function (downloadDirectoryModel) {
-                downloadDirectoryModel.updateAttributes({unrar_percent: downloadDirectoryObject.percent})
+        models.DownloadPackage.findById(downloadPackageObject.id)
+            .then(function (downloadPackageModel) {
+                downloadPackageModel.updateAttributes({unrar_progress: downloadDirectoryObject.percent})
                     .then(function () {
-                        res.json(downloadDirectoryModel);
+                        res.json(downloadPackageModel);
                     }
                 );
             }
