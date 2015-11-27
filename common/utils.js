@@ -113,7 +113,7 @@ utils.insertOrUpdateLog = function(id, downLogsObject, websocket, res) {
         'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
         {
             replacements: {
-                id: downLogsObject.id,
+                id: id,
                 logs: downLogsObject.logs
             },
             type: models.sequelize.QueryTypes.UPSERT
