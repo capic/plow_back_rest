@@ -464,17 +464,11 @@ router.post('/unrar',
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
         var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + downloadObject.id;
-        var child = exec(command);
+        exec(command,
+            function(error, stdout, stderr) {
 
-        child.stdout.on('data', function (data) {
-            console.log('stdout: ' + data);
-        });
-        child.stderr.on('data', function (data) {
-            console.log('stdout: ' + data);
-        });
-        child.on('close', function (code) {
-            console.log('closing code: ' + code);
-        });
+            }
+        );
     }
 );
 
