@@ -92,7 +92,7 @@ router.get('/next',
 
         models.Download.max('priority', {where: conditions})
             .then(function (download_priority) {
-                if (download_priority != undefined && download_priority != null && download_priority != NaN) {
+                if (download_priority != undefined && download_priority != null && download_priority != NaN && download_priority != 'NaN') {
                     conditions.priority = download_priority;
                     models.Download.min('id', {where: conditions})
                         .then(function (download_id) {
@@ -392,7 +392,7 @@ router.post('/moveOne',
                 .then(function () {
                     // on met a jour les logs du download
                     downloadLogsModel.logs = message;
-                    utils.insertOrUpdateLog(downloadLogsModel.id, downloadLogsModel);
+                    utils.insertOrUpdateLog(downloadLogsModel.id, websocket, downloadLogsModel);
 
                     if (websocket.connection.isOpen) {
                         websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
@@ -511,7 +511,7 @@ router.put('/logs/:id',
     function (req, res) {
         var downLogsObject = JSON.parse(JSON.stringify(req.body))
 
-        utils.insertOrUpdateLog(req.params.id, downLogsObject, res);
+        utils.insertOrUpdateLog(req.params.id, downLogsObject, websocket, res);
     }
 );
 

@@ -2,7 +2,6 @@
  * Created by Vincent on 13/11/2015.
  */
 var models = require('../models');
-var websocket = require('../websocket');
 var exec = require('child_process').exec;
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
@@ -109,7 +108,7 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     );
 };
 
-utils.insertOrUpdateLog = function(id, downLogsObject, res) {
+utils.insertOrUpdateLog = function(id, downLogsObject, websocket, res) {
     models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
         'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
         {
