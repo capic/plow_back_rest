@@ -60,22 +60,6 @@ router.post('/',
     }
 );
 
-router.put('/:id/unrarPercent',
-    function (req, res) {
-        var downloadDirectoryObject = JSON.parse(JSON.stringify(req.body));
-
-        models.DownloadDirectory.findById(req.params.id)
-            .then(function (downloadDirectoryModel) {
-                downloadDirectoryModel.updateAttributes({unrar_percent: downloadDirectoryObject.percent})
-                    .then(function () {
-                        res.json(downloadDirectoryModel);
-                    }
-                );
-            }
-        );
-    }
-);
-
 /**
  * delete a download by id
  */
