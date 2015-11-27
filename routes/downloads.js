@@ -505,7 +505,7 @@ router.put('/logs/:id',
     function (req, res) {
         var downLogsObject = JSON.parse(JSON.stringify(req.body))
 
-        utils.insertOrUpdateLog(req.params.id, downLogsObject, res.json);
+        utils.insertOrUpdateLog(req.params.id, downLogsObject, res);
     }
 );
 

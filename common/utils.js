@@ -127,7 +127,7 @@ utils.insertOrUpdateLog = function(id, downLogsObject, callback) {
                     }
 
                     if (callback) {
-                        callback(downloadLogsModel)
+                        callback.json(downloadLogsModel)
                     }
                 }
             );
