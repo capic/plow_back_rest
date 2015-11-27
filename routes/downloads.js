@@ -391,7 +391,7 @@ router.post('/moveOne',
                 .then(function () {
                     // on met a jour les logs du download
                     downloadLogsModel.logs = message;
-                    utils.insertOrUpdateLog(downloadLogsModel);
+                    utils.insertOrUpdateLog(downloadLogsModel.id, downloadLogsModel);
 
                     res.json(downloadModel);
                 }
@@ -505,7 +505,7 @@ router.put('/logs/:id',
     function (req, res) {
         var downLogsObject = JSON.parse(JSON.stringify(req.body))
 
-        utils.insertOrUpdateLog(downLogsObject, res.json);
+        utils.insertOrUpdateLog(req.params.id, downLogsObject, res.json);
     }
 );
 

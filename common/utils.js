@@ -109,7 +109,7 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     );
 };
 
-utils.insertOrUpdateLog = function(downLogsObject, callback) {
+utils.insertOrUpdateLog = function(id, downLogsObject, callback) {
     models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
         'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
         {
@@ -119,7 +119,7 @@ utils.insertOrUpdateLog = function(downLogsObject, callback) {
             },
             type: models.sequelize.QueryTypes.UPSERT
         }).then(function () {
-            models.DownloadLogs.findById(req.params.id)
+            models.DownloadLogs.findById(id)
                 .then(function (downloadLogsModel) {
                     if (websocket.connection.isOpen) {
                         websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
