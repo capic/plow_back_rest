@@ -392,7 +392,7 @@ router.post('/moveOne',
                 .then(function () {
                     // on met a jour les logs du download
                     downloadLogsModel.logs = message;
-                    utils.insertOrUpdateLog(downloadLogsModel.id, websocket, downloadLogsModel);
+                    utils.insertOrUpdateLog(downloadLogsModel.id, downloadLogsModel, websocket);
 
                     if (websocket.connection.isOpen) {
                         websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
