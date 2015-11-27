@@ -386,6 +386,7 @@ router.post('/moveOne',
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
         var updateInfos = function (downloadModel, downloadLogsModel, downloadDirectoryModel, param, message) {
+            console.log(downloadModel);
             // on met à jour le download avec le nouveau directory et le nouveau status
             downloadModel.updateAttributes(param)
                 .then(function () {
