@@ -1,6 +1,7 @@
 /**
  * Created by Vincent on 13/11/2015.
  */
+var express = require('express');
 var models = require('../models');
 var websocket = require('../websocket');
 var exec = require('child_process').exec;
