@@ -386,13 +386,13 @@ router.post('/moveOne',
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
         var updateInfos = function (downloadModel, downloadLogsModel, downloadDirectoryModel, param, message) {
-            console.log(downloadModel);
             // on met à jour le download avec le nouveau directory et le nouveau status
             downloadModel.updateAttributes(param)
                 .then(function () {
                     // on met a jour les logs du download
-                    downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + message});
-                    console.log("AAAAAAAAAAAAAAAAAA");
+                    downloadLogsModel.logs = message;
+                    utils.insertOrUpdateLog(downloadLogsModel);
+
                     res.json(downloadModel);
                 }
             )
@@ -505,24 +505,7 @@ router.put('/logs/:id',
     function (req, res) {
         var downLogsObject = JSON.parse(JSON.stringify(req.body))
 
-        models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
-            'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
-            {
-                replacements: {
-                    id: downLogsObject.id,
-                    logs: downLogsObject.logs
-                },
-                type: models.sequelize.QueryTypes.UPSERT
-            }).then(function () {
-                models.DownloadLogs.findById(req.params.id)
-                    .then(function (downloadLogsModel) {
-                        if (websocket.connection.isOpen) {
-                            websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
-                        }
-                        res.json(downloadLogsModel);
-                    }
-                );
-            });
+        utils.insertOrUpdateLog(downLogsObject, res.json);
     }
 );
 

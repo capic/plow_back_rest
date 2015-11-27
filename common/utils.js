@@ -1,6 +1,8 @@
 /**
  * Created by Vincent on 13/11/2015.
  */
+var models = require('../models');
+var websocket = require('../websocket');
 var exec = require('child_process').exec;
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
@@ -105,6 +107,30 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
             }
         }
     );
+};
+
+utils.insertOrUpdateLog = function(downLogsObject, callback) {
+    models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
+        'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
+        {
+            replacements: {
+                id: downLogsObject.id,
+                logs: downLogsObject.logs
+            },
+            type: models.sequelize.QueryTypes.UPSERT
+        }).then(function () {
+            models.DownloadLogs.findById(req.params.id)
+                .then(function (downloadLogsModel) {
+                    if (websocket.connection.isOpen) {
+                        websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
+                    }
+
+                    if (callback) {
+                        callback(downloadLogsModel)
+                    }
+                }
+            );
+        });
 };
 
 module.exports = utils;
