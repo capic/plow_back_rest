@@ -1,7 +1,6 @@
 /**
  * Created by Vincent on 13/11/2015.
  */
-var express = require('express');
 var models = require('../models');
 var websocket = require('../websocket');
 var exec = require('child_process').exec;
@@ -110,7 +109,7 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     );
 };
 
-utils.insertOrUpdateLog = function(id, downLogsObject, callback) {
+utils.insertOrUpdateLog = function(id, downLogsObject, res) {
     models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
         'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
         {
@@ -126,8 +125,8 @@ utils.insertOrUpdateLog = function(id, downLogsObject, callback) {
                         websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
                     }
 
-                    if (callback) {
-                        callback.json(downloadLogsModel)
+                    if (res) {
+                        res.json(downloadLogsModel)
                     }
                 }
             );

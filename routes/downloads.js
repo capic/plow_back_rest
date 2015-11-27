@@ -383,6 +383,7 @@ router.get('/availability/:id',
 
 router.post('/moveOne',
     function (req, res, next) {
+        //TODO: inclure l'exclude pour les notifications
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
         var updateInfos = function (downloadModel, downloadLogsModel, downloadDirectoryModel, param, message) {
@@ -392,6 +393,11 @@ router.post('/moveOne',
                     // on met a jour les logs du download
                     downloadLogsModel.logs = message;
                     utils.insertOrUpdateLog(downloadLogsModel.id, downloadLogsModel);
+
+                    if (websocket.connection.isOpen) {
+                        websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                        websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                    }
 
                     res.json(downloadModel);
                 }
