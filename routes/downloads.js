@@ -466,7 +466,7 @@ router.post('/unrar',
         var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + downloadObject.id;
         exec(command,
             function(error, stdout, stderr) {
-
+                console.log(stdout);
             }
         );
     }
