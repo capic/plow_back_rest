@@ -113,7 +113,9 @@ utils.moveDownload2 = function(downloadId, directoryId, downloadModel, downloadL
     exec(command,
         function(error, stdout, stderr) {
             if (!error) {
-                var res = stdout.substring(stdout.indexOf('#'), stdout.indexOf('\r\n', stdout.indexOf('#')));
+                var begin = stdout.indexOf('#');
+                var end = stdout.indexOf('\r\n', stdout.indexOf('#'));
+                var res = stdout.substring(begin, end);
 
                 var status = downloadStatusConfig.MOVED;
                 //var directory_id = directoryId;
