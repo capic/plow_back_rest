@@ -108,11 +108,27 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     );
 };
 
-utils.moveDownload2 = function(downloadId, directoryId) {
+utils.moveDownload2 = function(downloadId, directoryId, downloadModel, downloadLogModel, logs, callback) {
     var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + directoryId;
     exec(command,
         function(error, stdout, stderr) {
-            console.log(stdout);
+            if (!error) {
+                var res = stdout.substring(stdout.indexOf('#'), stdout.indexOf('\r\n', stdout.indexOf('#')));
+
+                var status = downloadStatusConfig.MOVED;
+                //var directory_id = directoryId;
+                //var old_directory_id= downloadModel.directory_id;
+
+                if (res != "OK") {
+                    status = downloadStatusConfig.ERROR_MOVING;
+                }
+
+                var param = {
+                    status: status
+                };
+
+                callback(downloadModel, downloadLogModel, param, logs);
+            }
         }
     );
 };

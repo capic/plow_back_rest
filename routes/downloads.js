@@ -386,7 +386,7 @@ router.post('/moveOne',
         //TODO: inclure l'exclude pour les notifications
         var downloadObject = JSON.parse(JSON.stringify(req.body));
 
-        var updateInfos = function (downloadModel, downloadLogsModel, downloadDirectoryModel, param, message) {
+        var updateInfos = function (downloadModel, downloadLogsModel, param, message) {
             // on met à jour le download avec le nouveau directory et le nouveau status
             downloadModel.updateAttributes(param)
                 .then(function () {
@@ -428,7 +428,7 @@ router.post('/moveOne',
 
                                             }
                                         );*/
-                                        utils.moveDownload2(downloadModel.id, downloadObject.directory_id)
+                                        utils.moveDownload2(downloadModel.id, downloadObject.directory_id, downloadModel, downloadLogsModel, logs, callback)
                                     }
                                 )
                             } else {
