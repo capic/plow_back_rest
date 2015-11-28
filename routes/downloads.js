@@ -428,7 +428,7 @@ router.post('/moveOne',
 
                                             }
                                         );*/
-                                        utils.moveDownload2(downloadModel.id, downloadObject.directory_id, downloadModel, downloadLogsModel, logs, callback)
+                                        utils.moveDownload2(downloadModel.id, downloadObject.directory_id, downloadModel, downloadLogsModel, logs, updateInfos)
                                     }
                                 )
                             } else {
