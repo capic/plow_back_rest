@@ -422,11 +422,13 @@ router.post('/moveOne',
 
                                 downloadModel.updateAttributes({status: downloadStatusConfig.MOVING})
                                     .then(function () {
-                                        models.DownloadDirectory.findById(downloadObject.directory_id)
+                                        /*models.DownloadDirectory.findById(downloadObject.directory_id)
                                             .then(function (downloadDirectoryModel) {
                                                 utils.moveDownload(logs, downloadObject, downloadModel, downloadLogsModel, downloadDirectoryModel, updateInfos)
+
                                             }
-                                        );
+                                        );*/
+                                        utils.moveDownload2(downloadModel.id, downloadObject.directory_id)
                                     }
                                 )
                             } else {

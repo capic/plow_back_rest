@@ -108,6 +108,15 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     );
 };
 
+utils.moveDownload2 = function(downloadId, directoryId) {
+    var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + directoryId;
+    exec(command,
+        function(error, stdout, stderr) {
+            console.log(stdout);
+        }
+    );
+};
+
 utils.insertOrUpdateLog = function(id, downLogsObject, websocket, res) {
     models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
         'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
