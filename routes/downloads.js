@@ -243,7 +243,8 @@ router.put('/:id',
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
                 {model: models.DownloadDirectory, as: 'download_directory'},
-                {model: models.DownloadHost, as: 'download_hostpeg'}
+                {model: models.DownloadDirectory, as: 'to_move_download_directory'},
+                {model: models.DownloadHost, as: 'download_host'}
             ]
         })
             .then(function () {
@@ -572,7 +573,7 @@ router.get('/file/exists/:id',
             }]
         })
             .then(function (downloadModel) {
-                if (downloadModel.status > downloadStatusConfig.FINISHED) {
+                if (downloadModel.status > downloadStatusConfig.FINISHED && downloadModel.status != downloadStatusConfig.MOVING) {
                     var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
                     var name = downloadModel.name.replace(/\s/g, "\\\\ ");
                     var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + directory + name + '" && echo true || echo false';
