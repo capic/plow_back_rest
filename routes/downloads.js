@@ -572,7 +572,7 @@ router.get('/file/exists/:id',
             }]
         })
             .then(function (downloadModel) {
-                if (downloadModel.status == downloadStatusConfig.FINISHED || downloadModel.status == downloadStatusConfig.MOVED) {
+                if (downloadModel.status > downloadStatusConfig.FINISHED) {
                     var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
                     var name = downloadModel.name.replace(/\s/g, "\\\\ ");
                     var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + directory + name + '" && echo true || echo false';
