@@ -127,8 +127,7 @@ utils.moveDownload2 = function(downloadId, directoryId, downloadModel, downloadL
                 }
 
                 var param = {
-                    status: status,
-                    logs: logs
+                    status: status
                 };
 
                 callback(downloadModel, downloadLogModel, param, logs);
