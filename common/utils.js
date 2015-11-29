@@ -10,104 +10,6 @@ var fromConfig = config.get('from');
 
 var utils = {};
 
-var move = function (oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback) {
-    var command = 'ssh root@' + downloadServerConfig.address + ' mv ' + oldDirectory + name + ' ' + newDirectory;
-    exec(command,
-        function(error, stdout, stderr) {
-            if (error == null) {
-                var param = {
-                    directory_id: downloadDirectoryModel.id,
-                    download_directory: downloadDirectoryModel,
-                    old_directory_id: downloadModel.directory_id,
-                    status: downloadStatusConfig.MOVED
-                };
-                logs += "Moving from " + oldDirectory + " to " + newDirectory + " OK !!!\r\n";
-            } else {
-                // meme si tout s'est bien passe on peut avoir cette erreur donc on considere que c'est ok
-                if (stdout == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
-                    var param = {
-                        directory_id: downloadDirectoryModel.id,
-                        download_directory: downloadDirectoryModel,
-                        status: downloadStatusConfig.MOVED
-                    };
-                    logs += "Moving from " + oldDirectory + " to " + newDirectory + " OK !!!\r\n";
-                } else {
-                    var param = {
-                        status: downloadStatusConfig.ERROR_MOVING,
-                        directory_id: downloadModel.old_directory_id,
-                        old_directory_id: downloadModel.directory_id
-                    };
-                    logs += "Moving from " + oldDirectory + " to " + newDirectory + " ERROR !!!\r\n";
-                }
-            }
-
-            logs += stdout + "\r\n";
-            callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
-        }
-    );
-};
-
-utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogsModel, downloadDirectoryModel, callback) {
-    var oldDirectory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
-    var newDirectory = downloadDirectoryModel.path.replace(/\s/g, "\\\\ ");
-
-    if (downloadObject.from == fromConfig.PYTHON_CLIENT) {
-        oldDirectory = downloadModel.old_download_directory.path.replace(/\s/g, "\\\\ ");
-        newDirectory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
-    }
-    var name = downloadModel.name.replace(/\s/g, "\\\\ ");
-
-    // on teste l'existence du fichier
-    var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + oldDirectory + name + '" && echo true || echo false';
-    exec(command,
-        function(error, stdout, stderr) {
-            if (!error) {
-                // si le fichier existe
-                if (stdout == "true\n") {
-                    logs += "File exists\r\n";
-                    move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
-                } else {
-                    var param = {
-                        status: downloadStatusConfig.ERROR_MOVING,
-                        directory_id: downloadModel.old_directory_id,
-                        old_directory_id: downloadModel.directory_id
-                    };
-                    logs += "File does not exist\r\n";
-                    logs += stdout + '\r\n';
-                    callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
-                }
-            } else {
-                if (stdout == "ln: failed to create symbolic link `/dev/fd/fd': No such file or directory\n") {
-                    logs += "Error in file exists but the file really exists\r\n";
-
-                    if (data == "true\n") {
-                        logs += "File exists\r\n";
-                        move(oldDirectory, newDirectory, name, logs, downloadModel, downloadLogsModel, downloadDirectoryModel, callback);
-                    } else {
-                        var param = {
-                            status: downloadStatusConfig.ERROR_MOVING,
-                            directory_id: downloadModel.old_directory_id,
-                            old_directory_id: downloadModel.directory_id
-                        };
-                        logs += "File does not exist\r\n";
-                        logs += stdout + '\r\n';
-                        callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
-                    }
-                } else {
-                    var param = {
-                        status: downloadStatusConfig.ERROR_MOVING,
-                        directory_id: downloadModel.old_directory_id,
-                        old_directory_id: downloadModel.directory_id
-                    };
-                    logs += "File " + oldDirectory + name + " ERROR => file exists check error !!!\r\n";
-                    logs += stdout + "\r\n";
-                    callback(downloadModel, downloadLogsModel, downloadDirectoryModel, param, logs);
-                }
-            }
-        }
-    );
-};
-
 utils.moveDownload2 = function(downloadId, srcDirectoryId, destDirectoryId, downloadModel, downloadLogModel, logs, callback) {
     var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + srcDirectoryId + ' ' + destDirectoryId;
     exec(command,
@@ -118,25 +20,29 @@ utils.moveDownload2 = function(downloadId, srcDirectoryId, destDirectoryId, down
                 var res = stdout.substring(begin + 1, end);
 
                 var status = downloadStatusConfig.MOVED;
+                var downloadDirectoryId = destDirectoryId;
 
                 if (res != "OK") {
                     status = downloadStatusConfig.ERROR_MOVING;
+                    downloadDirectoryId = srcDirectoryId;
                 }
 
                 logs += stdout;
 
                 var param = {
-                    status: status
+                    status: status,
+                    directory_id: downloadDirectoryId,
+                    to_move_directory_id: null
                 };
 
                 callback(downloadModel, downloadLogModel, param, logs);
             } else {
-                status = downloadStatusConfig.ERROR_MOVING;
-
                 logs += stderr;
 
                 var param = {
-                    status: status
+                    status: downloadStatusConfig.ERROR_MOVING,
+                    directory_id: srcDirectoryId,
+                    to_move_directory_id: null
                 };
 
                 callback(downloadModel, downloadLogModel, param, logs);

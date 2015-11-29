@@ -63,8 +63,8 @@ module.exports = function (sequelize, DataTypes) {
                         as: 'download_directory'
                     });
                     Download.belongsTo(models.DownloadDirectory, {
-                        foreignKey: 'old_directory_id',
-                        as: 'old_download_directory'
+                        foreignKey: 'to_move_directory_id',
+                        as: 'to_move_download_directory'
                     });
                     Download.belongsTo(models.DownloadHost, {
                         foreignKey: 'host_id',

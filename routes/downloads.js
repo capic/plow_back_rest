@@ -49,7 +49,7 @@ router.get('/',
                         as: 'download_directory'
                     }, {
                         model: models.DownloadDirectory,
-                        as: 'old_download_directory'
+                        as: 'to_move_download_directory'
                     },
                     {
                         model: models.DownloadHost,
@@ -67,7 +67,7 @@ router.get('/',
                     as: 'download_directory'
                 }, {
                     model: models.DownloadDirectory,
-                    as: 'old_download_directory'
+                    as: 'to_move_download_directory'
                 }, {
                     model: models.DownloadHost,
                     as: 'download_host'
@@ -103,9 +103,9 @@ router.get('/next',
                                         model: models.DownloadPackage, as: 'download_package'
                                     }, {
                                         model: models.DownloadDirectory, as: 'download_directory'
-                                    },  {
+                                    }, {
                                         model: models.DownloadDirectory,
-                                        as: 'old_download_directory'
+                                        as: 'to_move_download_directory'
                                     }, {
                                         model: models.DownloadHost, as: 'download_host'
                                     }
@@ -134,7 +134,7 @@ router.get('/:id',
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
                 {model: models.DownloadDirectory, as: 'download_directory'},
-                {model: models.DownloadDirectory, as: 'old_download_directory'},
+                {model: models.DownloadDirectory, as: 'to_move_download_directory'},
                 {model: models.DownloadHost, as: 'download_host'}
             ]
         })
@@ -409,7 +409,7 @@ router.post('/moveOne',
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
                 {model: models.DownloadDirectory, as: 'download_directory'},
-                {model: models.DownloadDirectory, as: 'old_download_directory'}
+                {model: models.DownloadDirectory, as: 'to_move_download_directory'}
             ]
         })
             .then(function (downloadModel) {
@@ -423,21 +423,13 @@ router.post('/moveOne',
                                 downloadModel.updateAttributes({status: downloadStatusConfig.MOVING})
                                     .then(function () {
                                         /*models.DownloadDirectory.findById(downloadObject.directory_id)
-                                            .then(function (downloadDirectoryModel) {
-                                                utils.moveDownload(logs, downloadObject, downloadModel, downloadLogsModel, downloadDirectoryModel, updateInfos)
+                                         .then(function (downloadDirectoryModel) {
+                                         utils.moveDownload(logs, downloadObject, downloadModel, downloadLogsModel, downloadDirectoryModel, updateInfos)
 
-                                            }
-                                        );*/
+                                         }
+                                         );*/
                                         var srcDirectoryId = downloadModel.directory_id;
                                         var dstDirectoryId = downloadObject.directory_id;
-
-                                        // deplacement depuis le client python
-                                        // => signifie qu'on a specifie le dossier de telechargement avant la fin de
-                                        // celui-ci donc il faut prendre les bons dossiers
-                                        if (downloadObject.from == fromConfig.PYTHON_CLIENT) {
-                                            srcDirectoryId = downloadModel.old_directory_id;
-                                            dstDirectoryId = downloadModel.directory_id;
-                                        }
 
                                         utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId, downloadModel, downloadLogsModel, logs, updateInfos)
                                     }
@@ -447,9 +439,7 @@ router.post('/moveOne',
                                     .then(function (downloadDirectoryModel) {
 
                                         downloadModel.updateAttributes({
-                                            directory_id: downloadDirectoryModel.id,
-                                            download_directory: downloadDirectoryModel,
-                                            old_directory_id: downloadObject.old_directory_id
+                                            to_move_directory_id: downloadDirectoryModel.id
                                         })
                                             .then(function () {
                                                 // a ce moment les logs ne sont peut etre pas creee en bdd
@@ -478,7 +468,7 @@ router.post('/unrar',
 
         var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + downloadObject.id;
         exec(command,
-            function(error, stdout, stderr) {
+            function (error, stdout, stderr) {
                 console.log(stdout);
             }
         );
@@ -528,9 +518,9 @@ router.put('/logs/:id',
 router.delete('/logs/:id',
     function (req, res) {
         models.DownloadLogs.findById(req.params.id)
-            .then(function(downloadLogsModel) {
+            .then(function (downloadLogsModel) {
                 downloadLogsModel.updateAttributes({logs: ''})
-                    .then(function(downloadLogsModelUpdated) {
+                    .then(function (downloadLogsModelUpdated) {
                         res.json(downloadLogsModelUpdated);
                     }
                 );
