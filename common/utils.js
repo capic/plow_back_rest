@@ -121,8 +121,19 @@ utils.moveDownload2 = function(downloadId, srcDirectoryId, destDirectoryId, down
 
                 if (res != "OK") {
                     status = downloadStatusConfig.ERROR_MOVING;
-                    logs += stdout;
                 }
+
+                logs += stdout;
+
+                var param = {
+                    status: status
+                };
+
+                callback(downloadModel, downloadLogModel, param, logs);
+            } else {
+                status = downloadStatusConfig.ERROR_MOVING;
+
+                logs += stderr;
 
                 var param = {
                     status: status
