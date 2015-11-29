@@ -248,7 +248,15 @@ router.put('/:id',
             ]
         })
             .then(function () {
-                models.Download.findById(req.params.id)
+                models.Download.findById(req.params.id,
+                    {
+                        include: [
+                            {model: models.DownloadPackage, as: 'download_package'},
+                            {model: models.DownloadDirectory, as: 'download_directory'},
+                            {model: models.DownloadDirectory, as: 'to_move_download_directory'},
+                            {model: models.DownloadHost, as: 'download_host'}
+                        ]
+                    })
                     .then(function (downloadModel) {
                         if (websocket.connection.isOpen) {
                             websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
