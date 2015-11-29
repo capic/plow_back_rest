@@ -572,29 +572,33 @@ router.get('/file/exists/:id',
             }]
         })
             .then(function (downloadModel) {
-                var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
-                var name = downloadModel.name.replace(/\s/g, "\\\\ ");
-                var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + directory + name + '" && echo true || echo false';
-                exec(command,
-                    function (error, stdout, stderr) {
-                        if (error) {
-                            var error = new Error(res.__(errorConfig.downloads.fileExists.message, downloadModel.download_directory.path + downloadModel.name));
-                            error.status = errorConfig.downloads.fileExists.code;
-
-                            return next(error);
-                        } else {
-                            if (stdout == 'true\n') {
-                                res.json({'return': true});
-                            } else {
+                if (downloadModel.status == downloadStatusConfig.FINISHED || downloadModel.status == downloadStatusConfig.MOVED) {
+                    var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
+                    var name = downloadModel.name.replace(/\s/g, "\\\\ ");
+                    var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + directory + name + '" && echo true || echo false';
+                    exec(command,
+                        function (error, stdout, stderr) {
+                            if (error) {
                                 var error = new Error(res.__(errorConfig.downloads.fileExists.message, downloadModel.download_directory.path + downloadModel.name));
                                 error.status = errorConfig.downloads.fileExists.code;
 
                                 return next(error);
-                            }
+                            } else {
+                                if (stdout == 'true\n') {
+                                    res.json({'return': true});
+                                } else {
+                                    var error = new Error(res.__(errorConfig.downloads.fileExists.message, downloadModel.download_directory.path + downloadModel.name));
+                                    error.status = errorConfig.downloads.fileExists.code;
 
+                                    return next(error);
+                                }
+
+                            }
                         }
-                    }
-                );
+                    );
+                } else {
+                    res.json({'return': true});
+                }
             }
         );
     }
