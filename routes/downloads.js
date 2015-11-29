@@ -608,26 +608,16 @@ router.post('/reset',
                 ]
             })
             .then(function (downloadModel) {
-                downloadModel.updateAttributes({status: downloadStatusConfig.WAITING})
+                downloadModel.updateAttributes({
+                    status: downloadStatusConfig.WAITING,
+                    size_file_downloaded: 0,
+                    size_part_downloaded: 0,
+                    progress_part: 0,
+                    average_speed: 0,
+                    current_speed: 0
+                })
                     .then(function () {
-                        if (downloadObject.deleteFile) {
-                            var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
-                            var name = downloadModel.name.replace(/\s/g, "\\\\ ");
-
-                            // on teste l'existence du fichier
-                            var command = 'ssh root@' + downloadServerConfig.address + ' rm "' + directory + name + '"';
-                            var execDeleteFile = exec(command);
-
-                            execDeleteFile.stdout.on('data', function (data) {
-                                console.log(data);
-                            });
-
-                            execDeleteFile.stderr.on('data', function (data) {
-                                console.log(data);
-                            });
-                        }
-
-                        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.reset_command + ' ' + downloadObject.id;
+                        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.reset_command + ' ' + downloadObject.id + ' ' + downloadObject.deleteFile;
                         var execReset = exec(command);
 
                         execReset.stdout.on('data', function (data) {
