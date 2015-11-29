@@ -428,7 +428,18 @@ router.post('/moveOne',
 
                                             }
                                         );*/
-                                        utils.moveDownload2(downloadModel.id, downloadObject.directory_id, downloadModel, downloadLogsModel, logs, updateInfos)
+                                        var srcDirectoryId = downloadModel.directory_id;
+                                        var dstDirectoryId = downloadObject.directory_id;
+
+                                        // deplacement depuis le client python
+                                        // => signifie qu'on a specifie le dossier de telechargement avant la fin de
+                                        // celui-ci donc il faut prendre les bons dossiers
+                                        if (downloadObject.from == fromConfig.PYTHON_CLIENT) {
+                                            srcDirectoryId = downloadModel.old_directory_id;
+                                            dstDirectoryId = downloadModel.directory_id;
+                                        }
+
+                                        utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId, downloadModel, downloadLogsModel, logs, updateInfos)
                                     }
                                 )
                             } else {

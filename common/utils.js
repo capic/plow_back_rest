@@ -108,8 +108,8 @@ utils.moveDownload = function (logs, downloadObject, downloadModel, downloadLogs
     );
 };
 
-utils.moveDownload2 = function(downloadId, directoryId, downloadModel, downloadLogModel, logs, callback) {
-    var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + directoryId;
+utils.moveDownload2 = function(downloadId, srcDirectoryId, destDirectoryId, downloadModel, downloadLogModel, logs, callback) {
+    var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + srcDirectoryId + ' ' + destDirectoryId;
     exec(command,
         function(error, stdout, stderr) {
             if (!error) {
@@ -118,8 +118,6 @@ utils.moveDownload2 = function(downloadId, directoryId, downloadModel, downloadL
                 var res = stdout.substring(begin + 1, end);
 
                 var status = downloadStatusConfig.MOVED;
-                //var directory_id = directoryId;
-                //var old_directory_id= downloadModel.directory_id;
 
                 if (res != "OK") {
                     status = downloadStatusConfig.ERROR_MOVING;
