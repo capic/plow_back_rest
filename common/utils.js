@@ -123,10 +123,12 @@ utils.moveDownload2 = function(downloadId, directoryId, downloadModel, downloadL
 
                 if (res != "OK") {
                     status = downloadStatusConfig.ERROR_MOVING;
+                    logs += stdout;
                 }
 
                 var param = {
-                    status: status
+                    status: status,
+                    logs: logs
                 };
 
                 callback(downloadModel, downloadLogModel, param, logs);
