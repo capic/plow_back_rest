@@ -184,6 +184,9 @@ router.post('/',
             }, {
                 model: models.DownloadDirectory,
                 as: 'download_directory'
+            }, {
+                model: models.DownloadDirectory,
+                as: 'to_move_download_directory'
             }]
         })
             .then(function (downloadModel) {
