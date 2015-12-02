@@ -237,15 +237,15 @@ router.post('/remove',
  */
 router.put('/:id',
     function (req, res) {
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
+        var downloadObject = JSON.parse(req.body);
         models.Download.update(downloadObject, {
-            where: {id: req.params.id},
+            where: {id: req.params.id}/*,
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
                 {model: models.DownloadDirectory, as: 'download_directory'},
                 {model: models.DownloadDirectory, as: 'to_move_download_directory'},
                 {model: models.DownloadHost, as: 'download_host'}
-            ]
+            ]*/
         })
             .then(function () {
                 models.Download.findById(req.params.id,
