@@ -238,7 +238,7 @@ router.post('/remove',
 router.put('/:id',
     function (req, res) {
         var downloadObject = JSON.parse(JSON.stringify(req.body));
-        models.Download.update(downloadObject, {
+        models.Download.update(req.body, {
             where: {id: req.params.id},
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
