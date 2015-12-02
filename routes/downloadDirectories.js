@@ -47,16 +47,20 @@ router.get('/:id',
  */
 router.post('/',
     function (req, res) {
-        var downloadDirectoryObject = JSON.parse(JSON.stringify(req.body));
+        if (req.body.hasOwnProperty('directory')) {
+            var downloadDirectoryObject = JSON.parse(req.body.directory);
 
-        models.DownloadDirectory.findOrCreate({
-            where: {path: downloadDirectoryObject.path},
-            defaults: downloadDirectoryObject
-        })
-            .spread(function (downloadDirectoryModel, created) {
-                res.json(downloadDirectoryModel.get({plain: true}));
-            }
-        );
+            models.DownloadDirectory.findOrCreate({
+                where: {path: downloadDirectoryObject.path},
+                defaults: downloadDirectoryObject
+            })
+                .spread(function (downloadDirectoryModel, created) {
+                    res.json(downloadDirectoryModel.get({plain: true}));
+                }
+            );
+        } else {
+            //TODO: erreur
+        }
     }
 );
 

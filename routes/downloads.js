@@ -552,16 +552,20 @@ router.delete('/logs/:id',
 
 router.post('/package',
     function (req, res) {
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
+        if (req.body.hasOwnProperty('package')) {
+            var packageObject = JSON.parse(req.body.package);
 
-        models.DownloadPackage.findOrCreate({
-            where: {name: downloadObject.name},
-            defaults: downloadObject
-        })
-            .spread(function (downloadPackageModel, created) {
-                res.json(downloadPackageModel.get({plain: true}));
-            }
-        );
+            models.DownloadPackage.findOrCreate({
+                where: {name: packageObject.name},
+                defaults: packageObject
+            })
+                .spread(function (downloadPackageModel, created) {
+                    res.json(downloadPackageModel.get({plain: true}));
+                }
+            );
+        } else {
+            // TODO: erreur
+        }
     }
 );
 

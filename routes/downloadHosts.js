@@ -46,13 +46,17 @@ router.get('/:id',
  */
 router.post('/',
   function (req, res) {
-    var downloadHostObject = JSON.parse(JSON.stringify(req.body));
+    if (req.body.hasOwnProperty('host')) {
+      var downloadHostObject = JSON.parse(req.body.host);
 
-    models.DownloadHost.findOrCreate({where: {name: downloadHostObject.name}, defaults: downloadHostObject})
-      .spread(function (downloadHostModel, created) {
-        res.json(downloadHostModel.get({plain: true}));
-      }
-    );
+      models.DownloadHost.findOrCreate({where: {name: downloadHostObject.name}, defaults: downloadHostObject})
+          .spread(function (downloadHostModel, created) {
+            res.json(downloadHostModel.get({plain: true}));
+          }
+      );
+    } else {
+      //TODO: erreur
+    }
   }
 );
 
