@@ -177,26 +177,31 @@ router.get('/link/:link',
  */
 router.post('/',
     function (req, res) {
-        models.Download.create(JSON.parse(JSON.stringify(req.body)), {
-            include: [{
-                model: models.DownloadPackage,
-                as: 'download_package'
-            }, {
-                model: models.DownloadDirectory,
-                as: 'download_directory'
-            }, {
-                model: models.DownloadDirectory,
-                as: 'to_move_download_directory'
-            }]
-        })
-            .then(function (downloadModel) {
-                if (websocket.connection.isOpen) {
-                    websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                }
+        if (req.body.hasOwnProperty('download')) {
+            var downloadObject = JSON.parse(req.body.download);
+            models.Download.create(downloadObject/*,{
+                include: [{
+                    model: models.DownloadPackage,
+                    as: 'download_package'
+                }, {
+                    model: models.DownloadDirectory,
+                    as: 'download_directory'
+                }, {
+                    model: models.DownloadDirectory,
+                    as: 'to_move_download_directory'
+                }]
+            }*/)
+                .then(function (downloadModel) {
+                    if (websocket.connection.isOpen) {
+                        websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                    }
 
-                res.json(downloadModel);
-            }
-        );
+                    res.json(downloadModel);
+                }
+            );
+        } else {
+            //TODO: erreur
+        }
     }
 );
 
