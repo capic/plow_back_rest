@@ -237,36 +237,40 @@ router.post('/remove',
  */
 router.put('/:id',
     function (req, res) {
-        var downloadObject = JSON.parse(req.body);
-        models.Download.update(downloadObject, {
-            where: {id: req.params.id}/*,
-            include: [
-                {model: models.DownloadPackage, as: 'download_package'},
-                {model: models.DownloadDirectory, as: 'download_directory'},
-                {model: models.DownloadDirectory, as: 'to_move_download_directory'},
-                {model: models.DownloadHost, as: 'download_host'}
-            ]*/
-        })
-            .then(function () {
-                models.Download.findById(req.params.id,
-                    {
-                        include: [
-                            {model: models.DownloadPackage, as: 'download_package'},
-                            {model: models.DownloadDirectory, as: 'download_directory'},
-                            {model: models.DownloadDirectory, as: 'to_move_download_directory'},
-                            {model: models.DownloadHost, as: 'download_host'}
-                        ]
-                    })
-                    .then(function (downloadModel) {
-                        if (websocket.connection.isOpen) {
-                            websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                            websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+        var json_object = JSON.parse(JSON.stringify(req.body));
+        if (json_object.hasOwnProperty('download')) {
+            models.Download.update(json_object.download, {
+                where: {id: req.params.id}/*,
+                 include: [
+                 {model: models.DownloadPackage, as: 'download_package'},
+                 {model: models.DownloadDirectory, as: 'download_directory'},
+                 {model: models.DownloadDirectory, as: 'to_move_download_directory'},
+                 {model: models.DownloadHost, as: 'download_host'}
+                 ]*/
+            })
+                .then(function () {
+                    models.Download.findById(req.params.id,
+                        {
+                            include: [
+                                {model: models.DownloadPackage, as: 'download_package'},
+                                {model: models.DownloadDirectory, as: 'download_directory'},
+                                {model: models.DownloadDirectory, as: 'to_move_download_directory'},
+                                {model: models.DownloadHost, as: 'download_host'}
+                            ]
+                        })
+                        .then(function (downloadModel) {
+                            if (websocket.connection.isOpen) {
+                                websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                                websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                            }
+                            res.json(downloadModel);
                         }
-                        res.json(downloadModel);
-                    }
-                );
-            }
-        );
+                    );
+                }
+            );
+        } else {
+            // TODO : erreur
+        }
     }
 );
 
