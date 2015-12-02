@@ -237,7 +237,7 @@ router.post('/remove',
  */
 router.put('/:id',
     function (req, res) {
-        var jsonObject = JSON.parse(JSON.stringify(req.body.download));
+        var jsonObject = JSON.parse(req.body.download);
         if (jsonObject.hasOwnProperty('download')) {
             var downloadObject = JSON.parse(JSON.stringify(jsonObject.download));
             models.Download.update(downloadObject, {
