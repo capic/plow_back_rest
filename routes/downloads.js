@@ -487,6 +487,7 @@ router.post('/unrar',
         exec(command,
             function (error, stdout, stderr) {
                 console.log(stdout);
+                res.json({})
             }
         );
     }
