@@ -487,7 +487,7 @@ router.post('/unrar',
         var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + dataObject.id;
         var s = spawn(command);
         s.stdout.on('data', function (data) { console.log(data) });
-        s.error.on('data', function (data) { console.log(data) });
+        s.stderr.on('data', function (data) { console.log(data) });
         s.on('exit', function(code) {
             if (code != 0) {
                 console.log('Failed: ' + code);
