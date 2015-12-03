@@ -179,18 +179,7 @@ router.post('/',
     function (req, res) {
         if (req.body.hasOwnProperty('download')) {
             var downloadObject = JSON.parse(req.body.download);
-            models.Download.create(downloadObject/*,{
-                include: [{
-                    model: models.DownloadPackage,
-                    as: 'download_package'
-                }, {
-                    model: models.DownloadDirectory,
-                    as: 'download_directory'
-                }, {
-                    model: models.DownloadDirectory,
-                    as: 'to_move_download_directory'
-                }]
-            }*/)
+            models.Download.create(downloadObject)
                 .then(function (downloadModel) {
                     if (websocket.connection.isOpen) {
                         websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
@@ -200,7 +189,10 @@ router.post('/',
                 }
             );
         } else {
-            //TODO: erreur
+            var error = new Error(res.__(errorConfig.downloads.addDownload.badJson.message, req.params.id, req.body));
+            error.status = errorConfig.downloads.addDownload.code;
+
+            return next(error);
         }
     }
 );
@@ -232,8 +224,6 @@ router.post('/remove',
                 );
             }
         );
-
-
     }
 );
 
@@ -245,14 +235,8 @@ router.put('/:id',
         if (req.body.hasOwnProperty('download')) {
             var downloadObject = JSON.parse(req.body.download);
             models.Download.update(downloadObject, {
-                where: {id: req.params.id}/*,
-                 include: [
-                 {model: models.DownloadPackage, as: 'download_package'},
-                 {model: models.DownloadDirectory, as: 'download_directory'},
-                 {model: models.DownloadDirectory, as: 'to_move_download_directory'},
-                 {model: models.DownloadHost, as: 'download_host'}
-                 ]*/
-            })
+                where: {id: req.params.id}}
+            )
                 .then(function () {
                     models.Download.findById(req.params.id,
                         {
@@ -274,7 +258,10 @@ router.put('/:id',
                 }
             );
         } else {
-            // TODO : erreur
+            var error = new Error(res.__(errorConfig.downloads.updateDownload.badJson.message, req.params.id, req.body));
+            error.status = errorConfig.downloads.updateDownload.code;
+
+            return next(error);
         }
     }
 );
@@ -312,12 +299,12 @@ router.delete('/:id',
  */
 router.post('/priority',
     function (req, res) {
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
+        var dataObject = JSON.parse(JSON.stringify(req.body));
 
-        models.Download.findById(downloadObject.id).then(
+        models.Download.findById(dataObject.id).then(
             function (downloadModel) {
                 downloadModel.updateAttributes({
-                    priority: downloadObject.priority
+                    priority: dataObject.priority
                 }).then(function () {
                         res.json(downloadModel);
                     }
@@ -405,7 +392,7 @@ router.get('/availability/:id',
 router.post('/moveOne',
     function (req, res, next) {
         //TODO: inclure l'exclude pour les notifications
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
+        var dataObject = JSON.parse(JSON.stringify(req.body));
 
         var updateInfos = function (downloadModel, downloadLogsModel, param, message) {
             // on met à jour le download avec le nouveau directory et le nouveau status
@@ -426,7 +413,7 @@ router.post('/moveOne',
         };
 
         // on recupere le download sur lequel on fait le traitement
-        models.Download.findById(downloadObject.id, {
+        models.Download.findById(dataObject.id, {
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
                 {model: models.DownloadDirectory, as: 'download_directory'},
@@ -434,29 +421,29 @@ router.post('/moveOne',
             ]
         })
             .then(function (downloadModel) {
-                if (downloadObject.from == fromConfig.PYTHON_CLIENT || (downloadObject.from == fromConfig.IHM_CLIENT && downloadModel.directory_id != downloadObject.directory_id)) {
+                if (dataObject.from == fromConfig.PYTHON_CLIENT || (dataObject.from == fromConfig.IHM_CLIENT && downloadModel.directory_id != dataObject.directory_id)) {
                     var logs = "";
-                    models.DownloadLogs.findById(downloadObject.id)
+                    models.DownloadLogs.findById(dataObject.id)
                         .then(function (downloadLogsModel) {
                             if (downloadModel.status == downloadStatusConfig.FINISHED || downloadModel.status == downloadStatusConfig.MOVED || downloadModel.status == downloadStatusConfig.ERROR_MOVING) {
                                 logs = "Moving action ...\r\n";
 
                                 downloadModel.updateAttributes({status: downloadStatusConfig.MOVING})
                                     .then(function () {
-                                        /*models.DownloadDirectory.findById(downloadObject.directory_id)
+                                        /*models.DownloadDirectory.findById(dataObject.directory_id)
                                          .then(function (downloadDirectoryModel) {
-                                         utils.moveDownload(logs, downloadObject, downloadModel, downloadLogsModel, downloadDirectoryModel, updateInfos)
+                                         utils.moveDownload(logs, dataObject, downloadModel, downloadLogsModel, downloadDirectoryModel, updateInfos)
 
                                          }
                                          );*/
                                         var srcDirectoryId = downloadModel.directory_id;
-                                        var dstDirectoryId = downloadObject.directory_id;
+                                        var dstDirectoryId = dataObject.directory_id;
 
                                         utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId, downloadModel, downloadLogsModel, logs, updateInfos)
                                     }
                                 )
                             } else {
-                                models.DownloadDirectory.findById(downloadObject.directory_id)
+                                models.DownloadDirectory.findById(dataObject.directory_id)
                                     .then(function (downloadDirectoryModel) {
 
                                         downloadModel.updateAttributes({
@@ -485,9 +472,9 @@ router.post('/moveOne',
 
 router.post('/unrar',
     function (req, res) {
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
+        var dataObject = JSON.parse(JSON.stringify(req.body));
 
-        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + downloadObject.id;
+        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + dataObject.id;
         exec(command,
             function (error, stdout, stderr) {
                 console.log(stdout);
@@ -527,9 +514,9 @@ router.post('/',
  */
 router.put('/logs/:id',
     function (req, res) {
-        var downLogsObject = JSON.parse(JSON.stringify(req.body))
+        var dataObject = JSON.parse(JSON.stringify(req.body))
 
-        utils.insertOrUpdateLog(req.params.id, downLogsObject, websocket, res);
+        utils.insertOrUpdateLog(req.params.id, dataObject, websocket, res);
     }
 );
 
@@ -571,11 +558,11 @@ router.post('/package',
 
 router.post('/package/unrarPercent',
     function (req, res) {
-        var downloadPackageObject = JSON.parse(JSON.stringify(req.body));
+        var dataObject = JSON.parse(JSON.stringify(req.body));
 
-        models.DownloadPackage.findById(downloadPackageObject.id)
+        models.DownloadPackage.findById(dataObject.id)
             .then(function (downloadPackageModel) {
-                downloadPackageModel.updateAttributes({unrar_progress: downloadPackageObject.unrar_progress})
+                downloadPackageModel.updateAttributes({unrar_progress: dataObject.unrar_progress})
                     .then(function () {
                         res.json(downloadPackageModel);
                     }
@@ -628,9 +615,9 @@ router.get('/file/exists/:id',
 
 router.post('/reset',
     function (req, res, next) {
-        var downloadObject = JSON.parse(JSON.stringify(req.body));
+        var dataObject = JSON.parse(JSON.stringify(req.body));
 
-        models.Download.findById(downloadObject.id,
+        models.Download.findById(dataObject.id,
             {
                 include: [
                     {model: models.DownloadPackage, as: 'download_package'},
@@ -647,7 +634,7 @@ router.post('/reset',
                     current_speed: 0
                 })
                     .then(function () {
-                        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.reset_command + ' ' + downloadObject.id + ' ' + downloadObject.deleteFile;
+                        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.reset_command + ' ' + dataObject.id + ' ' + dataObject.deleteFile;
                         var execReset = exec(command);
 
                         execReset.stdout.on('data', function (data) {
@@ -663,11 +650,11 @@ router.post('/reset',
                         if (websocket.connection.isOpen) {
                             websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {
                                 acknowledge: false,
-                                exclude: [downloadObject.wampId]
+                                exclude: [dataObject.wampId]
                             });
                             websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {
                                 acknowledge: false,
-                                exclude: [downloadObject.wampId]
+                                exclude: [dataObject.wampId]
                             });
                         }
 

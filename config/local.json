@@ -42,6 +42,18 @@
       "deleteDownload": {
         "code": 10001,
         "message": "downloads.error.DELETE_DOWNLOAD"
+      },
+      "addDownload": {
+        "code": 10002,
+        "badJson": {
+          "message": "downloads.error.ADD_DOWNLOAD.BAD_JSON"
+        }
+      },
+      "updateDownload": {
+        "code": 10003,
+        "badJson": {
+          "message": "downloads.error.UPDATE_DOWNLOAD.BAD_JSON"
+        }
       }
     },
     "downloadDirectories": {

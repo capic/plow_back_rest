@@ -7,7 +7,13 @@
   "downloads": {
     "error": {
       "FILE_EXISTS": "Le fichier téléchargé %s n'éxiste pas",
-      "DELETE_DOWNLOAD": "Impossible de supprimer le download avec l'id: %s"
+      "DELETE_DOWNLOAD": "Impossible de supprimer le download avec l'id: %s",
+      "ADD_DOWNLOAD": {
+        "BAD_JSON": "Mauvaise configuration du json pour la création du download %s, json: %s"
+      },
+      "UPDATE_DOWNLOAD": {
+        "BAD_JSON": "Mauvaise configuration du json pour la mise à jour du download %s, json: %s"
+      }
     }
   }
 }
