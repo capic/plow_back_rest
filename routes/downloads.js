@@ -402,7 +402,13 @@ router.post('/moveOne',
                     downloadLogsModel.logs = message;
                     utils.insertOrUpdateLog(downloadLogsModel.id, downloadLogsModel, websocket);
 
-                    models.Download.findById(downloadModel.id)
+                    models.Download.findById(downloadModel.id, {
+                        include: [
+                            {model: models.DownloadPackage, as: 'download_package'},
+                            {model: models.DownloadDirectory, as: 'download_directory'},
+                            {model: models.DownloadDirectory, as: 'to_move_download_directory'}
+                        ]
+                    })
                         .then(function(downloadModelUpdated) {
                             if (websocket.connection.isOpen) {
                                 websocket.session.publish('plow.downloads.downloads', [downloadModelUpdated], {}, {acknowledge: false});
