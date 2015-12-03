@@ -485,7 +485,7 @@ router.post('/unrar',
         var dataObject = JSON.parse(JSON.stringify(req.body));
 
         var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + dataObject.id;
-        var s = spawn('curl', []);
+        var s = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.unrar_command, dataObject.id]);
         s.stdout.on('data', function (data) { console.log(data) });
         s.stderr.on('data', function (data) { console.log(data) });
         s.on('exit', function(code) {
