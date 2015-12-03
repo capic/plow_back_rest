@@ -2,6 +2,7 @@ var models = require('../models');
 var express = require('express');
 var router = express.Router();
 var websocket = require('../websocket');
+var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var utils = require("../common/utils");
 var config = require("../configuration");
