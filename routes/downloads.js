@@ -402,12 +402,15 @@ router.post('/moveOne',
                     downloadLogsModel.logs = message;
                     utils.insertOrUpdateLog(downloadLogsModel.id, downloadLogsModel, websocket);
 
-                    if (websocket.connection.isOpen) {
-                        websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                        websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
-                    }
+                    models.Download.findById(downloadModel.id)
+                        .then(function(downloadModelUpdated) {
+                            if (websocket.connection.isOpen) {
+                                websocket.session.publish('plow.downloads.downloads', [downloadModelUpdated], {}, {acknowledge: false});
+                                websocket.session.publish('plow.downloads.download.' + downloadModelUpdated.id, [downloadModelUpdated], {}, {acknowledge: false});
+                            }
 
-                    res.json(downloadModel);
+                            res.json(downloadModelUpdated);
+                        });
                 }
             )
         };
