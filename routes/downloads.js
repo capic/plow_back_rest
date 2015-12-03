@@ -404,7 +404,7 @@ router.post('/moveOne',
 
                     if (websocket.connection.isOpen) {
                         websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                        websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                        websocket.session.publish('plow.downloads.download.' + downloadModel.id, {}, {}, {acknowledge: false});
                     }
 
                     res.json(downloadModel);
