@@ -486,14 +486,25 @@ router.post('/unrar',
 
         var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + dataObject.id;
         var s = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.unrar_command, dataObject.id]);
-        s.stdout.on('data', function (data) { console.log(data.toString()) });
-        s.stderr.on('data', function (data) { console.log(data.toString()) });
+       /* s.stdout.on('data',
+            function (data) {
+                if (websocket.connection.isOpen) {
+                    //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                    websocket.session.publish('plow.downloads.download.unrar.' + dataObject.id, [downloadModel], {}, {acknowledge: false});
+                }
+            }
+        );
+        //s.stderr.on('data', function (data) { console.log(data.toString()) });
         s.on('exit', function(code) {
+            if (websocket.connection.isOpen) {
+                //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                websocket.session.publish('plow.downloads.download.unrar.' + dataObject.id, [downloadModel], {}, {acknowledge: false});
+            }
             if (code != 0) {
                 console.log('Failed: ' + code);
             }
 
-        });
+        });*/
         res.end();
     }
 );
@@ -579,6 +590,10 @@ router.post('/package/unrarPercent',
             .then(function (downloadPackageModel) {
                 downloadPackageModel.updateAttributes({unrar_progress: dataObject.unrar_progress})
                     .then(function () {
+                        if (websocket.connection.isOpen) {
+                            //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                            websocket.session.publish('plow.downloads.download.unrar.' + dataObject.id, [downloadPackageModel], {}, {acknowledge: false});
+                        }
                         res.json(downloadPackageModel);
                     }
                 );
