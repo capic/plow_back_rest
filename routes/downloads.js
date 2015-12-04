@@ -492,6 +492,7 @@ router.post('/unrar',
             if (code != 0) {
                 console.log('Failed: ' + code);
             }
+            res.json({'code': code});
         });
         res.end();
     }
