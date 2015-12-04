@@ -494,7 +494,6 @@ router.post('/unrar',
             }
             res.json({'code': code});
         });
-        res.end();
     }
 );
 
