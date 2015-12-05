@@ -5,8 +5,6 @@ var models = require('../models');
 var exec = require('child_process').exec;
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
-var downloadStatusConfig = config.get('download_status');
-var fromConfig = config.get('from');
 
 var utils = {};
 

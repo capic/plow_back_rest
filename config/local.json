@@ -27,7 +27,8 @@
     "STARTING": 8,
     "MOVING": 9,
     "MOVED": 10,
-    "ERROR_MOVING": 11
+    "ERROR_MOVING": 11,
+    "TREATMENT_IN_PROGRESS": 999
   },
   "from": {
     "IHM_CLIENT": 1,

@@ -410,10 +410,16 @@ router.post('/moveOne',
                             if (downloadModel.status == downloadStatusConfig.FINISHED || downloadModel.status == downloadStatusConfig.MOVED || downloadModel.status == downloadStatusConfig.ERROR_MOVING) {
                                 logs = "Moving action ...\r\n";
 
-                                var srcDirectoryId = downloadModel.directory_id;
-                                var dstDirectoryId = dataObject.directory_id;
+                                downloadModel.updateAttributes({
+                                    status: downloadStatusConfig.TREATMENT_IN_PROGRESS
+                                })
+                                    .then(function () {
+                                        var srcDirectoryId = downloadModel.directory_id;
+                                        var dstDirectoryId = dataObject.directory_id;
 
-                                utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId);
+                                        utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId);
+                                    }
+                                );
                             } else {
                                 models.DownloadDirectory.findById(dataObject.directory_id)
                                     .then(function (downloadDirectoryModel) {
