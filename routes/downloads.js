@@ -592,7 +592,7 @@ router.post('/package/unrarPercent',
                     .then(function () {
                         if (websocket.connection.isOpen) {
                             //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                            websocket.session.publish('plow.downloads.download.unrar.' + dataObject.id, [downloadPackageModel], {}, {acknowledge: false});
+                            websocket.session.publish('plow.downloads.download.unrar.' + downloadPackageModel.id, [downloadPackageModel], {}, {acknowledge: false});
                         }
                         res.json(downloadPackageModel);
                     }
