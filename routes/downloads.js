@@ -392,35 +392,7 @@ router.get('/availability/:id',
 
 router.post('/moveOne',
     function (req, res, next) {
-        //TODO: inclure l'exclude pour les notifications
         var dataObject = JSON.parse(JSON.stringify(req.body));
-
-        var updateInfos = function (downloadModel, downloadLogsModel, param, message) {
-            // on met à jour le download avec le nouveau directory et le nouveau status
-            downloadModel.updateAttributes(param)
-                .then(function () {
-                    // on met a jour les logs du download
-                    downloadLogsModel.logs = message;
-                    utils.insertOrUpdateLog(downloadLogsModel.id, downloadLogsModel, websocket);
-
-                    models.Download.findById(downloadModel.id, {
-                        include: [
-                            {model: models.DownloadPackage, as: 'download_package'},
-                            {model: models.DownloadDirectory, as: 'download_directory'},
-                            {model: models.DownloadDirectory, as: 'to_move_download_directory'}
-                        ]
-                    })
-                        .then(function(downloadModelUpdated) {
-                            if (websocket.connection.isOpen) {
-                                websocket.session.publish('plow.downloads.downloads', [downloadModelUpdated], {}, {acknowledge: false});
-                                websocket.session.publish('plow.downloads.download.' + downloadModelUpdated.id, [downloadModelUpdated], {}, {acknowledge: false});
-                            }
-
-                            res.json(downloadModelUpdated);
-                        });
-                }
-            )
-        };
 
         // on recupere le download sur lequel on fait le traitement
         models.Download.findById(dataObject.id, {
@@ -438,20 +410,10 @@ router.post('/moveOne',
                             if (downloadModel.status == downloadStatusConfig.FINISHED || downloadModel.status == downloadStatusConfig.MOVED || downloadModel.status == downloadStatusConfig.ERROR_MOVING) {
                                 logs = "Moving action ...\r\n";
 
-                                downloadModel.updateAttributes({status: downloadStatusConfig.MOVING})
-                                    .then(function () {
-                                        /*models.DownloadDirectory.findById(dataObject.directory_id)
-                                         .then(function (downloadDirectoryModel) {
-                                         utils.moveDownload(logs, dataObject, downloadModel, downloadLogsModel, downloadDirectoryModel, updateInfos)
+                                var srcDirectoryId = downloadModel.directory_id;
+                                var dstDirectoryId = dataObject.directory_id;
 
-                                         }
-                                         );*/
-                                        var srcDirectoryId = downloadModel.directory_id;
-                                        var dstDirectoryId = dataObject.directory_id;
-
-                                        utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId, downloadModel, downloadLogsModel, logs, updateInfos)
-                                    }
-                                )
+                                utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId);
                             } else {
                                 models.DownloadDirectory.findById(dataObject.directory_id)
                                     .then(function (downloadDirectoryModel) {
@@ -476,7 +438,8 @@ router.post('/moveOne',
                     );
 
                 }
-            });
+            }
+        );
     }
 );
 

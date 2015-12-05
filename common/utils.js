@@ -10,43 +10,17 @@ var fromConfig = config.get('from');
 
 var utils = {};
 
-utils.moveDownload2 = function(downloadId, srcDirectoryId, destDirectoryId, downloadModel, downloadLogModel, logs, callback) {
+utils.moveDownload2 = function(downloadId, srcDirectoryId, destDirectoryId) {
     var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + srcDirectoryId + ' ' + destDirectoryId;
-    exec(command,
-        function(error, stdout, stderr) {
-            if (!error) {
-                var begin = stdout.indexOf('#');
-                var end = stdout.indexOf('#', begin + 1);
-                var res = stdout.substring(begin + 1, end);
+    var execMove = exec(command);
+    execMove.stdout.on('data',
+            function(data) {
 
-                var status = downloadStatusConfig.MOVED;
-                var downloadDirectoryId = destDirectoryId;
+        }
+    );
+    execMove.stdout.on('data',
+        function(data) {
 
-                if (res != "OK") {
-                    status = downloadStatusConfig.ERROR_MOVING;
-                    downloadDirectoryId = srcDirectoryId;
-                }
-
-                logs += stdout;
-
-                var param = {
-                    status: status,
-                    directory_id: downloadDirectoryId,
-                    to_move_directory_id: null
-                };
-
-                callback(downloadModel, downloadLogModel, param, logs);
-            } else {
-                logs += stderr;
-
-                var param = {
-                    status: downloadStatusConfig.ERROR_MOVING,
-                    directory_id: srcDirectoryId,
-                    to_move_directory_id: null
-                };
-
-                callback(downloadModel, downloadLogModel, param, logs);
-            }
         }
     );
 };
