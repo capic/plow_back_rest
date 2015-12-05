@@ -418,6 +418,8 @@ router.post('/moveOne',
                                         var dstDirectoryId = dataObject.directory_id;
 
                                         utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId);
+
+                                        res.json(downloadModel);
                                     }
                                 );
                             } else {
