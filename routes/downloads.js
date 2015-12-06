@@ -692,6 +692,8 @@ router.post('/package/files/delete',
         execDeletePackageFiles.on('close', function (code) {
             console.log('closing code: ' + code);
         });
+
+        res.end();
     }
 );
 
