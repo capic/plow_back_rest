@@ -543,6 +543,16 @@ router.delete('/logs/:id',
     }
 );
 
+router.get('/package/:id',
+    function (req, res) {
+        models.DownloadPackage.findById(req.params.id)
+            .then(function (downloadPackageModel) {
+                res.json(downloadPackageModel);
+            }
+        );
+    }
+);
+
 router.post('/package',
     function (req, res) {
         if (req.body.hasOwnProperty('package')) {
