@@ -28,6 +28,9 @@
     "MOVING": 9,
     "MOVED": 10,
     "ERROR_MOVING": 11,
+    "UNRARING": 12,
+    "UNRAR_OK": 13,
+    "UNRAR_ERROR": 14,
     "TREATMENT_IN_PROGRESS": 999
   },
   "from": {

@@ -8,12 +8,11 @@ var downloadServerConfig = config.get('download_server');
 
 var utils = {};
 
-utils.moveDownload2 = function(downloadId, srcDirectoryId, destDirectoryId) {
+utils.moveDownload2 = function(downloadId, srcDirectoryId, destDirectoryId, downloadModel) {
     var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + srcDirectoryId + ' ' + destDirectoryId;
     var execMove = exec(command);
     execMove.stdout.on('data',
-            function(data) {
-
+        function(data) {
         }
     );
     execMove.stdout.on('data',

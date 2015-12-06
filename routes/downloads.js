@@ -236,7 +236,8 @@ router.put('/:id',
         if (req.body.hasOwnProperty('download')) {
             var downloadObject = JSON.parse(req.body.download);
             models.Download.update(downloadObject, {
-                where: {id: req.params.id}}
+                    where: {id: req.params.id}
+                }
             )
                 .then(function () {
                     models.Download.findById(req.params.id,
@@ -454,28 +455,36 @@ router.post('/moveOne',
 router.post('/unrar',
     function (req, res) {
         var dataObject = JSON.parse(JSON.stringify(req.body));
+        var downloadObject = {status: downloadStatusConfig.TREATMENT_IN_PROGRESS};
+        models.Download.update(downloadObject, {
+                where: {package_id: dataObject.id}
+            }
+        )
+            .then(function () {
+                var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + dataObject.id;
+                var s = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.unrar_command, dataObject.id]);
+                /* s.stdout.on('data',
+                 function (data) {
+                 if (websocket.connection.isOpen) {
+                 //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                 websocket.session.publish('plow.downloads.download.unrar.' + dataObject.id, [downloadModel], {}, {acknowledge: false});
+                 }
+                 }
+                 );
+                 //s.stderr.on('data', function (data) { console.log(data.toString()) });
+                 s.on('exit', function(code) {
+                 if (websocket.connection.isOpen) {
+                 //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                 websocket.session.publish('plow.downloads.download.unrar.' + dataObject.id, [downloadModel], {}, {acknowledge: false});
+                 }
+                 if (code != 0) {
+                 console.log('Failed: ' + code);
+                 }
 
-        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.unrar_command + ' ' + dataObject.id;
-        var s = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.unrar_command, dataObject.id]);
-       /* s.stdout.on('data',
-            function (data) {
-                if (websocket.connection.isOpen) {
-                    //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                    websocket.session.publish('plow.downloads.download.unrar.' + dataObject.id, [downloadModel], {}, {acknowledge: false});
-                }
+                 });*/
             }
         );
-        //s.stderr.on('data', function (data) { console.log(data.toString()) });
-        s.on('exit', function(code) {
-            if (websocket.connection.isOpen) {
-                //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                websocket.session.publish('plow.downloads.download.unrar.' + dataObject.id, [downloadModel], {}, {acknowledge: false});
-            }
-            if (code != 0) {
-                console.log('Failed: ' + code);
-            }
 
-        });*/
         res.end();
     }
 );
