@@ -9,7 +9,8 @@
     "address": "192.168.1.200",
     "unrar_command": "python /var/www/plow_solution/main/download_basic.py unrar",
     "reset_command": "python /var/www/plow_solution/main/download_basic.py reset",
-    "move_command": "python /var/www/plow_solution/main/download_basic.py move"
+    "move_command": "python /var/www/plow_solution/main/download_basic.py move",
+    "delete_package_files": "python /var/www/plow_solution/main/download_basic.py delete_package_files"
   },
   "notification": {
     "activated": true,

@@ -676,4 +676,23 @@ router.post('/reset',
     }
 );
 
+router.post('/package/files/delete',
+    function (req, res, next) {
+        var dataObject = JSON.parse(JSON.stringify(req.body));
+
+        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.delete_package_files + ' ' + dataObject.id;
+        var execDeletePackageFiles = exec(command);
+
+        execDeletePackageFiles.stdout.on('data', function (data) {
+            console.log('stdout: ' + data);
+        });
+        execDeletePackageFiles.stderr.on('data', function (data) {
+            console.log('stdout: ' + data);
+        });
+        execDeletePackageFiles.on('close', function (code) {
+            console.log('closing code: ' + code);
+        });
+    }
+);
+
 module.exports = router;
