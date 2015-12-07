@@ -725,10 +725,10 @@ router.post('/package/files/delete',
     }
 );
 
-router.get('/actions/:downloadId/:actionId',
+router.get('/actions/:downloadId/:downloadActionId',
     function(req, res) {
         models.DownloadActionHistory.findOne({
-            where: {download_id: req.params.download_id, action_id: req.params.action_id}
+            where: {download_id: req.params.downloadId, download_action_id: req.params.downloadActionId}
         })
             .then(function (downloadAction) {
                 res.json(downloadAction)
