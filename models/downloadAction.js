@@ -13,7 +13,8 @@ module.exports = function (sequelize, DataTypes) {
             associate: function (models) {
                 DownloadAction.belongsToMany(models.Download, {
                     as: 'download_action_history',
-                    through: 'DownloadActionHistory'
+                    through: 'DownloadActionHistory',
+                    foreignKey: 'download_action_id'
                 });
             }
         }

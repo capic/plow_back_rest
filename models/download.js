@@ -72,7 +72,8 @@ module.exports = function (sequelize, DataTypes) {
                     });
                     Download.belongsToMany(models.DownloadAction, {
                         as: 'download_action_history',
-                        through: 'DownloadActionHistory'
+                        through: 'DownloadActionHistory',
+                        foreignKey: 'download_id'
                     });
                 }
             }
