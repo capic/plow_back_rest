@@ -728,7 +728,11 @@ router.post('/package/files/delete',
 router.get('/actions/:downloadId/:downloadActionId',
     function(req, res) {
         models.DownloadActionHistory.findOne({
-            where: {download_id: req.params.downloadId, download_action_id: req.params.downloadActionId}
+            where: {download_id: req.params.downloadId, download_action_id: req.params.downloadActionId},
+            include: [
+                {model: models.DownloadAction, as: 'download_action'}
+            ]
+
         })
             .then(function (downloadAction) {
                 res.json(downloadAction)
