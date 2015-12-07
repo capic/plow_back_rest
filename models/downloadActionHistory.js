@@ -3,6 +3,16 @@
  */
 module.exports = function (sequelize, DataTypes) {
     var DownloadActionHistory = sequelize.define('DownloadActionHistory', {
+        download_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true
+        },
+        download_action_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true
+        },
         percentage: DataTypes.INTEGER,
         time_left: DataTypes.INTEGER,
         lifecycle_insert_date: DataTypes.DATE,
