@@ -725,4 +725,16 @@ router.post('/package/files/delete',
     }
 );
 
+router.get('/actions/:downloadId/:actionId',
+    function(req, res) {
+        models.DownloadAction.findOne({
+            where: {download_id: req.params.download_id, action_id: req.params.action_id}
+        })
+            .then(function (downloadAction) {
+                res.json(downloadAction)
+            }
+        );
+    }
+);
+
 module.exports = router;
