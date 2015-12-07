@@ -11,7 +11,7 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'download_action',
     classMethods: {
       associate: function(models) {
-        DownloadAction.hasMany(models.download)
+        DownloadAction.hasMany(models.Download)
       }
     }
   });
