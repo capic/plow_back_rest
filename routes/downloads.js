@@ -436,8 +436,17 @@ router.post('/moveOne',
                                                     logs += "No moving just update the directory\r\n";
                                                     downloadLogsModel.updateAttributes({logs: downloadLogsModel.logs + logs});
                                                 }
-
-                                                res.json(downloadModel);
+                                                models.Download.findById(dataObject.id, {
+                                                    include: [
+                                                        {model: models.DownloadPackage, as: 'download_package'},
+                                                        {model: models.DownloadDirectory, as: 'download_directory'},
+                                                        {model: models.DownloadDirectory, as: 'to_move_download_directory'}
+                                                    ]
+                                                })
+                                                    .then(function (downloadModelReturned) {
+                                                        res.json(downloadModelReturned);
+                                                    }
+                                                );
                                             }
                                         );
                                     }
@@ -690,18 +699,27 @@ router.post('/package/files/delete',
     function (req, res, next) {
         var dataObject = JSON.parse(JSON.stringify(req.body));
 
-        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.delete_package_files + ' ' + dataObject.id;
-        var execDeletePackageFiles = exec(command);
+        var downloadObject = {status: downloadStatusConfig.TREATMENT_IN_PROGRESS};
+        models.Download.update(downloadObject, {
+                where: {package_id: dataObject.id}
+            }
+        )
+            .then(function () {
 
-        execDeletePackageFiles.stdout.on('data', function (data) {
-            console.log('stdout: ' + data);
-        });
-        execDeletePackageFiles.stderr.on('data', function (data) {
-            console.log('stdout: ' + data);
-        });
-        execDeletePackageFiles.on('close', function (code) {
-            console.log('closing code: ' + code);
-        });
+                var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.delete_package_files + ' ' + dataObject.id;
+                var execDeletePackageFiles = exec(command);
+
+                execDeletePackageFiles.stdout.on('data', function (data) {
+                    console.log('stdout: ' + data);
+                });
+                execDeletePackageFiles.stderr.on('data', function (data) {
+                    console.log('stdout: ' + data);
+                });
+                execDeletePackageFiles.on('close', function (code) {
+                    console.log('closing code: ' + code);
+                });
+            }
+        );
 
         res.end();
     }
