@@ -33,8 +33,8 @@ module.exports = function (sequelize, DataTypes) {
                     as: 'download_action'
                 });
                 DownloadActionHistory.belongsTo(models.Download, {
-                    foreignKey: 'download',
-                    as: 'download_id'
+                    foreignKey: 'download_id',
+                    as: 'download'
                 });
             }
         }
