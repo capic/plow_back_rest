@@ -728,21 +728,4 @@ router.post('/package/files/delete',
     }
 );
 
-router.get('/:downloadId/actions/:downloadActionId',
-    function (req, res) {
-        models.DownloadActionHistory.findOne(
-            {
-                where: {download_id: req.params.downloadId, download_action_id: req.params.downloadActionId},
-                include: [
-                    {model: models.DownloadAction, as: 'download_action'},
-                    {model: models.DownloadActionStatus, as: 'download_action_status'}
-                ]
-            })
-            .then(function (downloadActionHistoryModel) {
-                res.json(downloadActionHistoryModel);
-            }
-        );
-    }
-);
-
 module.exports = router;

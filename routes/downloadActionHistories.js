@@ -10,8 +10,8 @@ var errorConfig = config.get('errors');
  */
 router.get('/',
     function (req, res, next) {
-        var callback = function (downloadActions) {
-            res.json(downloadActions);
+        var callback = function (downloadActionHistories) {
+            res.json(downloadActionHistories);
         };
 
         var params = {};
@@ -20,25 +20,16 @@ router.get('/',
         }
 
         if (Object.keys(params).length !== 0) {
-            models.DownloadAction.findAll({
-                where: params
+            models.DownloadActionHistory.findAll({
+                where: params,
+                include: [
+                    {model: models.DownloadAction, as: 'download_action'},
+                    {model: models.DownloadActionStatus, as: 'download_action_status'}
+                ]
             }).then(callback);
         } else {
-            models.DownloadAction.findAll().then(callback);
+            models.DownloadActionHistory.findAll().then(callback);
         }
-    }
-);
-
-/**
- * get a download by id
- */
-router.get('/:id',
-    function (req, res, next) {
-        models.DownloadAction.findById(req.params.id)
-            .then(function (downloadActionModel) {
-                res.json(downloadActionModel);
-            }
-        );
     }
 );
 
