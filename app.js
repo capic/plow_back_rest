@@ -13,7 +13,7 @@ var downloads = require('./routes/downloads');
 var downloadDirectories = require('./routes/downloadDirectories');
 var downloadHosts = require('./routes/downloadHosts');
 var downloadHostPictures = require('./routes/downloadHostPictures');
-var downloadActions = require('./routes/downloadActions');
+var downloadActionHistories = require('./routes/downloadActionHistories');
 
 var app = express();
 
@@ -41,7 +41,7 @@ app.use('/downloads', downloads);
 app.use('/downloadDirectories', downloadDirectories);
 app.use('/downloadHosts', downloadHosts);
 app.use('/downloadHostPictures', downloadHostPictures);
-app.use('/downloadActions', downloadActions);
+app.use('/downloadActionHistories', downloadActionHistories);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
