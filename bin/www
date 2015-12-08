@@ -7,14 +7,12 @@
 var app = require('../app');
 var debug = require('debug')('plow_back_rest:server');
 var http = require('http');
-var config = require("../configuration");
-var downloadServerConfig = config.get('server');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || downloadServerConfig.port);
+var port = normalizePort(process.env.PORT || '3001');
 app.set('port', port);
 
 /**
