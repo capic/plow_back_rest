@@ -725,16 +725,11 @@ router.post('/package/files/delete',
     }
 );
 
-router.get('/actions/:downloadId/:downloadActionId',
+router.get('/actions/:downloadId',
     function(req, res) {
         models.Download.findById(req.params.downloadId)
             .then(function(downloadModel) {
-                models.DownloadAction.findById(req.params.downloadActionId)
-                    .then(function(downloadActionModel) {
-                        downloadModel.addDownloadAction(downloadActionModel);
-                        res.json(downloadActionModel);
-                    }
-                );
+               res.json(downloadModel.getDownloadActions());
             }
         );
     }
