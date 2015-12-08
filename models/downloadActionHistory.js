@@ -21,7 +21,15 @@ module.exports = function (sequelize, DataTypes) {
         freezeTableName: true,
         createdAt: false,
         updatedAt: false,
-        tableName: 'download_action_history'
+        tableName: 'download_action_history',
+        classMethods: {
+            associate: function (models) {
+                DownloadActionHistory.belongsTo(models.DownloadActionStatus, {
+                    foreignKey: 'download_action_status_id',
+                    as: 'download_action_status'
+                });
+            }
+        }
     });
 
     return DownloadActionHistory;

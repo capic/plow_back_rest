@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'download_action',
         classMethods: {
             associate: function (models) {
-                DownloadAction.belongsToMany(models.Download, {
+                DownloadAction.hasMany(models.Download, {
                     as: 'download_action_history',
                     through: 'DownloadActionHistory',
                     foreignKey: 'download_action_id'

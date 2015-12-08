@@ -440,7 +440,10 @@ router.post('/moveOne',
                                                     include: [
                                                         {model: models.DownloadPackage, as: 'download_package'},
                                                         {model: models.DownloadDirectory, as: 'download_directory'},
-                                                        {model: models.DownloadDirectory, as: 'to_move_download_directory'}
+                                                        {
+                                                            model: models.DownloadDirectory,
+                                                            as: 'to_move_download_directory'
+                                                        }
                                                     ]
                                                 })
                                                     .then(function (downloadModelReturned) {
@@ -725,11 +728,14 @@ router.post('/package/files/delete',
     }
 );
 
-router.get('/actions/:downloadId',
-    function(req, res) {
-        models.Download.findById(req.params.downloadId)
-            .then(function(downloadModel) {
-               res.json(downloadModel.getDownloadActions());
+router.get(':downloadId/actions/:downloadActionId',
+    function (req, res) {
+        models.DownloadActionHistory.findOne(
+            {
+                where: {download_id: req.params.downloadId, download_action_id: req.params.downloadActionId}
+            })
+            .then(function (downloadActionHistoryModel) {
+                res.json(downloadActionHistoryModel);
             }
         );
     }
