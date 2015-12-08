@@ -732,7 +732,10 @@ router.get('/:downloadId/actions/:downloadActionId',
     function (req, res) {
         models.DownloadActionHistory.findOne(
             {
-                where: {download_id: req.params.downloadId, download_action_id: req.params.downloadActionId}
+                where: {download_id: req.params.downloadId, download_action_id: req.params.downloadActionId},
+                include: [
+                    {model: models.DownloadActionHistory, as: 'download_action_history'}
+                ]
             })
             .then(function (downloadActionHistoryModel) {
                 res.json(downloadActionHistoryModel);
