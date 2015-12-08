@@ -42,12 +42,12 @@ router.post('/',
         if (req.body.hasOwnProperty('downloadActionHistory')) {
             var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
 
-            models.sequelize.query('INSERT INTO download_action_history (download_id, action_id, num, lifecycle_insert_date, lifecyle_update_date) ' +
-                'VALUES (:download_id, :action_id, 1, now(), now()) ON DUPLICATE KEY UPDATE num = num + 1',
+            models.sequelize.query('INSERT INTO download_action_history (download_id, download_action_id, num, lifecycle_insert_date, lifecyle_update_date) ' +
+                'VALUES (:download_id, :download_action_id, 1, now(), now()) ON DUPLICATE KEY UPDATE num = num + 1',
                 {
                     replacements: {
                         download_id: downloadActionHistoryObject.download_id,
-                        action_id: downloadActionHistoryObject.action_id
+                        download_action_id: downloadActionHistoryObject.download_action_id
                     },
                     type: models.sequelize.QueryTypes.INSERT
                 }).spread(function (downloadActionHistoryModel) {
