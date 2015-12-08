@@ -33,28 +33,50 @@ router.get('/',
     }
 );
 
-/*/!**
+
+/**
  * add a new download
- *!/
+ */
 router.post('/',
     function (req, res) {
-        if (req.body.hasOwnProperty('action')) {
-            var downloadActionObject = JSON.parse(req.body.directory);
+        if (req.body.hasOwnProperty('downloadActionHistory')) {
+            var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
 
-            models.DownloadAction.findOrCreate({
-                where: {path: downloadActionObject.path},
-                defaults: downloadActionObject
-            })
-                .spread(function (downloadDirectoryModel, created) {
-                    res.json(downloadDirectoryModel.get({plain: true}));
-                }
-            );
+            models.sequelize.query('INSERT INTO download_action_history (download_id, action_id, num, lifecycle_insert_date, lifecyle_update_date) ' +
+                'VALUES (:download_id, :action_id, 1, now(), now()) ON DUPLICATE KEY UPDATE num = num + 1',
+                {
+                    replacements: {
+                        download_id: downloadActionHistoryObject.download_id,
+                        action_id: downloadActionHistoryObject.action_id
+                    },
+                    type: models.sequelize.QueryTypes.INSERT
+                }).spread(function (downloadActionHistoryModel) {
+                    res.json(downloadActionHistoryModel.get());
+                });
         } else {
             //TODO: erreur
         }
     }
 );
 
+router.put('/download/:downloadId/downloadAction/:downloadActionId',
+    function (req, res) {
+        if (req.body.hasOwnProperty('downloadActionHistory')) {
+            var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
+
+            models.DownloadActionHistory.update(downloadActionHistoryObject, {
+                    where: {download_id: req.params.download_id, download_action_id: req.params.downloadActionId}
+                }
+            )
+                .then(function () {
+
+                }
+            );
+        }
+    }
+);
+
+/*
 /!**
  * delete a download by id
  *!/
