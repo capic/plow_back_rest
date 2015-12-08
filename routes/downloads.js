@@ -734,7 +734,7 @@ router.get('/:downloadId/actions/:downloadActionId',
             {
                 where: {download_id: req.params.downloadId, download_action_id: req.params.downloadActionId},
                 include: [
-                    {model: models.DownloadActionHistory, as: 'download_action_history'}
+                    {model: models.DownloadAction, as: 'download_action'}
                 ]
             })
             .then(function (downloadActionHistoryModel) {
