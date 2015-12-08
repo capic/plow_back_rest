@@ -729,7 +729,7 @@ router.get('/actions/:downloadId/:downloadActionId',
     function(req, res) {
         models.Download.findById(req.params.downloadId,
             function(downloadModel) {
-                models.DownloadAction.findById(req.params.downladActionId,
+                models.DownloadAction.findById(req.params.downloadActionId,
                     function(downloadActionModel) {
                         downloadModel.addDownloadAction(downloadActionModel);
                         res.json(downloadActionModel);
