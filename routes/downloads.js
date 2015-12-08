@@ -728,7 +728,7 @@ router.post('/package/files/delete',
     }
 );
 
-router.get(':downloadId/actions/:downloadActionId',
+router.get('/:downloadId/actions/:downloadActionId',
     function (req, res) {
         models.DownloadActionHistory.findOne(
             {
