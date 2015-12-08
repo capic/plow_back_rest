@@ -11,7 +11,7 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'download_action_status',
     classMethods: {
       associate: function(models) {
-        DownloadActionStatus.hasMany(models.DownloadActionHistory, {foreignKey: 'directory_id', as:'download_directory'});
+        DownloadActionStatus.hasMany(models.DownloadActionHistory, {foreignKey: 'download_action_status_id', as:'download_action_status'});
       }
     }
   });
