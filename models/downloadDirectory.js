@@ -11,8 +11,8 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'download_directory',
     classMethods: {
       associate: function(models) {
-        DownloadDirectory.hasMany(models.Download, {foreignKey: 'directory_id', as:'download_directory'})
-        DownloadDirectory.hasMany(models.Download, {foreignKey: 'to_move_directory_id', as:'to_move_download_directory'})
+        DownloadDirectory.hasMany(models.Download, {foreignKey: 'directory_id', as:'download_directory'});
+        DownloadDirectory.hasMany(models.Download, {foreignKey: 'to_move_directory_id', as:'to_move_download_directory'});
       }
     }
   });
