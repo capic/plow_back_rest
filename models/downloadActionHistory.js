@@ -28,6 +28,10 @@ module.exports = function (sequelize, DataTypes) {
                     foreignKey: 'download_action_status_id',
                     as: 'download_action_status'
                 });
+                DownloadActionHistory.belongsToMany(models.DownloadAction, {
+                    foreignKey: 'download_action',
+                    as: 'download_action'
+                });
             }
         }
     });
