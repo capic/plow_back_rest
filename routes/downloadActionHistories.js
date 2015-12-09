@@ -42,6 +42,7 @@ router.post('/',
     function (req, res) {
         if (req.body.hasOwnProperty('downloadActionHistory')) {
             var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
+            downloadActionHistoryObject.num = -1;
 
             models.DownloadActionHistory.create(downloadActionHistoryObject)
                 .then(function (downloadActionHistoryCreated) {
