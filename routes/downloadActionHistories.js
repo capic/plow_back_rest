@@ -43,7 +43,7 @@ router.post('/',
         if (req.body.hasOwnProperty('downloadActionHistory')) {
             var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
 
-            models.DownloadActionHistory.create(downloadActionHistoryObject, {raw: true})
+            models.DownloadActionHistory.create(downloadActionHistoryObject)
                 .then(function (downloadActionHistoryCreated) {
                     models.DownloadActionHistory.max('num',
                         {
@@ -75,6 +75,10 @@ router.post('/',
                             );
                         }
                     );
+                }
+            ).catch(
+                function(errors) {
+                    console.log(errors);
                 }
             );
         } else {
