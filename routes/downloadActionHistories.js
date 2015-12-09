@@ -50,7 +50,7 @@ router.post('/',
                         download_action_id: downloadActionHistoryObject.download_action_id
                     },
                     type: models.sequelize.QueryTypes.INSERT
-                }).spread(function () {
+                }).then(function () {
 
                 });
         } else {
