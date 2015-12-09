@@ -27,7 +27,12 @@ router.get('/',
                     {model: models.DownloadActionStatus, as: 'download_action_status'},
                     {model: models.DownloadActionProperty, as: 'download_action_property'}
                 ]
-            }).then(callback);
+            }).then(callback)
+                .catch(
+                function (errors) {
+                    console.log(errors);
+                }
+            );
         } else {
             models.DownloadActionHistory.findAll().then(callback);
         }
@@ -42,7 +47,7 @@ router.post('/',
     function (req, res) {
         if (req.body.hasOwnProperty('downloadActionHistory')) {
             var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
-            downloadActionHistoryObject.num = -1;
+            downloadActionHistoryObject.num = -1; // on force a une valeur bidon pour que le trigger puisse prendre la releve
 
             models.DownloadActionHistory.create(downloadActionHistoryObject)
                 .then(function (downloadActionHistoryCreated) {
@@ -78,7 +83,7 @@ router.post('/',
                     );
                 }
             ).catch(
-                function(errors) {
+                function (errors) {
                     console.log(errors);
                 }
             );
