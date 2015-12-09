@@ -44,6 +44,7 @@ router.post('/',
 
             models.DownloadActionHistory.create(downloadActionHistoryObject, {raw: true})
                 .then(function (downloadActionHistoryCreated) {
+                    var a = downloadActionHistoryCreated.reload();
                     models.DownloadActionHistory.findOne(
                         {
                             where: {
