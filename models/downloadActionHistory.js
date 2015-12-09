@@ -13,6 +13,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             primaryKey: true
         },
+        num: DataTypes.INTEGER,
         percentage: DataTypes.INTEGER,
         time_left: DataTypes.INTEGER,
         lifecycle_insert_date: DataTypes.DATE,
