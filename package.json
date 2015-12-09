@@ -17,7 +17,7 @@
     "i18n": "^0.5.0",
     "morgan": "~1.6.1",
     "mysql": "^2.9.0",
-    "sequelize": "~3.6.0",
+    "sequelize": "~3.14.0",
     "serve-favicon": "~2.3.0",
     "when": "^3.7.3"
   }
