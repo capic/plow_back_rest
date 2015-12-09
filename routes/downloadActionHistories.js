@@ -43,8 +43,23 @@ router.post('/',
             var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
 
             models.DownloadActionHistory.create(downloadActionHistoryObject)
-                .then(function (downloadActionHistoryModel) {
-                    res.json(downloadActionHistoryModel);
+                .then(function (downloadActionHistoryCreated) {
+                    models.DownloadActionHistory.findOne(
+                        {
+                            where: {
+                                download_id: downloadActionHistoryCreated.download_id,
+                                download_action_id: downloadActionHistoryCreated.download_action_id,
+                                num: downloadActionHistoryCreated.num
+                            },
+                            include: [
+                                {model: models.DownloadAction, as: 'download_action'},
+                                {model: models.DownloadActionStatus, as: 'download_action_status'}
+                            ]
+                        }
+                    ).then(function(downloadActionHistoryModel) {
+                            res.json(downloadActionHistoryModel);
+                        }
+                    );
                 }
             );
         } else {
