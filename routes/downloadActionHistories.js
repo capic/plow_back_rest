@@ -42,7 +42,7 @@ router.post('/',
         if (req.body.hasOwnProperty('downloadActionHistory')) {
             var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
 
-            models.DownloadActionHistory.create(downloadActionHistoryObject)
+            models.DownloadActionHistory.create(downloadActionHistoryObject, {raw: true})
                 .then(function (downloadActionHistoryCreated) {
                     models.DownloadActionHistory.findOne(
                         {
@@ -54,8 +54,7 @@ router.post('/',
                             include: [
                                 {model: models.DownloadAction, as: 'download_action'},
                                 {model: models.DownloadActionStatus, as: 'download_action_status'}
-                            ],
-                            raw: true
+                            ]
                         }
                     ).then(function(downloadActionHistoryModel) {
                             res.json(downloadActionHistoryModel);
