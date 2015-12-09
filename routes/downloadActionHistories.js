@@ -54,7 +54,8 @@ router.post('/',
                             include: [
                                 {model: models.DownloadAction, as: 'download_action'},
                                 {model: models.DownloadActionStatus, as: 'download_action_status'}
-                            ]
+                            ],
+                            raw: true
                         }
                     ).then(function(downloadActionHistoryModel) {
                             res.json(downloadActionHistoryModel);
