@@ -13,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             primaryKey: true
         },
-        download_property_id: {
+        download_action_property_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true
