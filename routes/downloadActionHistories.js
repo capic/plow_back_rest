@@ -44,21 +44,31 @@ router.post('/',
 
             models.DownloadActionHistory.create(downloadActionHistoryObject, {raw: true})
                 .then(function (downloadActionHistoryCreated) {
-                    var a = downloadActionHistoryCreated.reload();
-                    models.DownloadActionHistory.findOne(
+                    models.DownloadActionHistory.max('num',
                         {
                             where: {
                                 download_id: downloadActionHistoryCreated.download_id,
-                                download_action_id: downloadActionHistoryCreated.download_action_id,
-                                num: downloadActionHistoryCreated.num
-                            },
-                            include: [
-                                {model: models.DownloadAction, as: 'download_action'},
-                                {model: models.DownloadActionStatus, as: 'download_action_status'}
-                            ]
+                                download_action_id: downloadActionHistoryCreated.download_action_id
+                            }
                         }
-                    ).then(function(downloadActionHistoryModel) {
-                            res.json(downloadActionHistoryModel);
+                    ).then(
+                        function (max) {
+                            models.DownloadActionHistory.findOne(
+                                {
+                                    where: {
+                                        download_id: downloadActionHistoryCreated.download_id,
+                                        download_action_id: downloadActionHistoryCreated.download_action_id,
+                                        num: max
+                                    },
+                                    include: [
+                                        {model: models.DownloadAction, as: 'download_action'},
+                                        {model: models.DownloadActionStatus, as: 'download_action_status'}
+                                    ]
+                                }
+                            ).then(function (downloadActionHistoryModel) {
+                                    res.json(downloadActionHistoryModel);
+                                }
+                            );
                         }
                     );
                 }
@@ -87,32 +97,32 @@ router.put('/download/:downloadId/downloadAction/:downloadActionId',
 );
 
 /*
-/!**
+ /!**
  * delete a download by id
  *!/
-router.delete('/:id',
-    function (req, res, next) {
-        models.Download.findAndCountAll({
-            where: {
-                directory_id: req.params.id,
-                $or: [{status: downloadStatusConfig.WAITING}, {status: downloadStatusConfig.IN_PROGRESS}]
-            }
-        })
-            .then(function (result) {
-                // on supprime le directory seulement si il n'est pas utilise autre part
-                if (result.count <= 1) {
-                    models.DownloadDirectory.destroy({where: {id: req.params.id}})
-                        .then(function (ret) {
-                            res.json({'return': ret == 1});
-                        }
-                    );
-                } else {
-                    var error = new Error(res.__(errorConfig.downloadDirectories.deleteDirectory.message));
-                    error.status = errorConfig.downloadDirectories.deleteDirectory.code;
-                    return next(error);
-                }
-            });
-    }
-);*/
+ router.delete('/:id',
+ function (req, res, next) {
+ models.Download.findAndCountAll({
+ where: {
+ directory_id: req.params.id,
+ $or: [{status: downloadStatusConfig.WAITING}, {status: downloadStatusConfig.IN_PROGRESS}]
+ }
+ })
+ .then(function (result) {
+ // on supprime le directory seulement si il n'est pas utilise autre part
+ if (result.count <= 1) {
+ models.DownloadDirectory.destroy({where: {id: req.params.id}})
+ .then(function (ret) {
+ res.json({'return': ret == 1});
+ }
+ );
+ } else {
+ var error = new Error(res.__(errorConfig.downloadDirectories.deleteDirectory.message));
+ error.status = errorConfig.downloadDirectories.deleteDirectory.code;
+ return next(error);
+ }
+ });
+ }
+ );*/
 
 module.exports = router;
