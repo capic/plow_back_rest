@@ -24,7 +24,8 @@ router.get('/',
                 where: params,
                 include: [
                     {model: models.DownloadAction, as: 'download_action'},
-                    {model: models.DownloadActionStatus, as: 'download_action_status'}
+                    {model: models.DownloadActionStatus, as: 'download_action_status'},
+                    {model: models.DownloadActionProperty, as: 'download_action_property'}
                 ]
             }).then(callback);
         } else {
