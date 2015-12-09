@@ -13,9 +13,18 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             primaryKey: true
         },
-        num: DataTypes.INTEGER,
-        percentage: DataTypes.INTEGER,
-        time_left: DataTypes.INTEGER,
+        download_property_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true
+        },
+        num: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true
+        },
+        property_value: DataTypes.STRING,
+        download_action_status_id: DataTypes.INTEGER,
         lifecycle_insert_date: DataTypes.DATE,
         lifecycle_update_date: DataTypes.DATE
     }, {
@@ -32,6 +41,10 @@ module.exports = function (sequelize, DataTypes) {
                 DownloadActionHistory.belongsTo(models.DownloadAction, {
                     foreignKey: 'download_action_id',
                     as: 'download_action'
+                });
+                DownloadActionHistory.belongsTo(models.DownloadAction, {
+                    foreignKey: 'download_property_id',
+                    as: 'download_property'
                 });
                 DownloadActionHistory.belongsTo(models.Download, {
                     foreignKey: 'download_id',

@@ -79,17 +79,36 @@ router.post('/',
     }
 );
 
-router.put('/download/:downloadId/downloadAction/:downloadActionId',
+router.put('/download/:downloadId/downloadAction/:downloadActionId/num/:num',
     function (req, res) {
         if (req.body.hasOwnProperty('downloadActionHistory')) {
             var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
 
             models.DownloadActionHistory.update(downloadActionHistoryObject, {
-                    where: {download_id: req.params.download_id, download_action_id: req.params.downloadActionId}
+                    where: {
+                        download_id: req.params.downloadId,
+                        download_action_id: req.params.downloadActionId,
+                        num: req.params.num
+                    }
                 }
             )
                 .then(function () {
-
+                    models.DownloadActionHistory.findOne(
+                        {
+                            where: {
+                                download_id: req.params.downloadId,
+                                download_action_id: req.params.downloadActionId,
+                                num: req.params.num
+                            },
+                            include: [
+                                {model: models.DownloadAction, as: 'download_action'},
+                                {model: models.DownloadActionStatus, as: 'download_action_status'}
+                            ]
+                        }
+                    ).then(function (downloadActionHistoryModel) {
+                            res.json(downloadActionHistoryModel);
+                        }
+                    );
                 }
             );
         }
