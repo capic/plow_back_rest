@@ -42,9 +42,9 @@ module.exports = function (sequelize, DataTypes) {
                     foreignKey: 'download_action_id',
                     as: 'download_action'
                 });
-                DownloadActionHistory.belongsTo(models.DownloadProperty, {
-                    foreignKey: 'download_property_id',
-                    as: 'download_property'
+                DownloadActionHistory.belongsTo(models.Download<actionProperty, {
+                    foreignKey: 'download_action_property_id',
+                    as: 'download_action_property'
                 });
                 DownloadActionHistory.belongsTo(models.Download, {
                     foreignKey: 'download_id',
