@@ -24,7 +24,6 @@ module.exports = function (sequelize, DataTypes) {
             primaryKey: true
         },
         property_value: DataTypes.STRING,
-        download_action_status_id: DataTypes.INTEGER,
         lifecycle_insert_date: DataTypes.DATE,
         lifecycle_update_date: DataTypes.DATE
     }, {
