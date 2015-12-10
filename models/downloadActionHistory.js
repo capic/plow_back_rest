@@ -8,6 +8,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             primaryKey: true
         },
+
         download_action_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
