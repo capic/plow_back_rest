@@ -40,7 +40,6 @@ module.exports = function (sequelize, DataTypes) {
                     foreignKey: 'download_id',
                     as: 'download'
                 });
-                DownloadActionHistory.hasMany(models.DownloadActionComposedByProperties)
             }
         }
     });

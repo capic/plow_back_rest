@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'download_action_property',
         classMethods: {
             associate: function (models) {
-                DownloadActionProperty.hasMany(models.DownloadActionHistory, {foreignKey: 'download_action_property_id'});
+                DownloadActionProperty.hasMany(models.DownloadActionComposedByProperties, {foreignKey: 'download_action_property_id'});
             }
         }
     });
