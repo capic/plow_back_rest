@@ -54,8 +54,7 @@ router.post('/',
                         {
                             where: {
                                 download_id: downloadActionHistoryCreated.download_id,
-                                download_action_id: downloadActionHistoryCreated.download_action_id,
-                                download_action_property_id: downloadActionHistoryCreated.download_action_property_id
+                                download_action_id: downloadActionHistoryCreated.download_action_id
                             }
                         }
                     ).then(
@@ -65,13 +64,11 @@ router.post('/',
                                     where: {
                                         download_id: downloadActionHistoryCreated.download_id,
                                         download_action_id: downloadActionHistoryCreated.download_action_id,
-                                        download_action_property_id: downloadActionHistoryCreated.download_action_property_id,
                                         num: max
                                     },
                                     include: [
                                         {model: models.DownloadAction, as: 'download_action'},
-                                        {model: models.DownloadActionStatus, as: 'download_action_status'},
-                                        {model: models.DownloadActionProperty, as: 'download_action_property'}
+                                        {model: models.DownloadActionStatus, as: 'download_action_status'}
                                     ]
                                 }
                             ).then(function (downloadActionHistoryModel) {
