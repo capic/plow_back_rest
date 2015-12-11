@@ -12,7 +12,7 @@ module.exports = function (sequelize, DataTypes) {
         classMethods: {
             associate: function (models) {
                 DownloadAction.hasMany(models.DownloadActionHistory, {foreignKey: 'download_action_id'});
-                DownloadAction.hasMany(models.DownloadActionComposedByProperties, {as: 'download_action_composed_property'})
+                DownloadAction.hasMany(models.DownloadActionComposedByProperties, {as: 'download_action_composed_by_properties', foreignKey: 'download_action_id'})
             }
         }
     });
