@@ -27,12 +27,8 @@ router.get('/',
                         model: models.DownloadAction, as: 'download_action',
                         include: [
                             {
-                                model: models.DownloadActionComposedByProperties, as: 'download_action_composed_by_properties',
-                                include: [
-                                    {
-                                        model: models.DownloadActionProperty, as: 'download_action_property'
-                                    }
-                                ]
+                                model: models.Action, as: 'action',
+                                model: models.Property, as: 'property'
                             }
                         ]
                     },
