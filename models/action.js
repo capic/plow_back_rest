@@ -2,19 +2,19 @@
  * Created by Vincent on 27/08/2015.
  */
 module.exports = function (sequelize, DataTypes) {
-    var DownloadActionProperty = sequelize.define('DownloadActionProperty', {
+    var Action = sequelize.define('Action', {
         name: DataTypes.STRING
     }, {
         freezeTableName: true,
         createdAt: false,
         updatedAt: false,
-        tableName: 'download_action_property',
+        tableName: 'download_action_composed_by_download_action_properties',
         classMethods: {
             associate: function (models) {
-                DownloadActionProperty.hasMany(models.DownloadActionComposedByProperties, {foreignKey: 'download_action_property_id'});
+                DownloadAction.hasMany(models.DownloadAction, {as: 'download_action', foreignKey: 'action_id'});
             }
         }
     });
 
-    return DownloadActionProperty;
+    return Action;
 };

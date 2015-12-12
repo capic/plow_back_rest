@@ -3,7 +3,7 @@
  */
 module.exports = function (sequelize, DataTypes) {
     var DownloadAction = sequelize.define('DownloadAction', {
-        name: DataTypes.STRING
+        property_value: DataTypes.STRING
     }, {
         freezeTableName: true,
         createdAt: false,
@@ -11,8 +11,15 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'download_action',
         classMethods: {
             associate: function (models) {
-                DownloadAction.hasMany(models.DownloadActionHistory, {foreignKey: 'download_action_id'});
-                DownloadAction.hasMany(models.DownloadActionComposedByProperties, {as: 'download_action_composed_by_properties', foreignKey: 'download_action_id'})
+                DownloadAction.hasMany(models.DownloadActionHistory, {as: 'download_action_history', foreignKey: 'download_action_id'});
+                DownloadAction.belongsTo(models.Action, {
+                    foreignKey: 'action_id',
+                    as: 'action'
+                });
+                DownloadAction.belongsTo(models.Property, {
+                    foreignKey: 'property_id',
+                    as: 'property'
+                });
             }
         }
     });
