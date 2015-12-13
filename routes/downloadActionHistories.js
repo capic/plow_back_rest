@@ -23,10 +23,8 @@ router.get('/',
             models.DownloadActionHistory.findAll({
                 where: params,
                 include: [
-                    {
-                        model: models.Action, as: 'action',
-                        model: models.Property, as: 'property'
-                    },
+                    {model: models.Action, as: 'action'},
+                    {model: models.Property, as: 'property'},
                     {model: models.DownloadActionStatus, as: 'download_action_status'}
                 ]
             }).then(callback)
