@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
         freezeTableName: true,
         createdAt: false,
         updatedAt: false,
-        tableName: 'download_action_property',
+        tableName: 'property',
         classMethods: {
             associate: function (models) {
                 Property.hasMany(models.DownloadActionHistory, {as: 'download_action_history', foreignKey: 'property_id'});
