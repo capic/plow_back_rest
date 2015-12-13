@@ -26,7 +26,6 @@ router.get('/',
                     {
                         model: models.Action, as: 'action',
                         model: models.Property, as: 'property'
-
                     },
                     {model: models.DownloadActionStatus, as: 'download_action_status'}
                 ]
