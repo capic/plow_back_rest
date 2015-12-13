@@ -58,7 +58,7 @@ router.post('/',
                         {
                             where: {
                                 download_id: downloadActionHistoryCreated.download_id,
-                                download_action_id: downloadActionHistoryCreated.download_action_id
+                                action_id: downloadActionHistoryCreated.action_id
                             }
                         }
                     ).then(
@@ -67,7 +67,7 @@ router.post('/',
                                 {
                                     where: {
                                         download_id: downloadActionHistoryCreated.download_id,
-                                        download_action_id: downloadActionHistoryCreated.download_action_id,
+                                        action_id: downloadActionHistoryCreated.action_id,
                                         num: max
                                     },
                                     include: [
@@ -101,7 +101,7 @@ router.put('/download/:downloadId/downloadAction/:downloadActionId/num/:num',
             models.DownloadActionHistory.update(downloadActionHistoryObject, {
                     where: {
                         download_id: req.params.downloadId,
-                        download_action_id: req.params.downloadActionId,
+                        action_id: req.params.actionId,
                         num: req.params.num
                     }
                 }
@@ -111,7 +111,7 @@ router.put('/download/:downloadId/downloadAction/:downloadActionId/num/:num',
                         {
                             where: {
                                 download_id: req.params.downloadId,
-                                download_action_id: req.params.downloadActionId,
+                                action_id: req.params.actionId,
                                 num: req.params.num
                             },
                             include: [
