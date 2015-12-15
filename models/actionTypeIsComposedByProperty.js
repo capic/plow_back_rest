@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
         freezeTableName: true,
         createdAt: false,
         updatedAt: false,
-        tableName: 'action',
+        tableName: 'action_type_is_composed_by_property',
         classMethods: {
             associate: function (models) {
                 ActionTypeIsComposedByProperty.belongsTo(models.ActionType, {

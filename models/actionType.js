@@ -8,7 +8,7 @@ module.exports = function(sequelize, DataTypes) {
     freezeTableName: true,
     createdAt: false,
     updatedAt: false,
-    tableName: 'action_status',
+    tableName: 'action_type',
     classMethods: {
       associate: function(models) {
         ActionType.hasMany(models.Action, {foreignKey: 'action_type_id'});
