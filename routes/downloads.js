@@ -45,12 +45,6 @@ router.get('/',
                     {
                         model: models.DownloadPackage,
                         as: 'download_package'
-                    }, {
-                        model: models.DownloadDirectory,
-                        as: 'download_directory'
-                    }, {
-                        model: models.DownloadDirectory,
-                        as: 'to_move_download_directory'
                     },
                     {
                         model: models.DownloadHost,
@@ -63,12 +57,6 @@ router.get('/',
                 include: [{
                     model: models.DownloadPackage,
                     as: 'download_package'
-                }, {
-                    model: models.DownloadDirectory,
-                    as: 'download_directory'
-                }, {
-                    model: models.DownloadDirectory,
-                    as: 'to_move_download_directory'
                 }, {
                     model: models.DownloadHost,
                     as: 'download_host'
@@ -103,11 +91,6 @@ router.get('/next',
                                     {
                                         model: models.DownloadPackage, as: 'download_package'
                                     }, {
-                                        model: models.DownloadDirectory, as: 'download_directory'
-                                    }, {
-                                        model: models.DownloadDirectory,
-                                        as: 'to_move_download_directory'
-                                    }, {
                                         model: models.DownloadHost, as: 'download_host'
                                     }
                                 ]
@@ -134,8 +117,6 @@ router.get('/:id',
         models.Download.findById(req.params.id, {
             include: [
                 {model: models.DownloadPackage, as: 'download_package'},
-                {model: models.DownloadDirectory, as: 'download_directory'},
-                {model: models.DownloadDirectory, as: 'to_move_download_directory'},
                 {model: models.DownloadHost, as: 'download_host'}
             ]
         })
@@ -244,8 +225,6 @@ router.put('/:id',
                         {
                             include: [
                                 {model: models.DownloadPackage, as: 'download_package'},
-                                {model: models.DownloadDirectory, as: 'download_directory'},
-                                {model: models.DownloadDirectory, as: 'to_move_download_directory'},
                                 {model: models.DownloadHost, as: 'download_host'}
                             ]
                         })
@@ -277,10 +256,7 @@ router.delete('/:id',
             .then(function (ret) {
                 if (websocket.connection.isOpen) {
                     models.Download.findAll({
-                        include: [{model: models.DownloadPackage, as: 'download_package'}, {
-                            model: models.DownloadDirectory,
-                            as: 'download_directory'
-                        }]
+                        include: [{model: models.DownloadPackage, as: 'download_package'}]
                     }).then(function (downloadsModel) {
                         websocket.session.publish('plow.downloads.downloads', [downloadsModel], {}, {
                             acknowledge: false,
@@ -398,9 +374,7 @@ router.post('/moveOne',
         // on recupere le download sur lequel on fait le traitement
         models.Download.findById(dataObject.id, {
             include: [
-                {model: models.DownloadPackage, as: 'download_package'},
-                {model: models.DownloadDirectory, as: 'download_directory'},
-                {model: models.DownloadDirectory, as: 'to_move_download_directory'}
+                {model: models.DownloadPackage, as: 'download_package'}
             ]
         })
             .then(function (downloadModel) {
@@ -438,12 +412,7 @@ router.post('/moveOne',
                                                 }
                                                 models.Download.findById(dataObject.id, {
                                                     include: [
-                                                        {model: models.DownloadPackage, as: 'download_package'},
-                                                        {model: models.DownloadDirectory, as: 'download_directory'},
-                                                        {
-                                                            model: models.DownloadDirectory,
-                                                            as: 'to_move_download_directory'
-                                                        }
+                                                        {model: models.DownloadPackage, as: 'download_package'}
                                                     ]
                                                 })
                                                     .then(function (downloadModelReturned) {
@@ -607,10 +576,7 @@ router.post('/package/unrarPercent',
 router.get('/file/exists/:id',
     function (req, res, next) {
         models.Download.findById(req.params.id, {
-            include: [{model: models.DownloadPackage, as: 'download_package'}, {
-                model: models.DownloadDirectory,
-                as: 'download_directory'
-            }]
+            include: [{model: models.DownloadPackage, as: 'download_package'}]
         })
             .then(function (downloadModel) {
                 if (downloadModel.status > downloadStatusConfig.FINISHED && downloadModel.status != downloadStatusConfig.MOVING) {
@@ -652,8 +618,7 @@ router.post('/reset',
         models.Download.findById(dataObject.id,
             {
                 include: [
-                    {model: models.DownloadPackage, as: 'download_package'},
-                    {model: models.DownloadDirectory, as: 'download_directory'}
+                    {model: models.DownloadPackage, as: 'download_package'}
                 ]
             })
             .then(function (downloadModel) {
