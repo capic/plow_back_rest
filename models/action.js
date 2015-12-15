@@ -3,7 +3,8 @@
  */
 module.exports = function (sequelize, DataTypes) {
     var Action = sequelize.define('Action', {
-        name: DataTypes.STRING
+        lifecycle_insert_date: DataTypes.DATE,
+        lifecycle_update_date: DataTypes.DATE
     }, {
         freezeTableName: true,
         createdAt: false,
@@ -11,7 +12,18 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'action',
         classMethods: {
             associate: function (models) {
-                Action.hasMany(models.DownloadActionHistory, {as: 'download_action_history', foreignKey: 'action_id'});
+                Action.belongsTo(models.ActionType, {
+                    foreignKey: 'action_type_id',
+                    as: 'action_type'
+                });
+                Action.belongsTo(models.ActionStatus, {
+                    foreignKey: 'action_status_id',
+                    as: 'action_status'
+                });
+                Action.belongsTo(models.Download, {
+                    foreignKey: 'download_id',
+                    as: 'download'
+                });
             }
         }
     });

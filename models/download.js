@@ -58,19 +58,11 @@ module.exports = function (sequelize, DataTypes) {
                         foreignKey: 'package_id',
                         as: 'download_package'
                     });
-                    Download.belongsTo(models.DownloadDirectory, {
-                        foreignKey: 'directory_id',
-                        as: 'download_directory'
-                    });
-                    Download.belongsTo(models.DownloadDirectory, {
-                        foreignKey: 'to_move_directory_id',
-                        as: 'to_move_download_directory'
-                    });
                     Download.belongsTo(models.DownloadHost, {
                         foreignKey: 'host_id',
                         as: 'download_host'
                     });
-                    Download.hasMany(models.DownloadActionHistory, {foreignKey: 'download_id'});
+                    Download.hasMany(models.Action, {foreignKey: 'download_id'});
                 }
             }
         });
