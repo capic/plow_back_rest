@@ -11,7 +11,6 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'action_type',
     classMethods: {
       associate: function(models) {
-        ActionType.hasMany(models.Action, {foreignKey: 'action_type_id'});
         ActionType.hasMany(models.ActionTypeIsComposedByProperty, {foreignKey: 'action_type_id', as: 'action_type_is_composed_by_property'});
       }
     }
