@@ -42,7 +42,21 @@ router.get('/',
                 }
             );
         } else {
-            models.Action.findAll().then(callback);
+            models.Action.findAll({
+                include: [
+                    {model: models.ActionType, as: 'action_type',
+                        include: [
+                            {model: models.ActionTypeIsComposedByProperty, as: 'action_type_is_composed_by_property',
+                                include: [
+                                    {model: models.Directory, as: 'directory'},
+                                    {model: models.Property, as: 'property'}
+                                ]
+                            }
+                        ]
+                    },
+                    {model: models.ActionStatus, as: 'action_status'}
+                ]
+            }).then(callback);
         }
     }
 );
@@ -53,39 +67,12 @@ router.get('/',
  */
 router.post('/',
     function (req, res) {
-        if (req.body.hasOwnProperty('downloadActionHistory')) {
-            var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
-            downloadActionHistoryObject.num = -1; // on force a une valeur bidon pour que le trigger puisse prendre la releve
+        if (req.body.hasOwnProperty('action')) {
+            var action = JSON.parse(req.body.action);
 
-            models.DownloadActionHistory.create(downloadActionHistoryObject)
-                .then(function (downloadActionHistoryCreated) {
-                    models.DownloadActionHistory.max('num',
-                        {
-                            where: {
-                                download_id: downloadActionHistoryCreated.download_id,
-                                action_id: downloadActionHistoryCreated.action_id
-                            }
-                        }
-                    ).then(
-                        function (max) {
-                            models.DownloadActionHistory.findOne(
-                                {
-                                    where: {
-                                        download_id: downloadActionHistoryCreated.download_id,
-                                        action_id: downloadActionHistoryCreated.action_id,
-                                        num: max
-                                    },
-                                    include: [
-                                        {model: models.DownloadAction, as: 'download_action'},
-                                        {model: models.DownloadActionStatus, as: 'download_action_status'}
-                                    ]
-                                }
-                            ).then(function (downloadActionHistoryModel) {
-                                    res.json(downloadActionHistoryModel);
-                                }
-                            );
-                        }
-                    );
+            models.Action.create(action)
+                .then(function (actionModel) {
+                    console.log(actionModel)
                 }
             ).catch(
                 function (errors) {
