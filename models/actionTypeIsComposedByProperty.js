@@ -22,7 +22,6 @@ module.exports = function (sequelize, DataTypes) {
         classMethods: {
             associate: function (models) {
                 ActionTypeIsComposedByProperty.belongsTo(models.Action, {
-                    foreignKey: 'action_id',
                     as: 'action'
                 });
                 ActionTypeIsComposedByProperty.belongsTo(models.ActionType, {
