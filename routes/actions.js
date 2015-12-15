@@ -10,22 +10,30 @@ var errorConfig = config.get('errors');
  */
 router.get('/',
     function (req, res, next) {
-        var callback = function (downloadActionHistories) {
-            res.json(downloadActionHistories);
+        var callback = function (action) {
+            res.json(action);
         };
 
         var params = {};
-        for (prop in req.query) {
+        for (var prop in req.query) {
             params[prop] = req.query[prop];
         }
 
         if (Object.keys(params).length !== 0) {
-            models.DownloadActionHistory.findAll({
+            models.Action.findAll({
                 where: params,
                 include: [
-                    {model: models.Action, as: 'action'},
-                    {model: models.Property, as: 'property'},
-                    {model: models.DownloadActionStatus, as: 'download_action_status'}
+                    {model: models.ActionType, as: 'action_type',
+                        include: [
+                            {model: models.ActionTypeIsComposedByProperty, as: 'action_type_is_composed_by_property',
+                                include: [
+                                    {model: models.Directory, as: 'directory'},
+                                    {model: models.Property, as: 'property'}
+                                ]
+                            }
+                        ]
+                    },
+                    {model: models.ActionStatus, as: 'action_status'}
                 ]
             }).then(callback)
                 .catch(
@@ -34,7 +42,7 @@ router.get('/',
                 }
             );
         } else {
-            models.DownloadActionHistory.findAll().then(callback);
+            models.Action.findAll().then(callback);
         }
     }
 );
