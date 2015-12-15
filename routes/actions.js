@@ -25,7 +25,7 @@ router.get('/',
                 include: [
                     {model: models.ActionType, as: 'action_type',
                         include: [
-                            {model: models.ActionTypeIsComposedByProperty, as: 'action_type_is_composed_by_property',
+                            {model: models.ActionTypeIsComposedByProperty,
                                 include: [
                                     {model: models.Directory, as: 'directory'},
                                     {model: models.Property, as: 'property'}
