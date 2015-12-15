@@ -13,7 +13,6 @@ module.exports = function (sequelize, DataTypes) {
         classMethods: {
             associate: function (models) {
                 Action.hasMany(models.ActionTypeIsComposedByProperty, {
-                    foreignKey: 'action_id',
                     as: 'action_type_is_composed_by_property'
                 });
                 Action.belongsTo(models.ActionStatus, {
