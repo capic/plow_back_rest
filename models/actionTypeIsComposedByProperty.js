@@ -2,7 +2,7 @@
  * Created by Vincent on 27/08/2015.
  */
 module.exports = function (sequelize, DataTypes) {
-    var ActionIsComposedByProperty = sequelize.define('ActionIsComposedByProperty', {
+    var ActionTypeIsComposedByProperty = sequelize.define('ActionTypeIsComposedByProperty', {
         action_type_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -21,15 +21,15 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'action',
         classMethods: {
             associate: function (models) {
-                ActionIsComposedByProperty.belongsTo(models.ActionType, {
+                ActionTypeIsComposedByProperty.belongsTo(models.ActionType, {
                     foreignKey: 'action_type_id',
                     as: 'action_type'
                 });
-                ActionIsComposedByProperty.belongsTo(models.Property, {
+                ActionTypeIsComposedByProperty.belongsTo(models.Property, {
                     foreignKey: 'property_id',
                     as: 'property'
                 });
-                ActionIsComposedByProperty.belongsTo(models.Directory, {
+                ActionTypeIsComposedByProperty.belongsTo(models.Directory, {
                     foreignKey: 'directory_id',
                     as: 'directory'
                 });
@@ -37,5 +37,5 @@ module.exports = function (sequelize, DataTypes) {
         }
     });
 
-    return ActionIsComposedByProperty;
+    return ActionTypeIsComposedByProperty;
 };
