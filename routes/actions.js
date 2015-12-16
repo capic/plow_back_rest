@@ -23,14 +23,9 @@ router.get('/',
             models.Action.findAll({
                 where: params,
                 include: [
-                    {
-                        model: models.ActionTypeIsComposedByProperty, as: 'action_type_is_composed_by_property',
-                        include: [
-                            {model: models.ActionType, as: 'action_type'},
-                            {model: models.Directory, as: 'directory'},
-                            {model: models.Property, as: 'property'}
-                        ]
-                    },
+                    {model: models.ActionType, as: 'action_type'},
+                    {model: models.Directory, as: 'directory'},
+                    {model: models.Property, as: 'property'},
                     {model: models.ActionStatus, as: 'action_status'}
                 ]
             }).then(callback)
