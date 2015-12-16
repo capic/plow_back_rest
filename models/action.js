@@ -33,7 +33,6 @@ module.exports = function (sequelize, DataTypes) {
                     as: 'action_status'
                 });
                 Action.belongsTo(models.Download, {
-                    foreignKey: 'download_id',
                     as: 'download'
                 });
                 Action.belongsTo(models.ActionType, {
