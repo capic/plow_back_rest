@@ -62,7 +62,7 @@ module.exports = function (sequelize, DataTypes) {
                         foreignKey: 'host_id',
                         as: 'download_host'
                     });
-                    Download.hasMany(models.Action, {foreignKey: 'download_id', as: 'action'});
+                    Download.hasMany(models.Action);
                 }
             }
         });
