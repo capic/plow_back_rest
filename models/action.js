@@ -3,6 +3,22 @@
  */
 module.exports = function (sequelize, DataTypes) {
     var Action = sequelize.define('Action', {
+        download_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true
+        },
+        action_type_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true
+        },
+        property_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true
+        },
+        property_value: DataTypes.STRING,
         lifecycle_insert_date: DataTypes.DATE,
         lifecycle_update_date: DataTypes.DATE
     }, {
@@ -12,10 +28,6 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'action',
         classMethods: {
             associate: function (models) {
-                Action.hasMany(models.ActionTypeIsComposedByProperty, {
-                    foreignKey: 'action_id',
-                    as: 'action_type_is_composed_by_property'
-                });
                 Action.belongsTo(models.ActionStatus, {
                     foreignKey: 'action_status_id',
                     as: 'action_status'
@@ -23,6 +35,18 @@ module.exports = function (sequelize, DataTypes) {
                 Action.belongsTo(models.Download, {
                     foreignKey: 'download_id',
                     as: 'download'
+                });
+                Action.belongsTo(models.ActionType, {
+                    foreignKey: 'action_type_id',
+                    as: 'action_type'
+                });
+                Action.belongsTo(models.Property, {
+                    foreignKey: 'property_id',
+                    as: 'property'
+                });
+                Action.belongsTo(models.Directory, {
+                    foreignKey: 'directory_id',
+                    as: 'directory'
                 });
             }
         }
