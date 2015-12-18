@@ -15,13 +15,19 @@ router.get('/',
         };
 
         var params = {};
+        var groupBy = [];
         for (var prop in req.query) {
-            params[prop] = req.query[prop];
+            if (prop == 'group_by') {
+                groupBy.push(req.query[prop]);
+            } else {
+                params[prop] = req.query[prop];
+            }
         }
 
         if (Object.keys(params).length !== 0) {
             models.Action.findAll({
                 where: params,
+                group: groupBy,
                 include: [
                     {model: models.ActionType, as: 'action_type'},
                     {model: models.Directory, as: 'directory'},
