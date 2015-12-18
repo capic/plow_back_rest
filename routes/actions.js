@@ -16,6 +16,7 @@ router.get('/',
 
         var params = {};
         var groupBy = [];
+
         for (var prop in req.query) {
             if (prop == 'group_by') {
                 groupBy.push(req.query[prop]);
