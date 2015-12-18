@@ -28,7 +28,6 @@ router.get('/',
         if (Object.keys(params).length !== 0) {
             models.Action.findAll({
                 where: params,
-                group: groupBy,
                 include: [
                     {model: models.ActionType, as: 'action_type'},
                     {model: models.Directory, as: 'directory'},
