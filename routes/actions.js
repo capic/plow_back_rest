@@ -15,14 +15,8 @@ router.get('/',
         };
 
         var params = {};
-        var groupBy = [];
-
         for (var prop in req.query) {
-            if (prop == 'group_by') {
-                groupBy.push(req.query[prop]);
-            } else {
-                params[prop] = req.query[prop];
-            }
+            params[prop] = req.query[prop];
         }
 
         if (Object.keys(params).length !== 0) {
@@ -43,21 +37,17 @@ router.get('/',
         } else {
             models.Action.findAll({
                 include: [
-                    {
-                        model: models.ActionType, as: 'action_type',
-                        include: [
-                            {
-                                model: models.ActionTypeIsComposedByProperty, as: 'action_type_is_composed_by_property',
-                                include: [
-                                    {model: models.Directory, as: 'directory'},
-                                    {model: models.Property, as: 'property'}
-                                ]
-                            }
-                        ]
-                    },
+                    {model: models.ActionType, as: 'action_type'},
+                    {model: models.Directory, as: 'directory'},
+                    {model: models.Property, as: 'property'},
                     {model: models.ActionStatus, as: 'action_status'}
                 ]
-            }).then(callback);
+            }).then(callback)
+                .catch(
+                    function (errors) {
+                        console.log(errors);
+                    }
+                );
         }
     }
 );
@@ -86,7 +76,7 @@ router.post('/',
     }
 );
 
-router.put('/download/:downloadId/downloadAction/:downloadActionId/num/:num',
+router.put('/download/:downloadId/action/:actionId/property/:propertyId',
     function (req, res) {
         if (req.body.hasOwnProperty('downloadActionHistory')) {
             var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);

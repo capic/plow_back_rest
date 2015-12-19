@@ -10,8 +10,8 @@ var errorConfig = config.get('errors');
  */
 router.get('/',
     function (req, res, next) {
-        var callback = function (downloadDirectories) {
-            res.json(downloadDirectories);
+        var callback = function (directories) {
+            res.json(directories);
         };
 
         var params = {};
@@ -20,11 +20,11 @@ router.get('/',
         }
 
         if (Object.keys(params).length !== 0) {
-            models.DownloadDirectory.findAll({
+            models.Directory.findAll({
                 where: params
             }).then(callback);
         } else {
-            models.DownloadDirectory.findAll().then(callback);
+            models.Directory.findAll().then(callback);
         }
     }
 );
@@ -34,9 +34,9 @@ router.get('/',
  */
 router.get('/:id',
     function (req, res, next) {
-        models.DownloadDirectory.findById(req.params.id)
-            .then(function (downloadDirectoryModel) {
-                res.json(downloadDirectoryModel);
+        models.Directory.findById(req.params.id)
+            .then(function (directoryModel) {
+                res.json(directoryModel);
             }
         );
     }
@@ -48,14 +48,14 @@ router.get('/:id',
 router.post('/',
     function (req, res) {
         if (req.body.hasOwnProperty('directory')) {
-            var downloadDirectoryObject = JSON.parse(req.body.directory);
+            var directoryObject = JSON.parse(req.body.directory);
 
-            models.DownloadDirectory.findOrCreate({
-                where: {path: downloadDirectoryObject.path},
-                defaults: downloadDirectoryObject
+            models.Directory.findOrCreate({
+                where: {path: directoryObject.path},
+                defaults: directoryObject
             })
-                .spread(function (downloadDirectoryModel, created) {
-                    res.json(downloadDirectoryModel.get({plain: true}));
+                .spread(function (directoryModel, created) {
+                    res.json(directoryModel.get({plain: true}));
                 }
             );
         } else {
@@ -78,14 +78,14 @@ router.delete('/:id',
             .then(function (result) {
                 // on supprime le directory seulement si il n'est pas utilise autre part
                 if (result.count <= 1) {
-                    models.DownloadDirectory.destroy({where: {id: req.params.id}})
+                    models.Directory.destroy({where: {id: req.params.id}})
                         .then(function (ret) {
                             res.json({'return': ret == 1});
                         }
                     );
                 } else {
-                    var error = new Error(res.__(errorConfig.downloadDirectories.deleteDirectory.message));
-                    error.status = errorConfig.downloadDirectories.deleteDirectory.code;
+                    var error = new Error(res.__(errorConfig.directories.deleteDirectory.message));
+                    error.status = errorConfig.directories.deleteDirectory.code;
                     return next(error);
                 }
             });

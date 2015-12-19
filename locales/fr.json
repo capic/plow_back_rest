@@ -1,18 +1,18 @@
 {
-  "downloadDirectories": {
+  "directories": {
     "error": {
-      "DELETE_DIRECTORY": "Suppression du repertoire impossible, il est utilisé dans une autre téléchargement"
+      "DELETE_DIRECTORY": "Suppression du repertoire impossible, il est utilisï¿½ dans une autre tï¿½lï¿½chargement"
     }
   },
   "downloads": {
     "error": {
-      "FILE_EXISTS": "Le fichier téléchargé %s n'éxiste pas",
+      "FILE_EXISTS": "Le fichier tï¿½lï¿½chargï¿½ %s n'ï¿½xiste pas",
       "DELETE_DOWNLOAD": "Impossible de supprimer le download avec l'id: %s",
       "ADD_DOWNLOAD": {
-        "BAD_JSON": "Mauvaise configuration du json pour la création du download %s, json: %s"
+        "BAD_JSON": "Mauvaise configuration du json pour la crï¿½ation du download %s, json: %s"
       },
       "UPDATE_DOWNLOAD": {
-        "BAD_JSON": "Mauvaise configuration du json pour la mise à jour du download %s, json: %s"
+        "BAD_JSON": "Mauvaise configuration du json pour la mise ï¿½ jour du download %s, json: %s"
       }
     }
   }

@@ -61,10 +61,10 @@
         }
       }
     },
-    "downloadDirectories": {
+    "directories": {
       "deleteDirectory": {
         "code": 20000,
-        "message": "downloadDirectories.error.DELETE_DIRECTORY"
+        "message": "directories.error.DELETE_DIRECTORY"
       }
     }
   }
