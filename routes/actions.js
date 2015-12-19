@@ -133,8 +133,8 @@ router.put('/download/:downloadId/action/:actionId/property/:propertyId',
  }
  );
  } else {
- var error = new Error(res.__(errorConfig.downloadDirectories.deleteDirectory.message));
- error.status = errorConfig.downloadDirectories.deleteDirectory.code;
+ var error = new Error(res.__(errorConfig.directories.deleteDirectory.message));
+ error.status = errorConfig.directories.deleteDirectory.code;
  return next(error);
  }
  });
