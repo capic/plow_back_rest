@@ -63,7 +63,7 @@ router.post('/',
 
             models.Action.bulkCreate(listActions)
                 .then(function (actionModel) {
-                    console.log(actionModel)
+                    res.json(actionModel);
                 }
             ).catch(
                 function (errors) {
