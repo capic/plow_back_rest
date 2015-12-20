@@ -58,10 +58,10 @@ router.get('/',
  */
 router.post('/',
     function (req, res) {
-        if (req.body.hasOwnProperty('action')) {
-            var action = JSON.parse(req.body.action);
+        if (req.body.hasOwnProperty('actions')) {
+            var listActions = JSON.parse(req.body.action);
 
-            models.Action.create(action)
+            models.Action.bulkCreate(listActions)
                 .then(function (actionModel) {
                     console.log(actionModel)
                 }
