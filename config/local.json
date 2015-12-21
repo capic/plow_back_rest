@@ -34,6 +34,10 @@
     "UNRAR_ERROR": 14,
     "TREATMENT_IN_PROGRESS": 999
   },
+  "action_status": {
+    "WAITING": 1,
+    "IN_PROGRESS": 2
+  },
   "from": {
     "IHM_CLIENT": 1,
     "PYTHON_CLIENT": 2

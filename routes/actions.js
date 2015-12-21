@@ -61,9 +61,32 @@ router.post('/bulk',
         if (req.body.hasOwnProperty('actions')) {
             var listActions = JSON.parse(req.body.actions);
 
+            /*models.Action.count({
+                where: {
+                    download_id: listActions[0].download_id,
+                    $and: {action_type_id: listActions[0].action_type_id},
+                    $and: {actions_status_id: }
+                }
+            })*/
+
             models.Action.bulkCreate(listActions)
                 .then(function (actionModel) {
-                    res.json(actionModel);
+                    models.Action.max('num', {
+                        where: {
+                            download_id: actionModel.download_id,
+                            action_id: actionModel.action_id
+                        }
+                    }).then(function(num) {
+                        models.Action.findOne({
+                            where: {
+                                download_id: actionModel.download_id,
+                                action_id: actionModel.action_id,
+                                num: num
+                            }
+                        }).then(function(actionFoundModel) {
+                            res.json(actionFoundModel);
+                        });
+                    });
                 }
             ).catch(
                 function (errors) {
@@ -76,34 +99,32 @@ router.post('/bulk',
     }
 );
 
-router.put('/download/:downloadId/action/:actionId/property/:propertyId',
+router.put('/:downloadId/:actionTypeId/:propertyId/:num',
     function (req, res) {
-        if (req.body.hasOwnProperty('downloadActionHistory')) {
-            var downloadActionHistoryObject = JSON.parse(req.body.downloadActionHistory);
+        if (req.body.hasOwnProperty('action')) {
+            var actionObject = JSON.parse(req.body.action);
 
-            models.DownloadActionHistory.update(downloadActionHistoryObject, {
+            models.Action.update(actionObject, {
                     where: {
                         download_id: req.params.downloadId,
-                        action_id: req.params.actionId,
+                        action_type_id: req.params.actionTypeId,
+                        property_id: req.params.propertyId,
                         num: req.params.num
                     }
                 }
             )
                 .then(function () {
-                    models.DownloadActionHistory.findOne(
+                    models.Action.findOne(
                         {
                             where: {
                                 download_id: req.params.downloadId,
-                                action_id: req.params.actionId,
+                                action_type_id: req.params.actionTypeId,
+                                property_id: req.params.propertyId,
                                 num: req.params.num
-                            },
-                            include: [
-                                {model: models.DownloadAction, as: 'download_action'},
-                                {model: models.DownloadActionStatus, as: 'download_action_status'}
-                            ]
+                            }
                         }
-                    ).then(function (downloadActionHistoryModel) {
-                            res.json(downloadActionHistoryModel);
+                    ).then(function (actionModel) {
+                            res.json(actionModel);
                         }
                     );
                 }

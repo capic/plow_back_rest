@@ -396,14 +396,10 @@ router.post('/moveOne',
                                                 status: downloadStatusConfig.TREATMENT_IN_PROGRESS
                                             })
                                             .then(function () {
-                                                    var srcDirectoryId = downloadModel.directory_id;
-                                                    var dstDirectoryId = dataObject.directory_id;
-
-                                                    utils.moveDownload2(downloadModel.id, srcDirectoryId, dstDirectoryId);
+                                                    utils.moveDownload2(dataObject.download_id, dataObject.num);
 
                                                     res.json(downloadModel);
-                                                }
-                                            );
+                                                });
                                     } else {
                                         models.DownloadDirectory.findById(dataObject.directory_id)
                                             .then(function (downloadDirectoryModel) {
