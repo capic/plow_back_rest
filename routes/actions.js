@@ -56,7 +56,7 @@ router.get('/',
 /**
  * add a new download
  */
-router.post('/',
+router.post('/bulk',
     function (req, res) {
         if (req.body.hasOwnProperty('actions')) {
             var listActions = JSON.parse(req.body.actions);
