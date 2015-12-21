@@ -18,6 +18,11 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             primaryKey: true
         },
+        num: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true
+        },
         property_value: DataTypes.STRING,
         lifecycle_insert_date: DataTypes.DATE,
         lifecycle_update_date: DataTypes.DATE
