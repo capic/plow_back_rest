@@ -94,7 +94,7 @@ router.post('/bulk',
 router.put('/:downloadId/:actionTypeId/:num',
     function (req, res) {
         if (req.body.hasOwnProperty('actions')) {
-            var listActionsObject = JSON.parse(req.body.action);
+            var listActionsObject = JSON.parse(req.body.actions);
 
             listActionsObject.forEach(
                 function (actionObject) {
