@@ -103,7 +103,7 @@ router.put('/:downloadId/:actionTypeId/:num',
                             where: {
                                 download_id: req.params.downloadId,
                                 action_type_id: req.params.actionTypeId,
-                                property_id: actionObject.propertyId,
+                                property_id: actionObject.property_id,
                                 num: req.params.num
                             }
                         }
