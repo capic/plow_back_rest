@@ -1,5 +1,6 @@
 var models = require('../models');
 var express = require('express');
+var websocket = require('../websocket');
 var router = express.Router();
 var config = require("../configuration");
 var downloadStatusConfig = config.get('download_status');
@@ -69,7 +70,7 @@ router.post('/bulk',
                     }
                 }).then(function (num) {//TODO utiliser un hook
                         var listActionsTransformed = [];
-                        listActions.forEach(function(actionToTransform) {
+                        listActions.forEach(function (actionToTransform) {
                             actionToTransform.num = num + 1;
                             listActionsTransformed.push(actionToTransform);
                         });
@@ -108,13 +109,21 @@ router.put('/:downloadId/:actionTypeId/:num',
             listActionsObject.forEach(
                 function (actionObject) {
                     models.Action.upsert(actionObject/*, {
-                            where: {
-                                download_id: req.params.downloadId,
-                                action_type_id: req.params.actionTypeId,
-                                property_id: actionObject.property_id,
-                                num: req.params.num
+                     where: {
+                     download_id: req.params.downloadId,
+                     action_type_id: req.params.actionTypeId,
+                     property_id: actionObject.property_id,
+                     num: req.params.num
+                     }
+                     }*/
+                    ).then(
+                        function (modified) {
+                            if (modified) {
+                                if (websocket.connection.isOpen) {
+                                    websocket.session.publish('plow.downloads.download.' + actionObject.download_id + '.action.' + actionObject.action_type_id, [actionObject], {}, {acknowledge: false});
+                                }
                             }
-                        }*/
+                        }
                     );
                 }
             );
