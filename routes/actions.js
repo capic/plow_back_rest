@@ -98,6 +98,7 @@ router.put('/:downloadId/:actionTypeId/:num',
 
             listActionsObject.forEach(
                 function (actionObject) {
+                    console.log(actionObject);
                     models.Action.update(actionObject, {
                             where: {
                                 download_id: req.params.downloadId,
