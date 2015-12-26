@@ -30,10 +30,10 @@ router.get('/',
                 ]
             }).then(callback)
                 .catch(
-                function (errors) {
-                    console.log(errors);
-                }
-            );
+                    function (errors) {
+                        console.log(errors);
+                    }
+                );
         } else {
             models.Action.findAll({
                 include: [
@@ -61,40 +61,56 @@ router.post('/bulk',
         if (req.body.hasOwnProperty('actions')) {
             var listActions = JSON.parse(req.body.actions);
 
-            /*models.Action.count({
-                where: {
-                    download_id: listActions[0].download_id,
-                    $and: {action_type_id: listActions[0].action_type_id},
-                    $and: {actions_status_id: }
-                }
-            })*/
-
             models.Action.bulkCreate(listActions)
                 .then(function (actionModel) {
-                    models.Action.max('num', {
-                        where: {
-                            download_id: actionModel.download_id,
-                            action_id: actionModel.action_id
-                        }
-                    }).then(function(num) {
-                        models.Action.findOne({
+                        models.Action.max('num', {
                             where: {
                                 download_id: actionModel.download_id,
-                                action_id: actionModel.action_id,
-                                num: num
+                                action_id: actionModel.action_id
                             }
-                        }).then(function(actionFoundModel) {
-                            res.json(actionFoundModel);
+                        }).then(function (num) {
+                            models.Action.findOne({
+                                where: {
+                                    download_id: actionModel.download_id,
+                                    action_id: actionModel.action_id,
+                                    num: num
+                                }
+                            }).then(function (actionFoundModel) {
+                                res.json(actionFoundModel);
+                            });
                         });
-                    });
-                }
-            ).catch(
+                    }
+                ).catch(
                 function (errors) {
                     console.log(errors);
                 }
             );
         } else {
             //TODO: erreur
+        }
+    }
+);
+
+router.put('/:downloadId/:actionTypeId/:num',
+    function (req, res) {
+        if (req.body.hasOwnProperty('action')) {
+            var listActionsObject = JSON.parse(req.body.action);
+
+            listActionsObject.forEach(
+                function (actionObject) {
+                    models.Action.update(actionObject, {
+                            where: {
+                                download_id: req.params.downloadId,
+                                action_type_id: req.params.actionTypeId,
+                                property_id: actionObject.propertyId,
+                                num: req.params.num
+                            }
+                        }
+                    );
+                }
+            );
+
+            res.end();
         }
     }
 );
@@ -112,26 +128,27 @@ router.put('/:downloadId/:actionTypeId/:propertyId/:num',
                         num: req.params.num
                     }
                 }
-            )
+                )
                 .then(function () {
-                    models.Action.findOne(
-                        {
-                            where: {
-                                download_id: req.params.downloadId,
-                                action_type_id: req.params.actionTypeId,
-                                property_id: req.params.propertyId,
-                                num: req.params.num
+                        models.Action.findOne(
+                            {
+                                where: {
+                                    download_id: req.params.downloadId,
+                                    action_type_id: req.params.actionTypeId,
+                                    property_id: req.params.propertyId,
+                                    num: req.params.num
+                                }
                             }
-                        }
-                    ).then(function (actionModel) {
-                            res.json(actionModel);
-                        }
-                    );
-                }
-            );
+                        ).then(function (actionModel) {
+                                res.json(actionModel);
+                            }
+                        );
+                    }
+                );
         }
     }
 );
+
 
 /*
  /!**
