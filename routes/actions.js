@@ -94,11 +94,11 @@ router.post('/bulk',
 router.put('/:downloadId/:actionTypeId/:num',
     function (req, res) {
         if (req.body.hasOwnProperty('actions')) {
+            console.log(req.body.actions);
             var listActionsObject = JSON.parse(req.body.actions);
 
             listActionsObject.forEach(
                 function (actionObject) {
-                    console.log(actionObject);
                     models.Action.update(actionObject, {
                             where: {
                                 download_id: req.params.downloadId,
