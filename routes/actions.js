@@ -99,7 +99,7 @@ router.put('/:downloadId/:actionTypeId/:num',
 
             listActionsObject.forEach(
                 function (actionObject) {
-                    models.Action.upsert(actionObject/*, {
+                    models.Action.insertOrUpdate(actionObject/*, {
                             where: {
                                 download_id: req.params.downloadId,
                                 action_type_id: req.params.actionTypeId,
