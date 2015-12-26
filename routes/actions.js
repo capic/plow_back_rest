@@ -61,30 +61,38 @@ router.post('/bulk',
         if (req.body.hasOwnProperty('actions')) {
             var listActions = JSON.parse(req.body.actions);
 
-            models.Action.bulkCreate(listActions)
-                .then(function (actionModel) {
-                        models.Action.max('num', {
-                            where: {
-                                download_id: actionModel.download_id,
-                                action_id: actionModel.action_id
-                            }
-                        }).then(function (num) {
-                            models.Action.findOne({
-                                where: {
-                                    download_id: actionModel.download_id,
-                                    action_id: actionModel.action_id,
-                                    num: num
-                                }
-                            }).then(function (actionFoundModel) {
-                                res.json(actionFoundModel);
-                            });
+            if (listActions.length > 0) {
+                models.Action.max('num', {
+                    where: {
+                        download_id: listActions[0].download_id,
+                        action_id: listActions[0].action_id
+                    }
+                }).then(function (num) {//TODO utiliser un hook
+                        var listActionsTransformed = [];
+                        listActions.forEach(function(actionToTransform) {
+                            actionToTransform.num = num + 1;
+                            listActionsTransformed.push(actionToTransform);
                         });
+
+                        models.Action.bulkCreate(listActionsTransformed)
+                            .then(function (actionModel) {
+                                models.Action.findAll({
+                                    where: {
+                                        download_id: actionModel.download_id,
+                                        action_id: actionModel.action_id,
+                                        num: num
+                                    }
+                                }).then(function (actionsFoundModel) {
+                                    res.json(actionsFoundModel);
+                                });
+                            });
                     }
                 ).catch(
-                function (errors) {
-                    console.log(errors);
-                }
-            );
+                    function (errors) {
+                        console.log(errors);
+                    }
+                );
+            }
         } else {
             //TODO: erreur
         }
