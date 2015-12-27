@@ -69,6 +69,7 @@ router.post('/bulk',
                         action_type_id: listActions[0].action_type_id
                     }
                 }).then(function (num) {//TODO utiliser un hook
+                    if (num === 'NaN' || num === undefined || num === null) {
                         var listActionsTransformed = [];
                         listActions.forEach(function (actionToTransform) {
                             actionToTransform.num = num + 1;
@@ -88,7 +89,7 @@ router.post('/bulk',
                                 });
                             });
                     }
-                ).catch(
+                }).catch(
                     function (errors) {
                         console.log(errors);
                     }
