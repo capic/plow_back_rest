@@ -66,7 +66,7 @@ router.post('/bulk',
                 models.Action.max('num', {
                     where: {
                         download_id: listActions[0].download_id,
-                        action_id: listActions[0].action_id
+                        action_type_id: listActions[0].action_type_id
                     }
                 }).then(function (num) {//TODO utiliser un hook
                         var listActionsTransformed = [];
@@ -80,7 +80,7 @@ router.post('/bulk',
                                 models.Action.findAll({
                                     where: {
                                         download_id: actionModel.download_id,
-                                        action_id: actionModel.action_id,
+                                        action_type_id: actionModel.action_type_id,
                                         num: num
                                     }
                                 }).then(function (actionsFoundModel) {
