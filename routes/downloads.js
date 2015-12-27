@@ -580,11 +580,19 @@ router.post('/package/unrarPercent',
 router.get('/file/exists/:id',
     function (req, res, next) {
         models.Download.findById(req.params.id, {
-                include: [{model: models.DownloadPackage, as: 'download_package'}]
+                include: [
+                    {
+                        model: models.DownloadPackage,
+                        as: 'download_package'
+                    },                    {
+                        model: models.Directory,
+                        as: 'directory'
+                    }
+                ]
             })
             .then(function (downloadModel) {
                     if (downloadModel.status > downloadStatusConfig.FINISHED && downloadModel.status != downloadStatusConfig.MOVING) {
-                        var directory = downloadModel.download_directory.path.replace(/\s/g, "\\\\ ");
+                        var directory = downloadModel.directory.path.replace(/\s/g, "\\\\ ");
                         var name = downloadModel.name.replace(/\s/g, "\\\\ ");
                         var command = 'ssh root@' + downloadServerConfig.address + ' test -f "' + directory + name + '" && echo true || echo false';
                         exec(command,
