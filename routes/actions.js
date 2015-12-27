@@ -69,26 +69,29 @@ router.post('/bulk',
                         action_type_id: listActions[0].action_type_id
                     }
                 }).then(function (num) {//TODO utiliser un hook
-                    if (num === 'NaN' || num === undefined || num === null) {
-                        var listActionsTransformed = [];
-                        listActions.forEach(function (actionToTransform) {
-                            actionToTransform.num = num + 1;
-                            listActionsTransformed.push(actionToTransform);
+                    if (isNaN(num) || num === undefined || num === null) {
+                        num = 0;
+                    }
+
+                    var listActionsTransformed = [];
+                    listActions.forEach(function (actionToTransform) {
+                        actionToTransform.num = num + 1;
+                        listActionsTransformed.push(actionToTransform);
+                    });
+
+                    models.Action.bulkCreate(listActionsTransformed)
+                        .then(function (actionModel) {
+                            models.Action.findAll({
+                                where: {
+                                    download_id: actionModel.download_id,
+                                    action_type_id: actionModel.action_type_id,
+                                    num: num
+                                }
+                            }).then(function (actionsFoundModel) {
+                                res.json(actionsFoundModel);
+                            });
                         });
 
-                        models.Action.bulkCreate(listActionsTransformed)
-                            .then(function (actionModel) {
-                                models.Action.findAll({
-                                    where: {
-                                        download_id: actionModel.download_id,
-                                        action_type_id: actionModel.action_type_id,
-                                        num: num
-                                    }
-                                }).then(function (actionsFoundModel) {
-                                    res.json(actionsFoundModel);
-                                });
-                            });
-                    }
                 }).catch(
                     function (errors) {
                         console.log(errors);
