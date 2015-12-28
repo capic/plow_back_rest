@@ -161,7 +161,12 @@ router.put('/:id',
         if (req.body.hasOwnProperty('action')) {
             var actionObject = JSON.parse(req.body.action);
 
-            models.Action.upsert(actionObject
+            models.Action.update(actionObject,
+                {
+                    where: {id: req.params.id},
+                    include: [
+                        {model: models.ActionHasProperties, as: 'action_has_properties'}
+                    ]}
             ).then(
                 function (modified) {
                     if (modified) {
