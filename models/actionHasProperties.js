@@ -33,7 +33,6 @@ module.exports = function (sequelize, DataTypes) {
                     foreignKey: 'directory_id',
                     as: 'directory'
                 });
-                ActionHasProperties.hasMany(models.Action);
             }
         }
     });
