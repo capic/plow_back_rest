@@ -68,8 +68,13 @@ router.post('/',
         if (req.body.hasOwnProperty('action')) {
             var action = JSON.parse(req.body.action);
 
-            models.Action.create(action)
-                .then(function(actionModel) {
+            models.Action.create(action,
+                {
+                    include: [
+                        {model: models.ActionHasProperties, as: 'action_has_properties'}
+                    ]
+                }
+            ).then(function(actionModel) {
                     res.json(actionModel);
                 }
             );
