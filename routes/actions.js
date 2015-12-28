@@ -63,6 +63,29 @@ router.get('/',
     }
 );
 
+router.get('/:id',
+    function (req, res, next) {
+        models.Action.findById(req.params.id, {
+                include: [
+                    {model: models.ActionType, as: 'action_type'},
+                    {model: models.ActionStatus, as: 'action_status'},
+                    {
+                        model: models.ActionHasProperties, as: 'action_has_properties',
+                        include: [
+                            {model: models.Directory, as: 'directory'},
+                            {model: models.Property, as: 'property'}
+                        ]
+                    }
+                ]
+            })
+            .then(function (actionModel) {
+                    res.json(actionModel);
+                }
+            );
+    }
+);
+
+
 router.post('/',
     function(req, res) {
         if (req.body.hasOwnProperty('action')) {

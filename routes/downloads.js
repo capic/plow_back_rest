@@ -397,7 +397,7 @@ router.post('/moveOne',
                                                 status: downloadStatusConfig.TREATMENT_IN_PROGRESS
                                             })
                                             .then(function () {
-                                                    utils.moveDownload2(dataObject.download_id, dataObject.num);
+                                                    utils.moveDownload2(dataObject.download_id, dataObject.action_id);
 
                                                     res.json(downloadModel);
                                                 });
