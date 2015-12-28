@@ -87,7 +87,7 @@ router.get('/:id',
 
 
 router.post('/',
-    function(req, res) {
+    function (req, res) {
         if (req.body.hasOwnProperty('action')) {
             var action = JSON.parse(req.body.action);
 
@@ -97,7 +97,7 @@ router.post('/',
                         {model: models.ActionHasProperties, as: 'action_has_properties'}
                     ]
                 }
-            ).then(function(actionModel) {
+            ).then(function (actionModel) {
                     res.json(actionModel);
                 }
             );
@@ -156,33 +156,22 @@ router.post('/bulk',
     }
 );
 
-router.put('/:downloadId/:actionTypeId/:num',
+router.put('/:id',
     function (req, res) {
-        if (req.body.hasOwnProperty('actions')) {
-            console.log(req.body.actions);
-            var listActionsObject = JSON.parse(req.body.actions);
+        if (req.body.hasOwnProperty('action')) {
+            var actionObject = JSON.parse(req.body.action);
 
-            listActionsObject.forEach(
-                function (actionObject) {
-                    models.Action.upsert(actionObject/*, {
-                     where: {
-                     download_id: req.params.downloadId,
-                     action_type_id: req.params.actionTypeId,
-                     property_id: actionObject.property_id,
-                     num: req.params.num
-                     }
-                     }*/
-                    ).then(
-                        function (modified) {
-                            if (modified) {
-                                if (websocket.connection.isOpen) {
-                                    websocket.session.publish('plow.downloads.download.' + actionObject.download_id + '.action.' + actionObject.action_type_id, [actionObject], {}, {acknowledge: false});
-                                }
-                            }
+            models.Action.upsert(actionObject
+            ).then(
+                function (modified) {
+                    if (modified) {
+                        if (websocket.connection.isOpen) {
+                            websocket.session.publish('plow.downloads.download.' + actionObject.download_id + '.action.' + actionObject.action_type_id, [actionObject], {}, {acknowledge: false});
                         }
-                    );
+                    }
                 }
             );
+
 
             res.end();
         }
