@@ -11,7 +11,7 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'directory',
     classMethods: {
       associate: function(models) {
-        Directory.hasMany(models.Action, {foreignKey: 'directory_id'});
+        Directory.hasMany(models.ActionHasProperties, {foreignKey: 'directory_id'});
       }
     }
   });

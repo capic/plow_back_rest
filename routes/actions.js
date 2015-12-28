@@ -25,9 +25,14 @@ router.get('/',
                 where: params,
                 include: [
                     {model: models.ActionType, as: 'action_type'},
-                    {model: models.Directory, as: 'directory'},
-                    {model: models.Property, as: 'property'},
-                    {model: models.ActionStatus, as: 'action_status'}
+                    {model: models.ActionStatus, as: 'action_status'},
+                    {
+                        model: models.ActionHasProperties, as: 'action_has_properties',
+                        include: [
+                            {model: models.Directory, as: 'directory'},
+                            {model: models.Property, as: 'property'}
+                        ]
+                    }
                 ]
             }).then(callback)
                 .catch(
@@ -39,9 +44,14 @@ router.get('/',
             models.Action.findAll({
                 include: [
                     {model: models.ActionType, as: 'action_type'},
-                    {model: models.Directory, as: 'directory'},
-                    {model: models.Property, as: 'property'},
-                    {model: models.ActionStatus, as: 'action_status'}
+                    {model: models.ActionStatus, as: 'action_status'},
+                    {
+                        model: models.ActionHasProperties, as: 'action_has_properties',
+                        include: [
+                            {model: models.Directory, as: 'directory'},
+                            {model: models.Property, as: 'property'}
+                        ]
+                    }
                 ]
             }).then(callback)
                 .catch(
