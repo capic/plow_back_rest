@@ -63,6 +63,20 @@ router.get('/',
     }
 );
 
+router.post('/',
+    function(req, res) {
+        if (req.body.hasOwnProperty('action')) {
+            var action = JSON.parse(req.body.action);
+
+            models.Action.create(action)
+                .then(function(actionModel) {
+                    res.json(actionModel);
+                }
+            );
+        }
+    }
+);
+
 
 /**
  * add a new download
