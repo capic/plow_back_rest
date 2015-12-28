@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     freezeTableName: true,
     createdAt: false,
     updatedAt: false,
-    tableName: 'action_status',
+    tableName: 'action',
     classMethods: {
       associate: function(models) {
         Action.belongsTo(models.Download, {

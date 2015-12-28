@@ -13,12 +13,12 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             primaryKey: true
         },
-        property_value: DataTypes.STRING,
+        property_value: DataTypes.STRING
     }, {
         freezeTableName: true,
         createdAt: false,
         updatedAt: false,
-        tableName: 'action',
+        tableName: 'action_has_properties',
         classMethods: {
             associate: function (models) {
                 ActionHasProperties.belongsTo(models.Action, {
