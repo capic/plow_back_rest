@@ -111,7 +111,7 @@ router.put('/:id',
     function (req, res) {
         if (req.body.hasOwnProperty('action')) {
             var actionObject = JSON.parse(req.body.action);
-            var initialAction = actionObject;
+            var initialAction = JSON.parse(req.body.action);
 
             models.ActionHasProperties.bulkCreate(actionObject.action_has_properties,
                 {
