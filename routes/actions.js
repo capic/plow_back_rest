@@ -178,7 +178,7 @@ router.put('/:id',
                         function (modified) {
                             if (modified) {
                                 if (websocket.connection.isOpen) {
-                                    websocket.session.publish('plow.downloads.download.' + actionObject.download_id + '.action.' + actionObject.action_type_id, [actionObject], {}, {acknowledge: false});
+                                    websocket.session.publish('plow.downloads.download.' + actionObject.download_id + '.action.' + actionObject.id, [actionObject], {}, {acknowledge: false});
                                 }
                             }
                         }
