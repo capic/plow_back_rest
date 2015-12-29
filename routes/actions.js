@@ -157,12 +157,12 @@ router.post('/execute',
             //var execAction = exec(command);
             execAction.stdout.on('data',
                 function (data) {
-                    console.log(data);
+                    console.log(data.toString());
                 }
             );
             execAction.stderr.on('data',
                 function (data) {
-                    console.log(data);
+                    console.log(data.toString());
                 }
             );
             execAction.on('error', function (err) {
