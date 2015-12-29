@@ -160,6 +160,9 @@ router.post('/execute',
                 console.log(data);
             }
         );
+        execAction.on('error', function (err) {
+            console.log('Failed to start child process.' + err);
+        });
         execAction.on('close', function (code) {
             console.log('child process exited with code ' + code);
         });
