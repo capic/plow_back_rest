@@ -111,6 +111,7 @@ router.put('/:id',
     function (req, res) {
         if (req.body.hasOwnProperty('action')) {
             var actionObject = JSON.parse(req.body.action);
+            var initialAction = actionObject;
 
             models.ActionHasProperties.bulkCreate(actionObject.action_has_properties,
                 {
@@ -131,9 +132,9 @@ router.put('/:id',
                         }
                     ).then(
                         function (modified) {
-                            if (modified) {
+                            if (modified.length == 1) {
                                 if (websocket.connection.isOpen) {
-                                    websocket.session.publish('plow.downloads.download.' + actionObject.download_id + '.action.' + actionObject.id, [actionObject], {}, {acknowledge: false});
+                                    websocket.session.publish('plow.downloads.download.' + initialAction.download_id + '.action.' + initialAction.id, [initialAction], {}, {acknowledge: false});
                                 }
                             }
                         }
