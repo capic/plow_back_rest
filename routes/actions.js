@@ -123,6 +123,10 @@ router.put('/:id',
                             where: {id: req.params.id},
                             include: [
                                 {model: models.ActionHasProperties, as: 'action_has_properties'}
+                            ],
+                            fields: [
+                                'lifecycle_update_date',
+                                'action_status_id'
                             ]
                         }
                     ).then(
