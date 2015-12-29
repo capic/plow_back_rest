@@ -147,25 +147,29 @@ router.post('/execute',
         //ex: {"download_id": 1, "action_id": 1}
         var actionToExecute = JSON.parse(JSON.stringify(req.body));
 
-       // var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.action_command + ' ' + actionToExecute.download_id + ' ' + actionToExecute.action_id;
-        var execAction = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.action_command, actionToExecute.download_id, actionToExecute.action_id]);
-        //var execAction = exec(command);
-        execAction.stdout.on('data',
-            function(data) {
-                console.log(data);
-            }
-        );
-        execAction.stderr.on('data',
-            function(data) {
-                console.log(data);
-            }
-        );
-        execAction.on('error', function (err) {
-            console.log('Failed to start child process.' + err);
-        });
-        execAction.on('close', function (code) {
-            console.log('child process exited with code ' + code);
-        });
+        try {
+            // var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.action_command + ' ' + actionToExecute.download_id + ' ' + actionToExecute.action_id;
+            var execAction = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.action_command, actionToExecute.download_id, actionToExecute.action_id]);
+            //var execAction = exec(command);
+            execAction.stdout.on('data',
+                function (data) {
+                    console.log(data);
+                }
+            );
+            execAction.stderr.on('data',
+                function (data) {
+                    console.log(data);
+                }
+            );
+            execAction.on('error', function (err) {
+                console.log('Failed to start child process.' + err);
+            });
+            execAction.on('close', function (code) {
+                console.log('child process exited with code ' + code);
+            });
+        }catch(ex) {
+            console.log(ex);
+        }
 
         res.end();
     }
