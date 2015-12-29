@@ -111,14 +111,13 @@ router.put('/:id',
     function (req, res) {
         if (req.body.hasOwnProperty('action')) {
             var actionObject = JSON.parse(req.body.action);
-            var initialAction = JSON.parse(req.body.action);
 
             models.ActionHasProperties.bulkCreate(actionObject.action_has_properties,
                 {
                     updateOnDuplicate: ['property_value']
                 }
             ).then(
-                function() {
+                function () {
                     models.Action.update(actionObject,
                         {
                             where: {id: req.params.id},
@@ -134,7 +133,25 @@ router.put('/:id',
                         function (modified) {
                             if (modified.length == 1) {
                                 if (websocket.connection.isOpen) {
-                                    websocket.session.publish('plow.downloads.download.' + initialAction.download_id + '.action.' + initialAction.id, [initialAction], {}, {acknowledge: false});
+                                    models.Action.findById(req.params.id, {
+                                            include: [
+                                                {model: models.ActionType, as: 'action_type'},
+                                                {model: models.ActionStatus, as: 'action_status'},
+                                                {
+                                                    model: models.ActionHasProperties, as: 'action_has_properties',
+                                                    include: [
+                                                        {model: models.Directory, as: 'directory'},
+                                                        {model: models.Property, as: 'property'}
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ).then(
+                                        function (actionModel) {
+
+                                            websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.action.' + actionModel.id, [actionModel], {}, {acknowledge: false});
+                                        }
+                                    );
                                 }
                             }
                         }
@@ -172,7 +189,7 @@ router.post('/execute',
             execAction.on('close', function (code) {
                 console.log('child process exited with code ' + code);
             });
-        }catch(ex) {
+        } catch (ex) {
             console.log(ex);
         }
 
