@@ -158,6 +158,8 @@ router.post('/execute',
 
             }
         );
+
+        res.end();
     }
 );
 
