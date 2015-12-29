@@ -148,14 +148,14 @@ router.post('/execute',
         var actionToExecute = JSON.parse(JSON.stringify(req.body));
 
         var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.action_command + ' ' + actionToExecute.download_id + ' ' + actionToExecute.action_id;
-        console.log(command);
+
         var execAction = exec(command);
         execAction.stdout.on('data',
             function(data) {
                 console.log(data);
             }
         );
-        execAction.stderrt.on('data',
+        execAction.stderr.on('data',
             function(data) {
                 console.log(data);
             }
