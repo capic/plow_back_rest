@@ -160,6 +160,9 @@ router.post('/execute',
                 console.log(data);
             }
         );
+        execAction.on('close', function (code) {
+            console.log('child process exited with code ' + code);
+        });
 
         res.end();
     }
