@@ -386,9 +386,9 @@ router.post('/moveOne',
                 ]
             })
             .then(function (downloadModel) {
-                    if (dataObject.from == fromConfig.PYTHON_CLIENT || (dataObject.from == fromConfig.IHM_CLIENT && downloadModel.directory_id != dataObject.directory_id)) {
+                    //if (dataObject.from == fromConfig.PYTHON_CLIENT || (dataObject.from == fromConfig.IHM_CLIENT && downloadModel.directory_id != dataObject.directory_id)) {
                         var logs = "";
-                        models.DownloadLogs.findById(dataObject.id)
+                        models.DownloadLogs.findById(dataObject.download_id)
                             .then(function (downloadLogsModel) {
                                     if (downloadModel.status == downloadStatusConfig.FINISHED || downloadModel.status == downloadStatusConfig.MOVED || downloadModel.status == downloadStatusConfig.ERROR_MOVING) {
                                         logs = "Moving action ...\r\n";
@@ -431,7 +431,7 @@ router.post('/moveOne',
                                 }
                             );
 
-                    }
+                    //}
                 }
             );
     }

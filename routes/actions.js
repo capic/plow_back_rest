@@ -3,6 +3,7 @@ var express = require('express');
 var websocket = require('../websocket');
 var router = express.Router();
 var config = require("../configuration");
+var downloadServerConfig = config.get('download_server');
 var downloadStatusConfig = config.get('download_status');
 var errorConfig = config.get('errors');
 
@@ -105,57 +106,6 @@ router.post('/',
     }
 );
 
-
-/**
- * add a new download
- */
-router.post('/bulk',
-    function (req, res) {
-        if (req.body.hasOwnProperty('actions')) {
-            var listActions = JSON.parse(req.body.actions);
-
-            if (listActions.length > 0) {
-                models.Action.max('num', {
-                    where: {
-                        download_id: listActions[0].download_id,
-                        action_type_id: listActions[0].action_type_id
-                    }
-                }).then(function (num) {//TODO utiliser un hook
-                    if (isNaN(num) || num === undefined || num === null) {
-                        num = 0;
-                    }
-
-                    var listActionsTransformed = [];
-                    listActions.forEach(function (actionToTransform) {
-                        actionToTransform.num = num + 1;
-                        listActionsTransformed.push(actionToTransform);
-                    });
-
-                    models.Action.bulkCreate(listActionsTransformed)
-                        .then(function (actionModel) {
-                            models.Action.findAll({
-                                where: {
-                                    download_id: actionModel.download_id,
-                                    action_type_id: actionModel.action_type_id,
-                                    num: num
-                                }
-                            }).then(function (actionsFoundModel) {
-                                res.json(actionsFoundModel);
-                            });
-                        });
-
-                }).catch(
-                    function (errors) {
-                        console.log(errors);
-                    }
-                );
-            }
-        } else {
-            //TODO: erreur
-        }
-    }
-);
-
 router.put('/:id',
     function (req, res) {
         if (req.body.hasOwnProperty('action')) {
@@ -191,68 +141,23 @@ router.put('/:id',
     }
 );
 
-router.put('/:downloadId/:actionTypeId/:propertyId/:num',
+router.post('/execute',
     function (req, res) {
-        if (req.body.hasOwnProperty('action')) {
-            var actionObject = JSON.parse(req.body.action);
+        //ex: {"download_id": 1, "action_id": 1}
+        var actionToExecute = JSON.parse(req.body);
 
-            models.Action.update(actionObject, {
-                    where: {
-                        download_id: req.params.downloadId,
-                        action_type_id: req.params.actionTypeId,
-                        property_id: req.params.propertyId,
-                        num: req.params.num
-                    }
-                }
-                )
-                .then(function () {
-                        models.Action.findOne(
-                            {
-                                where: {
-                                    download_id: req.params.downloadId,
-                                    action_type_id: req.params.actionTypeId,
-                                    property_id: req.params.propertyId,
-                                    num: req.params.num
-                                }
-                            }
-                        ).then(function (actionModel) {
-                                res.json(actionModel);
-                            }
-                        );
-                    }
-                );
-        }
+        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.action_command + ' ' + actionToExecute.download_id + ' ' + actionToExecute.action_id;
+        var execMove = exec(command);
+        execMove.stdout.on('data',
+            function(data) {
+            }
+        );
+        execMove.stdout.on('data',
+            function(data) {
+
+            }
+        );
     }
 );
-
-
-/*
- /!**
- * delete a download by id
- *!/
- router.delete('/:id',
- function (req, res, next) {
- models.Download.findAndCountAll({
- where: {
- directory_id: req.params.id,
- $or: [{status: downloadStatusConfig.WAITING}, {status: downloadStatusConfig.IN_PROGRESS}]
- }
- })
- .then(function (result) {
- // on supprime le directory seulement si il n'est pas utilise autre part
- if (result.count <= 1) {
- models.DownloadDirectory.destroy({where: {id: req.params.id}})
- .then(function (ret) {
- res.json({'return': ret == 1});
- }
- );
- } else {
- var error = new Error(res.__(errorConfig.directories.deleteDirectory.message));
- error.status = errorConfig.directories.deleteDirectory.code;
- return next(error);
- }
- });
- }
- );*/
 
 module.exports = router;
