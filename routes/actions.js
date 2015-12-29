@@ -144,7 +144,7 @@ router.put('/:id',
 router.post('/execute',
     function (req, res) {
         //ex: {"download_id": 1, "action_id": 1}
-        var actionToExecute = JSON.parse(req.body);
+        var actionToExecute = JSON.parse(JSON.stringify(req.body));
 
         var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.action_command + ' ' + actionToExecute.download_id + ' ' + actionToExecute.action_id;
         var execMove = exec(command);
