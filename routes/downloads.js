@@ -606,7 +606,7 @@ router.get('/file/exists/:id',
                                     if (stdout == 'true\n') {
                                         res.json({'return': true});
                                     } else {
-                                        var error = new Error(res.__(errorConfig.downloads.fileExists.message, downloadModel.download_directory.path + downloadModel.name));
+                                        var error = new Error(res.__(errorConfig.downloads.fileExists.message, downloadModel.directory.path + downloadModel.name));
                                         error.status = errorConfig.downloads.fileExists.code;
 
                                         return next(error);
