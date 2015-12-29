@@ -161,22 +161,30 @@ router.put('/:id',
         if (req.body.hasOwnProperty('action')) {
             var actionObject = JSON.parse(req.body.action);
 
-            models.Action.update(actionObject,
+            models.ActionHasProperties.bulkCreate(actionObject.action_has_properties,
                 {
-                    where: {id: req.params.id},
-                    include: [
-                        {model: models.ActionHasProperties, as: 'action_has_properties'}
-                    ]}
+                    updateOnDuplicate: ['property_value']
+                }
             ).then(
-                function (modified) {
-                    if (modified) {
-                        if (websocket.connection.isOpen) {
-                            websocket.session.publish('plow.downloads.download.' + actionObject.download_id + '.action.' + actionObject.action_type_id, [actionObject], {}, {acknowledge: false});
+                function() {
+                    models.Action.update(actionObject,
+                        {
+                            where: {id: req.params.id},
+                            include: [
+                                {model: models.ActionHasProperties, as: 'action_has_properties'}
+                            ]
                         }
-                    }
+                    ).then(
+                        function (modified) {
+                            if (modified) {
+                                if (websocket.connection.isOpen) {
+                                    websocket.session.publish('plow.downloads.download.' + actionObject.download_id + '.action.' + actionObject.action_type_id, [actionObject], {}, {acknowledge: false});
+                                }
+                            }
+                        }
+                    );
                 }
             );
-
 
             res.end();
         }
