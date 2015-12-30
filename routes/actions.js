@@ -164,6 +164,16 @@ router.put('/:id',
     }
 );
 
+router.delete('/:id',
+    function(req, res) {
+        models.Action.destroy({where: {id: req.params.id}})
+            .then(function (ret) {
+                    res.json({'return': ret == 1});
+                }
+            );
+    }
+);
+
 router.post('/execute',
     function (req, res) {
         //ex: {"download_id": 1, "action_id": 1}
@@ -194,16 +204,6 @@ router.post('/execute',
         }
 
         res.end();
-    }
-);
-
-router.delete('/:id',
-    function(req, res) {
-        models.Action.destroy({where: {id: req.params.id}})
-            .then(function (ret) {
-                    res.json({'return': ret == 1});
-                }
-            );
     }
 );
 
