@@ -148,7 +148,6 @@ router.put('/:id',
                                         }
                                     ).then(
                                         function (actionModel) {
-
                                             websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.action.' + actionModel.id, [actionModel], {}, {acknowledge: false});
                                         }
                                     );

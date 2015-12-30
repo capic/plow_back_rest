@@ -233,7 +233,8 @@ router.put('/:id',
                             {
                                 include: [
                                     {model: models.DownloadPackage, as: 'download_package'},
-                                    {model: models.DownloadHost, as: 'download_host'}
+                                    {model: models.DownloadHost, as: 'download_host'},
+                                    {model: models.Directory, as: directory}
                                 ]
                             })
                             .then(function (downloadModel) {
