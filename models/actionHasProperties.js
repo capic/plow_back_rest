@@ -23,7 +23,8 @@ module.exports = function (sequelize, DataTypes) {
             associate: function (models) {
                 ActionHasProperties.belongsTo(models.Action, {
                     foreignKey: 'action_id',
-                    as: 'action'
+                    as: 'action',
+                    onDelete: 'cascade'
                 });
                 ActionHasProperties.belongsTo(models.Property, {
                     foreignKey: 'property_id',
