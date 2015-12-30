@@ -24,7 +24,7 @@ module.exports = function (sequelize, DataTypes) {
                     foreignKey: 'action_type_id',
                     as: 'action_type'
                 });
-                Action.hasMany(models.ActionHasProperties, {foreignKey: 'action_id', as: 'action_has_properties', onUpdate: 'CASCADE'});
+                Action.hasMany(models.ActionHasProperties, {foreignKey: 'action_id', as: 'action_has_properties', onDelete: 'cascade'});
             }
         }
     });

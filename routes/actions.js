@@ -197,4 +197,14 @@ router.post('/execute',
     }
 );
 
+router.delete('/:id',
+    function(req, res) {
+        models.Action.destroy({where: {id: req.params.id}})
+            .then(function (ret) {
+                    res.json({'return': ret == 1});
+                }
+            );
+    }
+);
+
 module.exports = router;
