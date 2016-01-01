@@ -22,10 +22,10 @@ router.get('/',
         for (var prop in req.query) {
             var tabOperator = prop.split("$");
             if (tabOperator.length > 0) {
-                var tabOperatorNum = tabOperator.split("£");
+                var tabOperatorNum = tabOperator[1].split("£");
                 if (tabOperator == "or") {
                     var p = {};
-                    p[tabOperator] = req.query[prop];
+                    p[tabOperator[0]] = req.query[prop];
 
                     if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
                         tabQuery[tabOperatorNum[1]].push(p);
@@ -39,6 +39,10 @@ router.get('/',
                 params[prop] = req.query[prop];
             }
         }
+
+       /* tabQuery.forEach(function(el){
+            params
+        });*/
 
         if (Object.keys(params).length !== 0) {
             models.Action.findAll({
