@@ -17,19 +17,23 @@ router.get('/',
             res.json(action);
         };
 
-        var tabOperators = [];
+        var tabQuery = [];
         var params = {};
         for (var prop in req.query) {
-            var tabSplit = prop.split("$");
-            if (tabSplit.length > 0) {
-                if (tabSplit[0] == "operator") {
-                    if (req.query[prop] == "or") {
-                        tabOperators[tabSplit[1]] = {$or: []};
-                    }
-                } else {
+            var tabOperator = prop.split("$");
+            if (tabOperator.length > 0) {
+                var tabOperatorNum = tabOperator.split("£");
+                if (tabOperator == "or") {
                     var p = {};
-                    p[tabSplit[0]] = req.query[prop];
-                    tabOperators[tabSplit[1]][0].push(p);
+                    p[tabOperator] = req.query[prop];
+
+                    if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
+                        tabQuery[tabOperatorNum[1]].push(p);
+                    } else {
+                        var op = {};
+                        op[$or] = [p];
+                        tabQuery[tabOperatorNum[1]] = op;
+                    }
                 }
             } else {
                 params[prop] = req.query[prop];
