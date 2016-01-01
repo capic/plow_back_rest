@@ -23,7 +23,7 @@ router.get('/',
             var tabOperator = prop.split("$");
             if (tabOperator.length > 0) {
                 var tabOperatorNum = tabOperator[1].split("£");
-                if (tabOperator == "or") {
+                if (tabOperator[0] == "or") {
                     var p = {};
                     p[tabOperator[0]] = req.query[prop];
 
