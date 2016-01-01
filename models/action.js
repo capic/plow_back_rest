@@ -16,6 +16,10 @@ module.exports = function (sequelize, DataTypes) {
                     foreignKey: 'download_id',
                     as: 'download'
                 });
+                Action.belongsTo(models.DownloadPackage, {
+                    foreignKey: 'download_package_id',
+                    as: 'download_package'
+                });
                 Action.belongsTo(models.ActionStatus, {
                     foreignKey: 'action_status_id',
                     as: 'action_status'

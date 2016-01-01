@@ -17,9 +17,23 @@ router.get('/',
             res.json(action);
         };
 
+        var tabOperators = [];
         var params = {};
         for (var prop in req.query) {
-            params[prop] = req.query[prop];
+            var tabSplit = prop.split("$");
+            if (tabSplit.length > 0) {
+                if (tabSplit[0] == "operator") {
+                    if (req.query[prop] == "or") {
+                        tabOperators[tabSplit[1]] = {$or: []};
+                    }
+                } else {
+                    var p = {};
+                    p[tabSplit[0]] = req.query[prop];
+                    tabOperators[tabSplit[1]][0].push(p);
+                }
+            } else {
+                params[prop] = req.query[prop];
+            }
         }
 
         if (Object.keys(params).length !== 0) {
