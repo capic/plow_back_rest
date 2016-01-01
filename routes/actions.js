@@ -31,7 +31,7 @@ router.get('/',
                         tabQuery[tabOperatorNum[1]].push(p);
                     } else {
                         var op = {};
-                        op[$or] = [p];
+                        op['$or'] = [p];
                         tabQuery[tabOperatorNum[1]] = op;
                     }
                 }
