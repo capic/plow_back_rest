@@ -51,7 +51,7 @@ utils.urlFiltersParametersTreatment = function(queryParameters) {
     var params = {};
     for (var prop in queryParameters) {
         var tabOperator = prop.split("$");
-        if (tabOperator.length > 0) {
+        if (tabOperator.length > 1) {
             var tabOperatorNum = tabOperator[1].split("£");
             if (tabOperatorNum[0] == "or") {
                 var p = {};
