@@ -41,9 +41,9 @@ router.get('/',
             }
         }
 
-       /* tabQuery.forEach(function(el){
-            params
-        });*/
+       tabQuery.forEach(function(el){
+            params[el.keys[0]] = el[el.keys[0]];
+        });
 
         if (Object.keys(params).length !== 0) {
             models.Action.findAll({
