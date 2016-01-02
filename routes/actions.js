@@ -42,7 +42,8 @@ router.get('/',
         }
 
        tabQuery.forEach(function(el){
-            params[el.keys()[0]] = el[el.keys()[0]];
+           var k = Object.keys(el);
+            params[k[0]] = el[k[0]];
         });
 
         if (Object.keys(params).length !== 0) {
