@@ -28,8 +28,7 @@ router.get('/',
                     p[tabOperator[0]] = req.query[prop];
 
                     if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
-                        var a = tabQuery[tabOperatorNum[1]]['$or'];
-                        a.push(p);
+                        tabQuery[tabOperatorNum[1]]['$or'].push(p);
                     } else {
                         var op = {};
                         op['$or'] = new Array();
