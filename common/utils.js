@@ -46,4 +46,37 @@ utils.insertOrUpdateLog = function(id, downLogsObject, websocket, res) {
         });
 };
 
+utils.urlFiltersParametersTreatment = function(queryParameters) {
+    var tabQuery = [];
+    var params = {};
+    for (var prop in queryParameters) {
+        var tabOperator = prop.split("$");
+        if (tabOperator.length > 0) {
+            var tabOperatorNum = tabOperator[1].split("£");
+            if (tabOperatorNum[0] == "or") {
+                var p = {};
+                p[tabOperator[0]] = queryParameters[prop];
+
+                if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
+                    tabQuery[tabOperatorNum[1]]['$or'].push(p);
+                } else {
+                    var op = {};
+                    op['$or'] = new Array();
+                    op['$or'].push(p);
+                    tabQuery[tabOperatorNum[1]] = op;
+                }
+            }
+        } else {
+            params[prop] = queryParameters[prop];
+        }
+    }
+
+    tabQuery.forEach(function(el){
+        var k = Object.keys(el);
+        params[k[0]] = el[k[0]];
+    });
+
+    return params;
+};
+
 module.exports = utils;
