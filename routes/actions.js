@@ -32,7 +32,8 @@ router.get('/',
                         a.push(p);
                     } else {
                         var op = {};
-                        op['$or'] = [p];
+                        op['$or'] = new Array();
+                        op['$or'].push(p);
                         tabQuery[tabOperatorNum[1]] = op;
                     }
                 }
