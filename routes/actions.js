@@ -18,7 +18,7 @@ router.get('/',
             res.json(action);
         };
 
-        var params = utils.urlFiltersParametersTreatment(req.params);
+        var params = utils.urlFiltersParametersTreatment(req.query);
 
         if (Object.keys(params).length !== 0) {
             models.Action.findAll({
