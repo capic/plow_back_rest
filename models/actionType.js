@@ -12,6 +12,10 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         ActionType.hasMany(models.Action, {foreignKey: 'action_type_id'});
+        ActionType.belongsTo(models.ActionTarget, {
+          foreignKey: 'action_target_id',
+          as: 'action_target'
+        });
       }
     }
   });

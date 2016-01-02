@@ -24,7 +24,12 @@ router.get('/',
             models.Action.findAll({
                 where: params,
                 include: [
-                    {model: models.ActionType, as: 'action_type'},
+                    {
+                        model: models.ActionType, as: 'action_type',
+                        include: [
+                            {model: models.ActionTarget, as: 'action_target'}
+                        ]
+                    },
                     {model: models.ActionStatus, as: 'action_status'},
                     {
                         model: models.ActionHasProperties, as: 'action_has_properties',
