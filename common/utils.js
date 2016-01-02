@@ -52,7 +52,7 @@ utils.urlFiltersParametersTreatment = function(queryParameters) {
     for (var prop in queryParameters) {
         var tabOperator = prop.split("$");
         if (tabOperator.length > 1) {
-            var tabOperatorNum = tabOperator[1].split("£");
+            var tabOperatorNum = tabOperator[1].split("µ");
             if (tabOperatorNum[0] == "or") {
                 var p = {};
                 p[tabOperator[0]] = queryParameters[prop];
