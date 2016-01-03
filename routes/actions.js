@@ -141,7 +141,7 @@ router.post('/',
                                     websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
                                     break;
                                 case actionConfig.type.PACKAGE:
-                                    websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                    websocket.session.publish('plow.downloads.package.' + actionModel.download_package_id + '.actions', [actionModel], {}, {acknowledge: false});
                                     break;
                             }
                         }
@@ -206,7 +206,7 @@ router.put('/:id',
                                                         websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
                                                         break;
                                                     case actionConfig.type.PACKAGE:
-                                                        websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                                        websocket.session.publish('plow.downloads.package.' + actionModel.download_package_id + '.actions', [actionModel], {}, {acknowledge: false});
                                                         break;
                                                 }
                                             }
