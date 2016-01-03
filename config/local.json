@@ -34,9 +34,15 @@
     "UNRAR_ERROR": 14,
     "TREATMENT_IN_PROGRESS": 999
   },
-  "action_status": {
-    "WAITING": 1,
-    "IN_PROGRESS": 2
+  "action": {
+    "status": {
+      "WAITING": 1,
+      "IN_PROGRESS": 2
+    },
+    "type": {
+      "DOWNLOAD": 1,
+      "PACKAGE": 2
+    }
   },
   "from": {
     "IHM_CLIENT": 1,

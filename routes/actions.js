@@ -6,7 +6,7 @@ var config = require("../configuration");
 var spawn = require('child_process').spawn;
 var utils = require('../common/utils');
 var downloadServerConfig = config.get('download_server');
-var downloadStatusConfig = config.get('download_status');
+var actionConfig = config.get('action');
 var errorConfig = config.get('errors');
 
 /**
@@ -104,14 +104,16 @@ router.post('/',
                 }
             ).then(function (actionModel) {
                 if (websocket.connection.isOpen) {
-                    if (actionModel.download_id != null) {
-                        websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
-                    } else if (actionModel.package_id != null) {
-                        websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                    switch (actionModel.action_type.action_target.id) {
+                        case actionConfig.type.DOWNLOAD:
+                            websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
+                            break;
+                        case actionConfig.type.PACKAGE:
+                            websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                            break;
                     }
-
                 }
-                    res.json(actionModel);
+                res.json(actionModel);
             });
         }
     }
@@ -158,10 +160,15 @@ router.put('/:id',
                                         }
                                     ).then(
                                         function (actionModel) {
-                                            if (actionModel.download_id != null) {
-                                                websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
-                                            } else if (actionModel.package_id != null) {
-                                                websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                            if (websocket.connection.isOpen) {
+                                                switch (actionModel.action_type.action_target.id) {
+                                                    case actionConfig.type.DOWNLOAD:
+                                                        websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                                        break;
+                                                    case actionConfig.type.PACKAGE:
+                                                        websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                                        break;
+                                                }
                                             }
 
                                         }
@@ -179,7 +186,7 @@ router.put('/:id',
 );
 
 router.delete('/:id',
-    function(req, res) {
+    function (req, res) {
         models.Action.destroy({where: {id: req.params.id}})
             .then(function (ret) {
                     res.json({'return': ret == 1});
