@@ -120,7 +120,7 @@ router.post('/',
                         }
                     ).then(
                         function (actionModel) {
-                            switch (actionModel.action_type.action_target.id) {
+                            switch (actionModel.action_type.action_target_id) {
                                 case actionConfig.type.DOWNLOAD:
                                     websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
                                     break;
