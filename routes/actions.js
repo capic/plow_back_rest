@@ -237,12 +237,12 @@ router.delete('/:id',
 
 router.post('/execute',
     function (req, res) {
-        //ex: {"download_id": 1, "action_id": 1, "action_target_id": 1}
+        //ex: {"object_id": 1, "action_id": 1, "action_target_id": 1}
         var actionToExecute = JSON.parse(JSON.stringify(req.body));
 
         try {
             // var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.action_command + ' ' + actionToExecute.download_id + ' ' + actionToExecute.action_id;
-            var execAction = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.action_command, actionToExecute.download_id, actionToExecute.action_id, actionToExecute.action_target_id]);
+            var execAction = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.action_command, actionToExecute.object_id, actionToExecute.action_id, actionToExecute.action_target_id]);
             //var execAction = exec(command);
             execAction.stdout.on('data',
                 function (data) {
