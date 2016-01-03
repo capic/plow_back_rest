@@ -103,9 +103,16 @@ router.post('/',
                     ]
                 }
             ).then(function (actionModel) {
-                    res.json(actionModel);
+                if (websocket.connection.isOpen) {
+                    if (actionModel.download_id != null) {
+                        websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
+                    } else if (actionModel.package_id != null) {
+                        websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                    }
+
                 }
-            );
+                    res.json(actionModel);
+            });
         }
     }
 );
@@ -151,7 +158,12 @@ router.put('/:id',
                                         }
                                     ).then(
                                         function (actionModel) {
-                                            websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.action.' + actionModel.id, [actionModel], {}, {acknowledge: false});
+                                            if (actionModel.download_id != null) {
+                                                websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                            } else if (actionModel.package_id != null) {
+                                                websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                            }
+
                                         }
                                     );
                                 }
