@@ -105,7 +105,7 @@ router.post('/',
                 }
             ).then(function (actionModelInserted) {
                 if (websocket.connection.isOpen) {
-                    models.Action.findById(req.params.id, {
+                    models.Action.findById(actionModelInserted.id, {
                             include: [
                                 {model: models.ActionType, as: 'action_type'},
                                 {model: models.ActionStatus, as: 'action_status'},
@@ -120,7 +120,6 @@ router.post('/',
                         }
                     ).then(
                         function (actionModel) {
-
                             switch (actionModel.action_type.action_target.id) {
                                 case actionConfig.type.DOWNLOAD:
                                     websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
