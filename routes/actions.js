@@ -246,19 +246,19 @@ router.post('/execute',
             //var execAction = exec(command);
             execAction.stdout.on('data',
                 function (data) {
-                    console.log(data.toString());
+                    //console.log(data.toString());
                 }
             );
             execAction.stderr.on('data',
                 function (data) {
-                    console.log(data.toString());
+                    //console.log(data.toString());
                 }
             );
             execAction.on('error', function (err) {
-                console.log('Failed to start child process.' + err);
+                //console.log('Failed to start child process.' + err);
             });
             execAction.on('close', function (code) {
-                console.log('child process exited with code ' + code);
+                //console.log('child process exited with code ' + code);
             });
         } catch (ex) {
             console.log(ex);
