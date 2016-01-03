@@ -103,18 +103,38 @@ router.post('/',
                         {model: models.ActionType, as: 'action_type'}
                     ]
                 }
-            ).then(function (actionModel) {
+            ).then(function (actionModelInserted) {
                 if (websocket.connection.isOpen) {
-                    switch (actionModel.action_type.action_target.id) {
-                        case actionConfig.type.DOWNLOAD:
-                            websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
-                            break;
-                        case actionConfig.type.PACKAGE:
-                            websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
-                            break;
-                    }
+                    models.Action.findById(req.params.id, {
+                            include: [
+                                {model: models.ActionType, as: 'action_type'},
+                                {model: models.ActionStatus, as: 'action_status'},
+                                {
+                                    model: models.ActionHasProperties, as: 'action_has_properties',
+                                    include: [
+                                        {model: models.Directory, as: 'directory'},
+                                        {model: models.Property, as: 'property'}
+                                    ]
+                                }
+                            ]
+                        }
+                    ).then(
+                        function (actionModel) {
+
+                            switch (actionModel.action_type.action_target.id) {
+                                case actionConfig.type.DOWNLOAD:
+                                    websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                    break;
+                                case actionConfig.type.PACKAGE:
+                                    websocket.session.publish('plow.downloads.package.' + actionModel.package_id + '.actions', [actionModel], {}, {acknowledge: false});
+                                    break;
+                            }
+
+                        }
+                    );
                 }
-                res.json(actionModel);
+
+                res.json(actionModelInserted);
             });
         }
     }
