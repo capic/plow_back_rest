@@ -99,7 +99,8 @@ router.post('/',
             models.Action.create(action,
                 {
                     include: [
-                        {model: models.ActionHasProperties, as: 'action_has_properties'}
+                        {model: models.ActionHasProperties, as: 'action_has_properties'},
+                        {model: models.ActionType, as: 'action_type'}
                     ]
                 }
             ).then(function (actionModel) {
