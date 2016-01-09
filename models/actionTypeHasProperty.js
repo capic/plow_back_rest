@@ -2,7 +2,7 @@
  * Created by Vincent on 27/08/2015.
  */
 module.exports = function (sequelize, DataTypes) {
-    var ActionTypeHasProperties = sequelize.define('ActionTypeHasProperties', {
+    var ActionTypeHasProperty = sequelize.define('ActionTypeHasProperty', {
         action_type_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -21,11 +21,11 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'action_type_has_properties',
         classMethods: {
             associate: function (models) {
-                ActionTypeHasProperties.belongsTo(models.ActionType, {
+                ActionTypeHasProperty.belongsTo(models.ActionType, {
                     foreignKey: 'action_type_id',
                     as: 'action_type'
                 });
-                ActionTypeHasProperties.belongsTo(models.Property, {
+                ActionTypeHasProperty.belongsTo(models.Property, {
                     foreignKey: 'property_id',
                     as: 'property'
                 });
@@ -33,5 +33,5 @@ module.exports = function (sequelize, DataTypes) {
         }
     });
 
-    return ActionTypeHasProperties;
+    return ActionTypeHasProperty;
 };
