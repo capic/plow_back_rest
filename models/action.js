@@ -4,7 +4,8 @@
 module.exports = function (sequelize, DataTypes) {
     var Action = sequelize.define('Action', {
         lifecycle_insert_date: DataTypes.DATE,
-        lifecycle_update_date: DataTypes.DATE
+        lifecycle_update_date: DataTypes.DATE,
+        order: DataTypes.INTEGER
     }, {
         freezeTableName: true,
         createdAt: false,

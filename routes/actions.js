@@ -106,6 +106,10 @@ router.post('/',
         if (req.body.hasOwnProperty('action')) {
             var action = JSON.parse(req.body.action);
 
+            // on force a 1 pour que le trigger prenne le relais
+            action.order = 1;
+            console.log(action);
+
             models.Action.create(action,
                 {
                     include: [
