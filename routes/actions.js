@@ -108,7 +108,6 @@ router.post('/',
 
             // on force a 1 pour que le trigger prenne le relais
             action.order = 1;
-            console.log(action);
 
             models.Action.create(action,
                 {
