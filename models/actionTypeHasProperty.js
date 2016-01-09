@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
         freezeTableName: true,
         createdAt: false,
         updatedAt: false,
-        tableName: 'action_type_has_properties',
+        tableName: 'action_type_has_property',
         classMethods: {
             associate: function (models) {
                 ActionTypeHasProperty.belongsTo(models.ActionType, {
