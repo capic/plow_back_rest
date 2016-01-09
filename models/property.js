@@ -11,7 +11,8 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'property',
         classMethods: {
             associate: function (models) {
-                Property.hasMany(models.ActionHasProperties, {foreignKey: 'property_id'});
+                Property.hasMany(models.ActionHasProperties, {foreignKey: 'property_id', as: 'action_has_properties'});
+                Property.hasMany(models.ActionTypeHasProperty, {foreignKey: 'property_id', as: 'action_type_has_property'})
             }
         }
     });
