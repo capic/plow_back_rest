@@ -18,20 +18,23 @@ router.get('/',
             res.json(actionType);
         };
 
+        var relationsList = [
+            {
+                model: models.ActionTypeHasProperty, as: 'action_type_has_property',
+                include: [
+                    {model: models.Property, as: 'property'}
+                ]
+            },
+            {model: models.ActionTarget, as: 'action_target'}
+        ];
+
         var params = utils.urlFiltersParametersTreatment(req.query);
+        var include = utils.includeFiltersParametersTreatment(req.query, relationsList);
 
         if (Object.keys(params).length !== 0) {
             models.ActionType.findAll({
                 where: params,
-                include: [
-                    {
-                        model: models.ActionTypeHasProperty, as: 'action_type_has_property',
-                        include: [
-                            {model: models.Property, as: 'property'}
-                        ]
-                    },
-                    {model: models.ActionTarget, as: 'action_target'}
-                ]
+                include: include
             }).then(callback)
                 .catch(
                     function (errors) {

@@ -79,4 +79,32 @@ utils.urlFiltersParametersTreatment = function(queryParameters) {
     return params;
 };
 
+var includeTreatment = function(queryParameters, prop, relationsList) {
+    var found = false;
+    var i = 0;
+    while (i < relationsList.length && !found) {
+        var tabRelations = prop.split('.');
+
+        if (Array.isArray(relationsList[i])) {
+            return includeTreatment(queryParameters, prop, relationsList[i]);
+        } else {
+            if (relationsList[i].as == tabRelations[0]) {
+                found = true;
+                var whereObject = {};
+                whereObject[tabRelations[1]] = queryParameters[tabRelations];
+                relationsList[i].through = {where: whereObject};
+            }
+        }
+        i++;
+    }
+};
+
+utils.includeFiltersParametersTreatment = function(queryParameters, relationsList) {
+    for (var prop in queryParameters) {
+        if (prop.indexOf('.') > -1) {
+            includeTreatment(queryParameters, prop, relationsList);
+        }
+    }
+};
+
 module.exports = utils;
