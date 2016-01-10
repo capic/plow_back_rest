@@ -33,7 +33,7 @@ router.get('/',
         if (Object.keys(params).length !== 0) {
             models.ActionType.findAll({
                 where: params,
-                include: include
+                include: relationsList
             }).then(callback)
                 .catch(
                     function (errors) {
@@ -42,15 +42,7 @@ router.get('/',
                 );
         } else {
             models.ActionType.findAll({
-                include: [
-                    {
-                        model: models.ActionTypeHasProperty, as: 'action_type_has_property',
-                        include: [
-                            {model: models.Property, as: 'property'}
-                        ]
-                    },
-                    {model: models.ActionTarget, as: 'action_target'}
-                ]
+                include: relationsList
             }).then(callback)
                 .catch(
                     function (errors) {
