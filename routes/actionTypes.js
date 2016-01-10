@@ -29,7 +29,6 @@ router.get('/',
         ];
 
         var params = utils.urlFiltersParametersTreatment(req.query, relationsList);
-        console.log(relationsList);
 
         if (Object.keys(params).length !== 0) {
             models.ActionType.findAll({
