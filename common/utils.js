@@ -50,27 +50,30 @@ utils.urlFiltersParametersTreatment = function(queryParameters, relationsList) {
     var tabQuery = [];
     var params = {};
     for (var prop in queryParameters) {
-        var tabOperator = prop.split("$");
-        if (tabOperator.length > 1) {
-            var tabOperatorNum = tabOperator[1].split("µ");
-            if (tabOperatorNum[0] == "or") {
-                var p = {};
-                p[tabOperator[0]] = queryParameters[prop];
+        var elValue = parameterTypeTreatment(queryParameters[prop]);
+        if (elValue != null) {
+            var tabOperator = prop.split("$");
+            if (tabOperator.length > 1) {
+                var tabOperatorNum = tabOperator[1].split("µ");
+                if (tabOperatorNum[0] == "or") {
+                    var p = {};
+                    p[tabOperator[0]] = elValue;
 
-                if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
-                    tabQuery[tabOperatorNum[1]]['$or'].push(p);
-                } else {
-                    var op = {};
-                    op['$or'] = new Array();
-                    op['$or'].push(p);
-                    tabQuery[tabOperatorNum[1]] = op;
+                    if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
+                        tabQuery[tabOperatorNum[1]]['$or'].push(p);
+                    } else {
+                        var op = {};
+                        op['$or'] = new Array();
+                        op['$or'].push(p);
+                        tabQuery[tabOperatorNum[1]] = op;
+                    }
                 }
-            }
-        } else {
-            if (prop.indexOf('.') > -1) {
-                includeTreatment(queryParameters, prop, relationsList);
             } else {
-                params[prop] = queryParameters[prop];
+                if (prop.indexOf('.') > -1) {
+                    includeTreatment(queryParameters, prop, elValue, relationsList);
+                } else {
+                    params[prop] = elValue;
+                }
             }
         }
     }
@@ -83,24 +86,34 @@ utils.urlFiltersParametersTreatment = function(queryParameters, relationsList) {
     return params;
 };
 
-var includeTreatment = function(queryParameters, prop, relationsList) {
+var includeTreatment = function(queryParameters, prop, elValue, relationsList) {
     var found = false;
     var i = 0;
     while (i < relationsList.length && !found) {
         var tabRelations = prop.split('.');
 
         if (Array.isArray(relationsList[i])) {
-            return includeTreatment(queryParameters, prop, relationsList[i]);
+            return includeTreatment(queryParameters, prop, elValue, relationsList[i]);
         } else {
             if (relationsList[i].as == tabRelations[0]) {
                 found = true;
                 var whereObject = {};
-                whereObject[tabRelations[1]] = queryParameters[prop];
+                whereObject[tabRelations[1]] = elValue;
                 relationsList[i].where = whereObject;
             }
         }
         i++;
     }
+};
+
+var parameterTypeTreatment = function(param) {
+    var ret = null;
+
+    if (param == 'true' || param == 'false') {
+        ret = (param === 'true');
+    }
+
+    return ret;
 };
 
 module.exports = utils;
