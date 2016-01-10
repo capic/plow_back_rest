@@ -28,8 +28,7 @@ router.get('/',
             {model: models.ActionTarget, as: 'action_target'}
         ];
 
-        var params = utils.urlFiltersParametersTreatment(req.query);
-        var include = utils.includeFiltersParametersTreatment(req.query, relationsList);
+        var params = utils.urlFiltersParametersTreatment(req.query, relationsList);
 
         if (Object.keys(params).length !== 0) {
             models.ActionType.findAll({

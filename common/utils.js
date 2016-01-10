@@ -46,7 +46,7 @@ utils.insertOrUpdateLog = function(id, downLogsObject, websocket, res) {
         });
 };
 
-utils.urlFiltersParametersTreatment = function(queryParameters) {
+utils.urlFiltersParametersTreatment = function(queryParameters, relationsList) {
     var tabQuery = [];
     var params = {};
     for (var prop in queryParameters) {
@@ -67,7 +67,11 @@ utils.urlFiltersParametersTreatment = function(queryParameters) {
                 }
             }
         } else {
-            params[prop] = queryParameters[prop];
+            if (prop.indexOf('.') > -1) {
+                includeTreatment(queryParameters, prop, relationsList);
+            } else {
+                params[prop] = queryParameters[prop];
+            }
         }
     }
 
@@ -96,14 +100,6 @@ var includeTreatment = function(queryParameters, prop, relationsList) {
             }
         }
         i++;
-    }
-};
-
-utils.includeFiltersParametersTreatment = function(queryParameters, relationsList) {
-    for (var prop in queryParameters) {
-        if (prop.indexOf('.') > -1) {
-            includeTreatment(queryParameters, prop, relationsList);
-        }
     }
 };
 
