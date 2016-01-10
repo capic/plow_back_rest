@@ -95,7 +95,7 @@ var includeTreatment = function(queryParameters, prop, relationsList) {
             if (relationsList[i].as == tabRelations[0]) {
                 found = true;
                 var whereObject = {};
-                whereObject[tabRelations[1]] = queryParameters[tabRelations];
+                whereObject[tabRelations[1]] = queryParameters[prop];
                 relationsList[i].through = {where: whereObject};
             }
         }
