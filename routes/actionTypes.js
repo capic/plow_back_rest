@@ -22,7 +22,12 @@ router.get('/',
             {
                 model: models.ActionTypeHasProperty, as: 'action_type_has_property',
                 include: [
-                    {model: models.Property, as: 'property'}
+                    {
+                        model: models.Property, as: 'property',
+                        include: [
+                            {model: models.PropertyType, as: 'property_type'}
+                        ]
+                    }
                 ]
             },
             {model: models.ActionTarget, as: 'action_target'}
@@ -60,7 +65,12 @@ router.get('/:id',
                     {
                         model: models.ActionTypeHasProperty, as: 'action_type_has_property',
                         include: [
-                            {model: models.Property, as: 'property'}
+                            {
+                                model: models.Property, as: 'property',
+                                include: [
+                                    {model: models.PropertyType, as: 'property_type'}
+                                ]
+                            }
                         ]
                     },
                     {model: models.ActionTarget, as: 'action_target'}
