@@ -258,6 +258,7 @@ router.post('/executeAll',
             utils.executeAction(actionObject.objectId, actionObject.actionId, actionObject.targetId);
         });
 
+        res.end();
     }
 );
 
