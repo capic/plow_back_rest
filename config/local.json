@@ -42,7 +42,7 @@
     "target": {
       "DOWNLOAD": 1,
       "PACKAGE": 2
-    },
+    }
   },
   "from": {
     "IHM_CLIENT": 1,
