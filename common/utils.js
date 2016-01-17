@@ -128,7 +128,7 @@ utils.executeAction = function(objectId, actionId, actionTargetId) {
         );
         execAction.stderr.on('data',
             function (data) {
-                //console.log(data.toString());
+                console.log(data.toString());
             }
         );
         execAction.on('error', function (err) {
