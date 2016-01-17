@@ -123,7 +123,7 @@ utils.executeAction = function(objectId, actionId, actionTargetId) {
 
         execAction.stdout.on('data',
             function (data) {
-                //console.log(data.toString());
+                console.log(data.toString());
             }
         );
         execAction.stderr.on('data',
