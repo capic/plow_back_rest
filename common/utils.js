@@ -3,6 +3,7 @@
  */
 var models = require('../models');
 var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
 
@@ -114,6 +115,31 @@ var parameterTypeTreatment = function(param) {
     }
 
     return ret;
+};
+
+utils.executeAction = function(objectId, actionId, actionTargetId) {
+    try {
+        var execAction = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.action_command, objectId, actionId, actionTargetId]);
+
+        execAction.stdout.on('data',
+            function (data) {
+                //console.log(data.toString());
+            }
+        );
+        execAction.stderr.on('data',
+            function (data) {
+                //console.log(data.toString());
+            }
+        );
+        execAction.on('error', function (err) {
+            //console.log('Failed to start child process.' + err);
+        });
+        execAction.on('close', function (code) {
+            //console.log('child process exited with code ' + code);
+        });
+    } catch (ex) {
+        console.log(ex);
+    }
 };
 
 module.exports = utils;

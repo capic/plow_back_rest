@@ -140,10 +140,10 @@ router.post('/',
                     function (actionModel) {
                         if (websocket.connection.isOpen) {
                             switch (actionModel.action_type.action_target_id) {
-                                case actionConfig.type.DOWNLOAD:
+                                case actionConfig.target.DOWNLOAD:
                                     websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
                                     break;
-                                case actionConfig.type.PACKAGE:
+                                case actionConfig.target.PACKAGE:
                                     websocket.session.publish('plow.downloads.package.' + actionModel.download_package_id + '.actions', [actionModel], {}, {acknowledge: false});
                                     break;
                             }
@@ -205,10 +205,10 @@ router.put('/:id',
                                         function (actionModel) {
                                             if (websocket.connection.isOpen) {
                                                 switch (actionModel.action_type.action_target_id) {
-                                                    case actionConfig.type.DOWNLOAD:
+                                                    case actionConfig.target.DOWNLOAD:
                                                         websocket.session.publish('plow.downloads.download.' + actionModel.download_id + '.actions', [actionModel], {}, {acknowledge: false});
                                                         break;
-                                                    case actionConfig.type.PACKAGE:
+                                                    case actionConfig.target.PACKAGE:
                                                         websocket.session.publish('plow.downloads.package.' + actionModel.download_package_id + '.actions', [actionModel], {}, {acknowledge: false});
                                                         break;
                                                 }
@@ -243,31 +243,21 @@ router.post('/execute',
         //ex: {"object_id": 1, "action_id": 1, "action_target_id": 1}
         var actionToExecute = JSON.parse(JSON.stringify(req.body));
 
-        try {
-            // var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.action_command + ' ' + actionToExecute.download_id + ' ' + actionToExecute.action_id;
-            var execAction = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.action_command, actionToExecute.object_id, actionToExecute.action_id, actionToExecute.action_target_id]);
-            //var execAction = exec(command);
-            execAction.stdout.on('data',
-                function (data) {
-                    //console.log(data.toString());
-                }
-            );
-            execAction.stderr.on('data',
-                function (data) {
-                    //console.log(data.toString());
-                }
-            );
-            execAction.on('error', function (err) {
-                //console.log('Failed to start child process.' + err);
-            });
-            execAction.on('close', function (code) {
-                //console.log('child process exited with code ' + code);
-            });
-        } catch (ex) {
-            console.log(ex);
-        }
+        utils.executeAction(actionToExecute.object_id, actionToExecute.action_id, actionToExecute.action_target_id);
 
         res.end();
+    }
+);
+
+router.post('/executeAll',
+    function(req, res) {
+        // [{objectId: 1, actionId: 1, targetId: 1}, ...]
+        var actionObjectsList = JSON.parse(JSON.stringify(req.body));
+
+        actionObjectsList.forEach(function(actionObject) {
+            utils.executeAction(actionObject.objectId, actionObject.actionId, actionObject.targetId);
+        });
+
     }
 );
 
