@@ -270,9 +270,7 @@ router.post('/executeAll',
         // [{objectId: 1, actionId: 1, targetId: 1}, ...]
         var actionObjectsList = JSON.parse(JSON.stringify(req.body));
 
-        actionObjectsList.forEach(function(actionObject) {
-            utils.executeActions(actionObjectsList);
-        });
+        utils.executeActions(actionObjectsList);
 
         res.end();
     }
