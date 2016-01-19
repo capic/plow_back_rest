@@ -109,22 +109,6 @@ router.post('/',
             // on force a 1 pour que le trigger prenne le relais
             action.order = 1;
 
-            // on rempli les champs automatiquement
-
-            var propertiesList = [];
-            switch (action.action_type_id) {
-                case actionConfig.type.MOVE_DOWNLOAD:
-                case actionConfig.type.UNRAR_PACKAGE:
-                case actionConfig.type.DELETE_PACKAGE:
-                    // repertoire source
-                    propertiesList.push({property_id: actionConfig.property.DIRECTORY_SRC, directory_id: action.directory_id});
-                    break;
-            }
-
-            if (propertiesList.length > 0) {
-                action.action_has_properties.concat(propertiesList);
-            }
-
             models.Action.create(action,
                 {
                     include: [
