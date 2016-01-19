@@ -64,7 +64,7 @@ utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) 
                         tabQuery[tabOperatorNum[1]]['$or'].push(p);
                     } else {
                         var op = {};
-                        op['$or'] = new Array();
+                        op['$or'] = [];
                         op['$or'].push(p);
                         tabQuery[tabOperatorNum[1]] = op;
                     }

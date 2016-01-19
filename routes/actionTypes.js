@@ -20,17 +20,17 @@ router.get('/',
 
         var relationsList = [
             {
-                model: models.ActionTypeHasProperty, as: 'action_type_has_property',
+                model: models.ActionTypeHasProperty, as: 'action_type_has_property', required: false,
                 include: [
                     {
-                        model: models.Property, as: 'property',
+                        model: models.Property, as: 'property', required: false,
                         include: [
-                            {model: models.PropertyType, as: 'property_type'}
+                            {model: models.PropertyType, as: 'property_type', required: false}
                         ]
                     }
                 ]
             },
-            {model: models.ActionTarget, as: 'action_target'}
+            {model: models.ActionTarget, as: 'action_target', required: false}
         ];
 
         var params = utils.urlFiltersParametersTreatment(req.query, relationsList);

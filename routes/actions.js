@@ -25,17 +25,17 @@ router.get('/',
                 where: params,
                 include: [
                     {
-                        model: models.ActionType, as: 'action_type', required: false,
+                        model: models.ActionType, as: 'action_type',
                         include: [
-                            {model: models.ActionTarget, as: 'action_target', required: false}
+                            {model: models.ActionTarget, as: 'action_target'}
                         ]
                     },
-                    {model: models.ActionStatus, as: 'action_status', required: false,},
+                    {model: models.ActionStatus, as: 'action_status'},
                     {
-                        model: models.ActionHasProperties, as: 'action_has_properties', required: false,
+                        model: models.ActionHasProperties, as: 'action_has_properties',
                         include: [
-                            {model: models.Directory, as: 'directory', required: false},
-                            {model: models.Property, as: 'property', required: false}
+                            {model: models.Directory, as: 'directory'},
+                            {model: models.Property, as: 'property'}
                         ]
                     }
                 ]
@@ -49,17 +49,17 @@ router.get('/',
             models.Action.findAll({
                 include: [
                     {
-                        model: models.ActionType, as: 'action_type', required: false,
+                        model: models.ActionType, as: 'action_type',
                         include: [
-                            {model: models.ActionTarget, as: 'action_target', required: false}
+                            {model: models.ActionTarget, as: 'action_target'}
                         ]
                     },
-                    {model: models.ActionStatus, as: 'action_status', required: false},
+                    {model: models.ActionStatus, as: 'action_status'},
                     {
-                        model: models.ActionHasProperties, as: 'action_has_properties', required: false,
+                        model: models.ActionHasProperties, as: 'action_has_properties',
                         include: [
-                            {model: models.Directory, as: 'directory', required: false},
-                            {model: models.Property, as: 'property', required: false}
+                            {model: models.Directory, as: 'directory'},
+                            {model: models.Property, as: 'property'}
                         ]
                     }
                 ]
