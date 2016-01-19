@@ -259,7 +259,7 @@ router.post('/execute',
         //ex: {"object_id": 1, "action_id": 1, "action_target_id": 1}
         var actionToExecute = JSON.parse(JSON.stringify(req.body));
 
-        utils.executeAction(actionToExecute.object_id, actionToExecute.action_id, actionToExecute.action_target_id);
+        utils.executeActions([actionToExecute]);
 
         res.end();
     }
@@ -271,7 +271,7 @@ router.post('/executeAll',
         var actionObjectsList = JSON.parse(JSON.stringify(req.body));
 
         actionObjectsList.forEach(function(actionObject) {
-            utils.executeAction(actionObject.objectId, actionObject.actionId, actionObject.targetId);
+            utils.executeActions(actionObjectsList);
         });
 
         res.end();

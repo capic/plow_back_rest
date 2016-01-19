@@ -9,21 +9,21 @@ var downloadServerConfig = config.get('download_server');
 
 var utils = {};
 
-utils.moveDownload2 = function(downloadId, action_id) {
+utils.moveDownload2 = function (downloadId, action_id) {
     var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + action_id;
     var execMove = exec(command);
     execMove.stdout.on('data',
-        function(data) {
+        function (data) {
         }
     );
     execMove.stdout.on('data',
-        function(data) {
+        function (data) {
 
         }
     );
 };
 
-utils.insertOrUpdateLog = function(id, downLogsObject, websocket, res) {
+utils.insertOrUpdateLog = function (id, downLogsObject, websocket, res) {
     models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
         'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
         {
@@ -33,8 +33,8 @@ utils.insertOrUpdateLog = function(id, downLogsObject, websocket, res) {
             },
             type: models.sequelize.QueryTypes.UPSERT
         }).then(function () {
-            models.DownloadLogs.findById(id)
-                .then(function (downloadLogsModel) {
+        models.DownloadLogs.findById(id)
+            .then(function (downloadLogsModel) {
                     if (websocket.connection.isOpen) {
                         websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
                     }
@@ -44,10 +44,10 @@ utils.insertOrUpdateLog = function(id, downLogsObject, websocket, res) {
                     }
                 }
             );
-        });
+    });
 };
 
-utils.urlFiltersParametersTreatment = function(queryParameters, relationsList) {
+utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) {
     var tabQuery = [];
     var params = {};
     for (var prop in queryParameters) {
@@ -79,7 +79,7 @@ utils.urlFiltersParametersTreatment = function(queryParameters, relationsList) {
         }
     }
 
-    tabQuery.forEach(function(el){
+    tabQuery.forEach(function (el) {
         var k = Object.keys(el);
         params[k[0]] = el[k[0]];
     });
@@ -87,7 +87,7 @@ utils.urlFiltersParametersTreatment = function(queryParameters, relationsList) {
     return params;
 };
 
-var includeTreatment = function(queryParameters, prop, elValue, relationsList) {
+var includeTreatment = function (queryParameters, prop, elValue, relationsList) {
     var found = false;
     var i = 0;
     while (i < relationsList.length && !found) {
@@ -107,7 +107,7 @@ var includeTreatment = function(queryParameters, prop, elValue, relationsList) {
     }
 };
 
-var parameterTypeTreatment = function(param) {
+var parameterTypeTreatment = function (param) {
     var ret = null;
 
     if (param == 'true' || param == 'false') {
@@ -117,9 +117,10 @@ var parameterTypeTreatment = function(param) {
     return ret;
 };
 
-utils.executeAction = function(objectId, actionId, actionTargetId) {
+utils.executeActions = function (actionsList) {
     try {
-        var execAction = spawn('ssh', ['root@' + downloadServerConfig.address, downloadServerConfig.action_command, objectId, actionId, actionTargetId]);
+        var execAction = spawn('ssh', ['root@' + downloadServerConfig.address,
+            downloadServerConfig.action_command, JSON.stringify(actionsList)]);
 
         execAction.stdout.on('data',
             function (data) {
