@@ -42,6 +42,14 @@
     "target": {
       "DOWNLOAD": 1,
       "PACKAGE": 2
+    },
+    "type": {
+      "MOVE_DOWNLOAD": 1,
+      "UNRAR_PACKAGE": 2,
+      "DELETE_PACKAGE": 3
+    },
+    "property": {
+      "DIRECTORY_SRC": 2
     }
   },
   "from": {
