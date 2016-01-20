@@ -3,7 +3,8 @@
  */
 module.exports = function(sequelize, DataTypes) {
   var ActionType = sequelize.define('ActionType', {
-    name: DataTypes.STRING
+    name: DataTypes.STRING,
+    translation_key: DataTypes.STRING
   }, {
     freezeTableName: true,
     createdAt: false,

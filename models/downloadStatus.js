@@ -4,6 +4,7 @@
 module.exports = function(sequelize, DataTypes) {
   var DownloadStatus = sequelize.define('DownloadStatus', {
     name: DataTypes.STRING,
+    translation_key: DataTypes.STRING,
     ord: DataTypes.INTEGER
   }, {
     freezeTableName: true,

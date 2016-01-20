@@ -3,7 +3,8 @@
  */
 module.exports = function (sequelize, DataTypes) {
     var Property = sequelize.define('Property', {
-        name: DataTypes.STRING
+        name: DataTypes.STRING,
+        translation_key: DataTypes.STRING
     }, {
         freezeTableName: true,
         createdAt: false,
