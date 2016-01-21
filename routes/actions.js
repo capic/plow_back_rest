@@ -242,8 +242,10 @@ router.post('/execute',
     function (req, res) {
         //ex: {"object_id": 1, "action_id": 1, "action_target_id": 1}
         var actionToExecute = JSON.parse(JSON.stringify(req.body));
+        var tabActionsToExecute = []
+        tabActionsToExecute.push(actionToExecute);
 
-        utils.executeActions([actionToExecute]);
+        utils.executeActions(tabActionsToExecute);
 
         res.end();
     }
