@@ -119,8 +119,9 @@ var parameterTypeTreatment = function (param) {
 
 utils.executeActions = function (actionsList) {
     try {
+        var json = JSON.stringify(actionsList);
         var execAction = spawn('ssh', ['root@' + downloadServerConfig.address,
-            downloadServerConfig.action_command, JSON.stringify(actionsList)]);
+            downloadServerConfig.action_command, json]);
 
         execAction.stdout.on('data',
             function (data) {
