@@ -20,7 +20,7 @@ router.get('/',
                 );
             });
 
-            res.json(downloadHostPictures);
+            res.json(list);
         };
 
         var params = {};
