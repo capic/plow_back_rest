@@ -112,6 +112,8 @@ var parameterTypeTreatment = function (param) {
 
     if (param == 'true' || param == 'false') {
         ret = (param === 'true');
+    } else {
+        ret = param;
     }
 
     return ret;
