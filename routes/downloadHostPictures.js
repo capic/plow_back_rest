@@ -10,7 +10,7 @@ var errorConfig = config.get('errors');
 router.get('/',
     function (req, res, next) {
         var callback = function (downloadHostPictures) {
-            downloadHostPictures.picture = new Buffer(downloadHostPictures.picture).toString('base64');
+            downloadHostPictures.picture = new Buffer(downloadHostPictures.picture.data).toString('base64');
             res.json(downloadHostPictures);
         };
 
