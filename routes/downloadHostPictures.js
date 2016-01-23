@@ -45,10 +45,15 @@ router.get('/:id',
     function (req, res, next) {
         models.DownloadHostPicture.findById(req.params.id)
             .then(function (downloadHostPictureModel) {
-                res.json({
-                    id: downloadHostPictureModel.id,
-                    picture: new Buffer(downloadHostPictureModel.picture).toString('base64')
-                });
+                if (downloadHostPictureModel != null) {
+                    res.json({
+                        id: downloadHostPictureModel.id,
+                        picture: new Buffer(downloadHostPictureModel.picture).toString('base64')
+                    });
+                } else {
+                    res.json(null);
+                }
+
             }
         );
     }
