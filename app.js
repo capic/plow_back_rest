@@ -18,6 +18,7 @@ var actionTypes = require('./routes/actionTypes');
 var config = require("./configuration");
 var heapdumpConfig = config.get('heapdump');
 
+//kill -USR2 <pid>
 if (heapdumpConfig.activated) {
     var heapdump = require('heapdump');
 
