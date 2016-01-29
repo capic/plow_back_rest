@@ -5,6 +5,11 @@
     "user": "root",
     "password": "capic_20_04_1982"
   },
+  "heapdump": {
+    "activated": false,
+    "directory": "/var/www/plow_solution/plow_back_rest/dump/",
+    "minute": 0
+  },
   "download_server": {
     "address": "192.168.1.200",
     "unrar_command": "python /var/www/plow_solution/main/download_basic.py unrar",

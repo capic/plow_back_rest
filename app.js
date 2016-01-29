@@ -15,6 +15,21 @@ var downloadHosts = require('./routes/downloadHosts');
 var downloadHostPictures = require('./routes/downloadHostPictures');
 var actions = require('./routes/actions');
 var actionTypes = require('./routes/actionTypes');
+var config = require("configuration");
+var heapdumpConfig = config.get('heapdump');
+
+if (heapdumpConfig.activated) {
+    var heapdump = require('heapdump');
+
+    process.chdir(heapdumpConfig.directory);
+
+    if (heapdumpConfig.minute != 0) {
+        setInterval(function () {
+            heapdump.writeSnapshot()
+        }, 60000 * heapdumpConfig.minute);
+    }
+}
+
 
 var app = express();
 
