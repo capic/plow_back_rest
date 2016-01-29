@@ -27,7 +27,7 @@ if (heapdumpConfig.activated) {
     if (heapdumpConfig.minute != 0) {
         setInterval(function () {
             heapdump.writeSnapshot()
-        }, 60000 * heapdumpConfig.minute);
+        }, 6000 * heapdumpConfig.minute);
     }
 }
 
