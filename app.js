@@ -15,6 +15,7 @@ var downloadHosts = require('./routes/downloadHosts');
 var downloadHostPictures = require('./routes/downloadHostPictures');
 var actions = require('./routes/actions');
 var actionTypes = require('./routes/actionTypes');
+var applicationConfiguration = require('./routes/applicationConfiguration');
 
 var app = express();
 
@@ -44,6 +45,7 @@ app.use('/downloadHosts', downloadHosts);
 app.use('/downloadHostPictures', downloadHostPictures);
 app.use('/actions', actions);
 app.use('/actionTypes', actionTypes);
+app.use('/applicationConfiguration', applicationConfiguration);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
