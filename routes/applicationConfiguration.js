@@ -39,7 +39,7 @@ router.get('/:id',
 
 router.put('/:id',
     function (req, res) {
-        var applicationConfigurationObject = JSON.parse(req.body);
+        var applicationConfigurationObject = JSON.parse(JSON.stringify(req.body));
         models.ApplicationConfiguration.update(applicationConfigurationObject, {
                 where: {id: req.params.id}
             })
