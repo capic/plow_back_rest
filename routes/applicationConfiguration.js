@@ -31,9 +31,31 @@ router.get('/:id',
     function (req, res, next) {
         models.ApplicationConfiguration.findById(req.params.id)
             .then(function (applicationConfigurationModel) {
-                res.json(applicationConfigurationModel);
-            }
-        );
+                    res.json(applicationConfigurationModel);
+                }
+            );
+    }
+);
+
+router.put('/:id',
+    function (req, res) {
+        var applicationConfigurationObject = JSON.parse(req.body);
+        models.ApplicationConfiguration.update(applicationConfigurationObject, {
+                where: {id: req.params.id}
+            })
+            .then(function () {
+                    models.ApplicationConfiguration.findById(req.params.id,
+                        {})
+                        .then(function (applicationConfigurationdModel) {
+                                /*if (websocket.connection.isOpen) {
+                                    websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                                    websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                                }*/
+                                res.json(applicationConfigurationdModel);
+                            }
+                        );
+                }
+            );
     }
 );
 
