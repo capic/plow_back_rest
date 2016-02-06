@@ -3,7 +3,8 @@
  */
 module.exports = function(sequelize, DataTypes) {
   var ApplicationConfiguration = sequelize.define('ApplicationConfiguration', {
-    download_activated: DataTypes.BOOLEAN
+    download_activated: DataTypes.BOOLEAN,
+    log_debug_activated: DataTypes.BOOLEAN
   }, {
     freezeTableName: true,
     createdAt: false,
