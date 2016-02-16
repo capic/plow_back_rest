@@ -243,8 +243,10 @@ router.put('/:id',
                             })
                             .then(function (downloadModel) {
                                     if (websocket.connection.isOpen) {
-                                        websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                                        websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                                        if (downloadModel) {
+                                            websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                                            websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                                        }
                                     }
                                     res.json(downloadModel);
                                 }
