@@ -75,9 +75,9 @@ utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) 
 
 var sequelizeParameterTreatment = function(prop, queryParameters, queryOptions) {
     if (prop == "_limit") {
-        queryOptions['limit'] = queryParameters[prop];
+        queryOptions['limit'] = parseInt(queryParameters[prop], 10);
     } else if (prop == "_offset") {
-        queryOptions['offset'] = queryParameters[prop];
+        queryOptions['offset'] = parseInt(queryParameters[prop], 10);
     }
 };
 
