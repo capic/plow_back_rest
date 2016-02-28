@@ -239,8 +239,10 @@ router.put('/:id',
                             })
                             .then(function (downloadModel) {
                                     if (websocket.connection.isOpen) {
-                                        websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                                        websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                                        if (downloadModel) {
+                                            websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                                            websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                                        }
                                     }
                                     res.json(downloadModel);
                                 }
@@ -703,6 +705,25 @@ router.post('/package/files/delete',
             );
 
         res.end();
+    }
+);
+
+router.post('/stop',
+    function(req, res) {
+        var dataObject = JSON.parse(JSON.stringify(req.body));
+
+        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.stop_download + ' ' + dataObject.id;
+        var execStopDownload = exec(command);
+
+        execStopDownload.stdout.on('data', function (data) {
+            console.log('stdout: ' + data);
+        });
+        execStopDownload.stderr.on('data', function (data) {
+            console.log('stdout: ' + data);
+        });
+        execStopDownload.on('close', function (code) {
+            console.log('closing code: ' + code);
+        });
     }
 );
 
