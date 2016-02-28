@@ -18,58 +18,31 @@ router.get('/',
             res.json(action);
         };
 
-        var params = utils.urlFiltersParametersTreatment(req.query);
+        var relationsList = [
+            {
+                model: models.ActionType, as: 'action_type',
+                include: [
+                    {model: models.ActionTarget, as: 'action_target'}
+                ]
+            },
+            {model: models.ActionStatus, as: 'action_status'},
+            {
+                model: models.ActionHasProperties, as: 'action_has_properties',
+                include: [
+                    {model: models.Directory, as: 'directory'},
+                    {model: models.Property, as: 'property'}
+                ]
+            }
+        ];
 
-        if (Object.keys(params).length !== 0) {
-            models.Action.findAll({
-                where: params,
-                include: [
-                    {
-                        model: models.ActionType, as: 'action_type',
-                        include: [
-                            {model: models.ActionTarget, as: 'action_target'}
-                        ]
-                    },
-                    {model: models.ActionStatus, as: 'action_status'},
-                    {
-                        model: models.ActionHasProperties, as: 'action_has_properties',
-                        include: [
-                            {model: models.Directory, as: 'directory'},
-                            {model: models.Property, as: 'property'}
-                        ]
-                    }
-                ]
-            }).then(callback)
-                .catch(
-                    function (errors) {
-                        console.log(errors);
-                    }
-                );
-        } else {
-            models.Action.findAll({
-                include: [
-                    {
-                        model: models.ActionType, as: 'action_type',
-                        include: [
-                            {model: models.ActionTarget, as: 'action_target'}
-                        ]
-                    },
-                    {model: models.ActionStatus, as: 'action_status'},
-                    {
-                        model: models.ActionHasProperties, as: 'action_has_properties',
-                        include: [
-                            {model: models.Directory, as: 'directory'},
-                            {model: models.Property, as: 'property'}
-                        ]
-                    }
-                ]
-            }).then(callback)
-                .catch(
-                    function (errors) {
-                        console.log(errors);
-                    }
-                );
-        }
+        var queryOptions = utils.urlFiltersParametersTreatment(req.query, relationsList);
+
+        models.Action.findAll(queryOptions).then(callback)
+            .catch(
+                function (errors) {
+                    console.log(errors);
+                }
+            );
     }
 );
 

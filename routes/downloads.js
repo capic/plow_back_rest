@@ -33,8 +33,7 @@ router.get('/',
             res.json(downloadsModel);
         };
 
-        var queryOptions = {};
-        queryOptions['include'] = [
+        var relationsList = [
             {
                 model: models.DownloadPackage,
                 as: 'download_package'
@@ -49,21 +48,7 @@ router.get('/',
             }
         ];
 
-        var params = {};
-        for (prop in req.query) {
-            if (prop == "limit") {
-                queryOptions['limit'] = req.query[prop];
-            } else if (prop == "offset") {
-                queryOptions['offset'] = req.query[prop];
-            } else {
-                params[prop] = req.query[prop];
-            }
-        }
-
-
-        if (Object.keys(params).length !== 0) {
-            queryOptions['where'] = params;
-        }
+        var queryOptions = utils.urlFiltersParametersTreatment(req.query, relationsList);
 
         models.Download.findAll(queryOptions).then(callback);
     }

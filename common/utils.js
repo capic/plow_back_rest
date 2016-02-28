@@ -50,31 +50,15 @@ utils.insertOrUpdateLog = function (id, downLogsObject, websocket, res) {
 utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) {
     var tabQuery = [];
     var params = {};
+    var queryOptions = {};
+
     for (var prop in queryParameters) {
         var elValue = parameterTypeTreatment(queryParameters[prop]);
         if (elValue != null) {
-            var tabOperator = prop.split("$");
-            if (tabOperator.length > 1) {
-                var tabOperatorNum = tabOperator[1].split("µ");
-                if (tabOperatorNum[0] == "or") {
-                    var p = {};
-                    p[tabOperator[0]] = elValue;
-
-                    if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
-                        tabQuery[tabOperatorNum[1]]['$or'].push(p);
-                    } else {
-                        var op = {};
-                        op['$or'] = [];
-                        op['$or'].push(p);
-                        tabQuery[tabOperatorNum[1]] = op;
-                    }
-                }
+            if (prop.startsWith("_")) {
+                sequelizeParameterTreatment(prop, queryParameters, queryOptions);
             } else {
-                if (prop.indexOf('.') > -1) {
-                    includeTreatment(queryParameters, prop, elValue, relationsList);
-                } else {
-                    params[prop] = elValue;
-                }
+                queryParameterTreatment(prop, queryParameters, elValue, relationsList, tabQuery);
             }
         }
     }
@@ -84,7 +68,43 @@ utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) 
         params[k[0]] = el[k[0]];
     });
 
-    return params;
+    queryOptions['where'] = params;
+
+    return queryOptions;
+};
+
+var sequelizeParameterTreatment = function(prop, queryParameters, queryOptions) {
+    if (prop == "_limit") {
+        queryOptions['limit'] = queryParameters[prop];
+    } else if (prop == "_offset") {
+        queryOptions['offset'] = queryParameters[prop];
+    }
+};
+
+var queryParameterTreatment = function (prop, queryParameters, elValue, relationsList, tabQuery) {
+    var tabOperator = prop.split("$");
+    if (tabOperator.length > 1) {
+        var tabOperatorNum = tabOperator[1].split("µ");
+        if (tabOperatorNum[0] == "or") {
+            var p = {};
+            p[tabOperator[0]] = elValue;
+
+            if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
+                tabQuery[tabOperatorNum[1]]['$or'].push(p);
+            } else {
+                var op = {};
+                op['$or'] = [];
+                op['$or'].push(p);
+                tabQuery[tabOperatorNum[1]] = op;
+            }
+        }
+    } else {
+        if (prop.indexOf('.') > -1) {
+            includeTreatment(queryParameters, prop, elValue, relationsList);
+        } else {
+            params[prop] = elValue;
+        }
+    }
 };
 
 var includeTreatment = function (queryParameters, prop, elValue, relationsList) {

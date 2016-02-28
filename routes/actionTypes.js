@@ -33,28 +33,14 @@ router.get('/',
             {model: models.ActionTarget, as: 'action_target', required: false}
         ];
 
-        var params = utils.urlFiltersParametersTreatment(req.query, relationsList);
+        var queryOptions = utils.urlFiltersParametersTreatment(req.query, relationsList);
 
-        if (Object.keys(params).length !== 0) {
-            models.ActionType.findAll({
-                where: params,
-                include: relationsList
-            }).then(callback)
-                .catch(
-                    function (errors) {
-                        console.log(errors);
-                    }
-                );
-        } else {
-            models.ActionType.findAll({
-                include: relationsList
-            }).then(callback)
-                .catch(
-                    function (errors) {
-                        console.log(errors);
-                    }
-                );
-        }
+        models.ActionType.findAll(queryOptions).then(callback)
+            .catch(
+                function (errors) {
+                    console.log(errors);
+                }
+            );
     }
 );
 
