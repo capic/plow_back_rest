@@ -33,43 +33,39 @@ router.get('/',
             res.json(downloadsModel);
         };
 
+        var queryOptions = {};
+        queryOptions['include'] = [
+            {
+                model: models.DownloadPackage,
+                as: 'download_package'
+            },
+            {
+                model: models.DownloadHost,
+                as: 'download_host'
+            },
+            {
+                model: models.Directory,
+                as: 'directory'
+            }
+        ];
+
         var params = {};
         for (prop in req.query) {
-            params[prop] = req.query[prop];
+            if (prop == "limit") {
+                queryOptions['limit'] = req.query[prop];
+            } else if (prop == "offset") {
+                queryOptions['offset'] = req.query[prop];
+            } else {
+                params[prop] = req.query[prop];
+            }
         }
 
+
         if (Object.keys(params).length !== 0) {
-            models.Download.findAll({
-                where: params,
-                include: [
-                    {
-                        model: models.DownloadPackage,
-                        as: 'download_package'
-                    },
-                    {
-                        model: models.DownloadHost,
-                        as: 'download_host'
-                    },
-                    {
-                        model: models.Directory,
-                        as: 'directory'
-                    }
-                ]
-            }).then(callback);
-        } else {
-            models.Download.findAll({
-                include: [{
-                    model: models.DownloadPackage,
-                    as: 'download_package'
-                }, {
-                    model: models.DownloadHost,
-                    as: 'download_host'
-                }, {
-                        model: models.Directory,
-                        as: 'directory'
-                }]
-            }).then(callback);
+            queryOptions['where'] = params;
         }
+
+        models.Download.findAll(queryOptions).then(callback);
     }
 )
 ;
