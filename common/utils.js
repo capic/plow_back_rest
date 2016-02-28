@@ -58,7 +58,7 @@ utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) 
             if (prop.startsWith("_")) {
                 sequelizeParameterTreatment(prop, queryParameters, queryOptions);
             } else {
-                queryParameterTreatment(prop, queryParameters, elValue, relationsList, tabQuery);
+                queryParameterTreatment(prop, queryParameters, elValue, relationsList, tabQuery, params);
             }
         }
     }
@@ -81,7 +81,7 @@ var sequelizeParameterTreatment = function(prop, queryParameters, queryOptions) 
     }
 };
 
-var queryParameterTreatment = function (prop, queryParameters, elValue, relationsList, tabQuery) {
+var queryParameterTreatment = function (prop, queryParameters, elValue, relationsList, tabQuery, params) {
     var tabOperator = prop.split("$");
     if (tabOperator.length > 1) {
         var tabOperatorNum = tabOperator[1].split("µ");
