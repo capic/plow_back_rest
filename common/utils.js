@@ -69,6 +69,7 @@ utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) 
     });
 
     queryOptions['where'] = params;
+    queryOptions['include'] = relationsList;
 
     return queryOptions;
 };
