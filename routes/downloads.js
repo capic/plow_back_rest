@@ -159,7 +159,8 @@ router.post('/',
                         if (websocket.connection.isOpen) {
                             websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
                         }
-
+                        // TODO: renvoyer le download avec l'id
+                        console.log(downloadModel);
                         res.json(downloadModel);
                     }
                 );
