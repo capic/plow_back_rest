@@ -90,7 +90,7 @@ var queryParameterTreatment = function (prop, queryParameters, elValue, relation
             var p = {};
             p[tabOperator[0]] = elValue;
 
-            if (tabQuery.hasOwnProperty(tabOperatorNum[1])) {
+            if (Object.prototype.hasOwnProperty.call(tabQuery, tabOperatorNum[1])) {
                 tabQuery[tabOperatorNum[1]]['$or'].push(p);
             } else {
                 var op = {};

@@ -76,7 +76,7 @@ router.get('/:id',
 
 router.post('/',
     function (req, res) {
-        if (req.body.hasOwnProperty('action')) {
+        if (Object.prototype.hasOwnProperty.call(req.body, 'action')) {
             var action = JSON.parse(req.body.action);
 
             // on force a 1 pour que le trigger prenne le relais
@@ -132,7 +132,7 @@ router.post('/',
 
 router.put('/:id',
     function (req, res) {
-        if (req.body.hasOwnProperty('action')) {
+        if (Object.prototype.hasOwnProperty.call(req.body, 'action')) {
             var actionObject = JSON.parse(req.body.action);
 
             models.ActionHasProperties.bulkCreate(actionObject.action_has_properties,

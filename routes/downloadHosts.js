@@ -46,7 +46,7 @@ router.get('/:id',
  */
 router.post('/',
   function (req, res) {
-    if (req.body.hasOwnProperty('host')) {
+    if (Object.prototype.hasOwnProperty.call(req.body, 'host')) {
       var downloadHostObject = JSON.parse(req.body.host);
 
       models.DownloadHost.findOrCreate({where: {name: downloadHostObject.name}, defaults: downloadHostObject})

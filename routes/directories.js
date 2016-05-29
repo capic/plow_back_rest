@@ -47,7 +47,7 @@ router.get('/:id',
  */
 router.post('/',
     function (req, res) {
-        if (req.body.hasOwnProperty('directory')) {
+        if (Object.prototype.hasOwnProperty.call(req.body, 'directory')) {
             var directoryObject = JSON.parse(req.body.directory);
 
             models.Directory.findOrCreate({
