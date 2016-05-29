@@ -152,14 +152,13 @@ router.get('/link/:link',
  */
 router.post('/',
     function (req, res) {
-        if (req.body.hasOwnProperty('download')) {
+        if (Object.prototype.hasOwnProperty.call(req.body, 'download')) {
             var downloadObject = JSON.parse(req.body.download);
             models.Download.create(downloadObject)
                 .then(function (downloadModel) {
                         if (websocket.connection.isOpen) {
                             websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
                         }
-                        // TODO: renvoyer le download avec l'id
                         console.log(downloadModel);
                         res.json(downloadModel);
                     }
@@ -208,7 +207,7 @@ router.post('/remove',
  */
 router.put('/:id',
     function (req, res) {
-        if (req.body.hasOwnProperty('download')) {
+        if (Object.prototype.hasOwnProperty.call(req.body, 'download')) {
             var downloadObject = JSON.parse(req.body.download);
             models.Download.update(downloadObject, {
                     where: {id: req.params.id}
@@ -529,7 +528,7 @@ router.get('/package/:id',
 
 router.post('/package',
     function (req, res) {
-        if (req.body.hasOwnProperty('package')) {
+        if (Object.prototype.hasOwnProperty.call(req.body, 'package')) {
             var packageObject = JSON.parse(req.body.package);
 
             models.DownloadPackage.findOrCreate({
