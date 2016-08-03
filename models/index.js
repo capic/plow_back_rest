@@ -7,7 +7,8 @@ var Sequelize = require("sequelize");
 var env       = process.env.NODE_ENV || "development";
 var config    = require("../configuration");
 var dbConfig  = config.get('db');
-var sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {host: dbConfig.host, dialect: 'mysql', logging: true});
+var sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {host: dbConfig.host, dialect: 'mysql', logging: true, define: {charset: 'utf8',
+    collate: 'utf8_general_ci'}});
 var db        = {};
 
 fs
