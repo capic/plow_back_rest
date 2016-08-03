@@ -18,6 +18,7 @@ router.get('/status',
     function (req, res, next) {
         models.DownloadStatus.findAll()
             .then(function (downloadStatusModel) {
+                    res.header("Content-Type", "application/json; charset=utf-8");
                     res.json(downloadStatusModel);
                 }
             );
