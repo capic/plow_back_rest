@@ -140,6 +140,32 @@ var parameterTypeTreatment = function (param) {
     return ret;
 };
 
+utils.stopCurrentDownloads = function() {
+    try {
+        var execAction = spawn('ssh', ['root@' + downloadServerConfig.address,
+            downloadServerConfig.stop_current_downloads]);
+
+        execAction.stdout.on('data',
+            function (data) {
+                console.log(data.toString());
+            }
+        );
+        execAction.stderr.on('data',
+            function (data) {
+                console.log(data.toString());
+            }
+        );
+        execAction.on('error', function (err) {
+            //console.log('Failed to start child process.' + err);
+        });
+        execAction.on('close', function (code) {
+            //console.log('child process exited with code ' + code);
+        });
+    } catch (ex) {
+        console.log(ex);
+    }
+};
+
 utils.executeActions = function (actionsList) {
     try {
         var json = JSON.stringify(actionsList);

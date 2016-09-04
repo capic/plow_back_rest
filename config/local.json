@@ -16,7 +16,8 @@
     "reset_command": "python /var/www/plow_solution/main/download_basic.py reset",
     "action_command": "python /var/www/plow_solution/main/download_basic.py action",
     "delete_package_files": "python /var/www/plow_solution/main/download_basic.py delete_package_files",
-    "stop_download": "python /var/www/plow_solution/main/download_basic.py stop"
+    "stop_download": "python /var/www/plow_solution/main/download_basic.py stop",
+    "stop_current_downloads": "python /var/www/plow_solution/main/download_basic.py stop_current_downloads"
   },
   "notification": {
     "activated": true,
