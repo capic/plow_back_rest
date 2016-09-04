@@ -54,8 +54,10 @@ router.put('/:id',
                                     websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
                                 }*/
 
-                                // stop current downloads
-                                utils.stopCurrentDownloads();
+                                if (!applicationConfigurationdModel.download_activated) {
+                                    // stop current downloads
+                                    utils.stopCurrentDownloads();
+                                }
 
                                 res.json(applicationConfigurationdModel);
                             }
