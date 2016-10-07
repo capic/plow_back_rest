@@ -663,6 +663,42 @@ router.post('/reset',
     }
 );
 
+router.post('/pause',
+    function (req, res, next) {
+        var dataObject = JSON.parse(JSON.stringify(req.body));
+
+        models.Download.findById(dataObject.id,
+            {
+                include: [
+                    {model: models.DownloadPackage, as: 'download_package'}
+                ]
+            })
+            .then(function (downloadModel) {
+                    downloadModel.updateAttributes({
+                        status: downloadStatusConfig.PAUSE
+                    })
+                        .then(function () {
+                                var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.reset_command + ' ' + dataObject.id + ' ' + dataObject.deleteFile;
+
+                                if (websocket.connection.isOpen) {
+                                    websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {
+                                        acknowledge: false,
+                                        exclude: [dataObject.wampId]
+                                    });
+                                    websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {
+                                        acknowledge: false,
+                                        exclude: [dataObject.wampId]
+                                    });
+                                }
+
+                                res.json(downloadModel);
+                            }
+                        );
+                }
+            );
+    }
+);
+
 router.post('/package/files/delete',
     function (req, res, next) {
         var dataObject = JSON.parse(JSON.stringify(req.body));
