@@ -674,10 +674,17 @@ router.post('/pause',
                 ]
             })
             .then(function (downloadModel) {
+                var dataObject = JSON.parse(JSON.stringify(req.body));
+
+                var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.stop_download + ' ' + dataObject.id;
+                var execStopDownload = exec(command);
+
+                execStopDownload.stdout.on('data', function (data) {
                     downloadModel.updateAttributes({
                         status: downloadStatusConfig.PAUSE
                     })
                         .then(function () {
+
                                 var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.reset_command + ' ' + dataObject.id + ' ' + dataObject.deleteFile;
 
                                 if (websocket.connection.isOpen) {
@@ -694,6 +701,15 @@ router.post('/pause',
                                 res.json(downloadModel);
                             }
                         );
+                });
+                execStopDownload.stderr.on('data', function (data) {
+                    console.log('stdout: ' + data);
+                });
+                execStopDownload.on('close', function (code) {
+                    console.log('closing code: ' + code);
+                });
+
+
                 }
             );
     }
