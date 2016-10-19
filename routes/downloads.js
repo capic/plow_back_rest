@@ -209,32 +209,44 @@ router.put('/:id',
     function (req, res) {
         if (Object.prototype.hasOwnProperty.call(req.body, 'download')) {
             var downloadObject = JSON.parse(req.body.download);
-            models.Download.update(downloadObject, {
-                    where: {id: req.params.id}
-                }
-                )
-                .then(function () {
-                        models.Download.findById(req.params.id,
-                            {
-                                include: [
-                                    {model: models.DownloadPackage, as: 'download_package'},
-                                    {model: models.DownloadHost, as: 'download_host'},
-                                    {model: models.Directory, as: 'directory'}
-                                ]
-                            })
-                            .then(function (downloadModel) {
-                                    if (websocket.connection.isOpen) {
-                                        if (downloadModel) {
-                                            websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                                            websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
-                                        }
-                                    }
-                                    res.json(downloadModel);
-                                }
-                            );
+            var update = true;
+
+            if (Object.prototype.hasOwnProperty.call(req.body, 'update')) {
+                update = JSON.parse(req.body.update);
+            }
+
+            if (!update) {
+                websocket.session.publish('plow.downloads.downloads', [downloadObject], {}, {acknowledge: false});
+                websocket.session.publish('plow.downloads.download.' + downloadObject.id, [downloadObject], {}, {acknowledge: false});
+            } else {
+                models.Download.update(downloadObject, {
+                        where: {id: req.params.id}
                     }
-                );
-        } else {
+                )
+                    .then(function () {
+                            models.Download.findById(req.params.id,
+                                {
+                                    include: [
+                                        {model: models.DownloadPackage, as: 'download_package'},
+                                        {model: models.DownloadHost, as: 'download_host'},
+                                        {model: models.Directory, as: 'directory'}
+                                    ]
+                                })
+                                .then(function (downloadModel) {
+                                        if (websocket.connection.isOpen) {
+                                            if (downloadModel) {
+                                                websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                                                websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                                            }
+                                        }
+                                        res.json(downloadModel);
+                                    }
+                                );
+                        }
+                    );
+            }
+        }
+        else {
             var error = new Error(res.__(errorConfig.downloads.updateDownload.badJson.message, req.params.id, req.body));
             error.status = errorConfig.downloads.updateDownload.code;
 
