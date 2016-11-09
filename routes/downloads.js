@@ -34,18 +34,10 @@ router.get('/',
         };
 
         var relationsList = [
-            {
-                model: models.DownloadPackage,
-                as: 'download_package'
-            },
-            {
-                model: models.DownloadHost,
-                as: 'download_host'
-            },
-            {
-                model: models.Directory,
-                as: 'directory'
-            }
+            //{ model: models.DownloadStatus, as: 'download_status' },
+            { model: models.DownloadPackage, as: 'download_package' },
+            { model: models.DownloadHost, as: 'download_host' },
+            { model: models.Directory, as: 'directory' }
         ];
 
         var queryOptions = utils.urlFiltersParametersTreatment(req.query, relationsList);
@@ -214,10 +206,28 @@ router.put('/:id',
             if (Object.prototype.hasOwnProperty.call(req.body, 'update')) {
                 update = JSON.parse(req.body.update);
             }
-
+            console.log("UPDATE ============> " + update);
             if (!update) {
-                websocket.session.publish('plow.downloads.downloads', [downloadObject], {}, {acknowledge: false});
-                websocket.session.publish('plow.downloads.download.' + downloadObject.id, [downloadObject], {}, {acknowledge: false});
+                models.Download.findById(req.params.id,
+                    {
+                        include: [
+                            {model: models.DownloadPackage, as: 'download_package'},
+                            {model: models.DownloadHost, as: 'download_host'},
+                            {model: models.Directory, as: 'directory'}
+                        ]
+                    })
+                    .then(function (downloadModel) {
+                        downloadObject.download_package = downloadModel.download_package;
+                        downloadObject.download_host = downloadModel.download_host;
+                        downloadObject.directory = downloadModel.directory;
+                        downloadObject.progress_file = parseInt((downloadObject.size_file_downloaded * 100) / downloadObject.size_file);
+
+                        websocket.session.publish('plow.downloads.downloads', [downloadObject], {}, {acknowledge: false});
+                        websocket.session.publish('plow.downloads.download.' + downloadObject.id, [downloadObject], {}, {acknowledge: false});
+
+                        res.json(downloadObject);
+                    });
+
             } else {
                 models.Download.update(downloadObject, {
                         where: {id: req.params.id}
@@ -260,23 +270,27 @@ router.put('/:id',
  */
 router.delete('/:id',
     function (req, res) {
-        models.Download.destroy({where: {id: req.params.id}})
-            .then(function (ret) {
-                    if (websocket.connection.isOpen) {
-                        models.Download.findAll({
-                            include: [{model: models.DownloadPackage, as: 'download_package'}]
-                        }).then(function (downloadsModel) {
-                            websocket.session.publish('plow.downloads.downloads', [downloadsModel], {}, {
-                                acknowledge: false,
-                                exclude: [req.params.wampId]
-                            });
-                            //websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
-                        });
-                    }
+        console.log("*************************** "+ req.params.id);
+        utils.deleteDownload(res, req.params.wampId, [req.params.id]);
+    }
+);
 
-                    res.json({'return': ret == 1});
-                }
-            );
+router.post('/finished',
+    function(req, res) {
+        models.Download.findAll({
+            include: [
+                {model: models.DownloadPackage, as: 'download_package'},
+                {model: models.DownloadHost, as: 'download_host'},
+                {model: models.Directory, as: 'directory'}
+            ],
+            where: {status: downloadStatusConfig.FINISHED}})
+        .then(function (downloadsModel) {
+            var ids =[];
+            downloadsModel.forEach(function(downloadModel) {
+                ids.push(downloadModel.id);
+            });
+            utils.deleteDownload(res, req.params.wampId, ids);
+        });
     }
 );
 
@@ -678,52 +692,7 @@ router.post('/reset',
 router.post('/pause',
     function (req, res, next) {
         var dataObject = JSON.parse(JSON.stringify(req.body));
-
-        models.Download.findById(dataObject.id,
-            {
-                include: [
-                    {model: models.DownloadPackage, as: 'download_package'}
-                ]
-            })
-            .then(function (downloadModel) {
-                var dataObject = JSON.parse(JSON.stringify(req.body));
-
-                var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.stop_download + ' ' + dataObject.id;
-                var execStopDownload = exec(command);
-
-                execStopDownload.stdout.on('data', function (data) {
-                    downloadModel.updateAttributes({
-                        status: downloadStatusConfig.PAUSE
-                    })
-                        .then(function () {
-
-                                var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.reset_command + ' ' + dataObject.id + ' ' + dataObject.deleteFile;
-
-                                if (websocket.connection.isOpen) {
-                                    websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {
-                                        acknowledge: false,
-                                        exclude: [dataObject.wampId]
-                                    });
-                                    websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {
-                                        acknowledge: false,
-                                        exclude: [dataObject.wampId]
-                                    });
-                                }
-
-                                res.json(downloadModel);
-                            }
-                        );
-                });
-                execStopDownload.stderr.on('data', function (data) {
-                    console.log('stdout: ' + data);
-                });
-                execStopDownload.on('close', function (code) {
-                    console.log('closing code: ' + code);
-                });
-
-
-                }
-            );
+        utils.executeActionAndUpdateDownloadStatus(dataObject, downloadStatusConfig.PAUSE, downloadServerConfig.stop_download);
     }
 );
 
@@ -761,18 +730,26 @@ router.post('/stop',
     function(req, res) {
         var dataObject = JSON.parse(JSON.stringify(req.body));
 
-        var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.stop_download + ' ' + dataObject.id;
-        var execStopDownload = exec(command);
+        var ret = utils.executeActionAndUpdateDownloadStatus(dataObject, downloadStatusConfig.STOP, downloadServerConfig.stop_download);
+        res.json(ret);
+    }
+);
 
-        execStopDownload.stdout.on('data', function (data) {
-            console.log('stdout: ' + data);
-        });
-        execStopDownload.stderr.on('data', function (data) {
-            console.log('stdout: ' + data);
-        });
-        execStopDownload.on('close', function (code) {
-            console.log('closing code: ' + code);
-        });
+router.post('/start',
+    function(req, res) {
+        var dataObject = JSON.parse(JSON.stringify(req.body));
+
+        var ret = utils.executeActionAndUpdateDownloadStatus(dataObject, downloadStatusConfig.START, downloadServerConfig.start_download);
+        res.json(ret);
+    }
+);
+
+
+router.post('/resume',
+    function(req, res) {
+        var dataObject = JSON.parse(JSON.stringify(req.body));
+
+        utils.executeActionAndUpdateDownloadStatus(res, dataObject, downloadStatusConfig.WAITING, null);
     }
 );
 

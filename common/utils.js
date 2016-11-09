@@ -2,12 +2,128 @@
  * Created by Vincent on 13/11/2015.
  */
 var models = require('../models');
+var websocket = require('../websocket');
 var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
 
 var utils = {};
+
+var sequelizeParameterTreatment = function(prop, queryParameters, queryOptions) {
+    if (prop == "_limit") {
+        queryOptions['limit'] = parseInt(queryParameters[prop], 10);
+    } else if (prop == "_offset") {
+        queryOptions['offset'] = parseInt(queryParameters[prop], 10);
+    }
+};
+
+var queryParameterTreatment = function (prop, queryParameters, elValue, relationsList, tabQuery, params) {
+    var tabOperator = prop.split("$");
+    if (tabOperator.length > 1) {
+        var tabOperatorNum = tabOperator[1].split("µ");
+        if (tabOperatorNum[0] == "or") {
+            var p = {};
+            p[tabOperator[0]] = elValue;
+
+            if (Object.prototype.hasOwnProperty.call(tabQuery, tabOperatorNum[1])) {
+                tabQuery[tabOperatorNum[1]]['$or'].push(p);
+            } else {
+                var op = {};
+                op['$or'] = [];
+                op['$or'].push(p);
+                tabQuery[tabOperatorNum[1]] = op;
+            }
+        }
+    } else {
+        if (prop.indexOf('.') > -1) {
+            includeTreatment(queryParameters, prop, elValue, relationsList);
+        } else {
+            params[prop] = elValue;
+        }
+    }
+};
+
+var includeTreatment = function (queryParameters, prop, elValue, relationsList) {
+    var found = false;
+    var i = 0;
+    while (i < relationsList.length && !found) {
+        var tabRelations = prop.split('.');
+
+        if (Array.isArray(relationsList[i])) {
+            return includeTreatment(queryParameters, prop, elValue, relationsList[i]);
+        } else {
+            if (relationsList[i].as == tabRelations[0]) {
+                found = true;
+                var whereObject = {};
+                whereObject[tabRelations[1]] = elValue;
+                relationsList[i].where = whereObject;
+            }
+        }
+        i++;
+    }
+};
+
+var parameterTypeTreatment = function (param) {
+    var ret = null;
+
+    if (param == 'true' || param == 'false') {
+        ret = (param === 'true');
+    } else {
+        ret = param;
+    }
+
+    return ret;
+};
+
+var updateDownloadStatusModel = function(res, downloadModel, status, wampId) {
+    downloadModel.updateAttributes({
+        status: status
+    })
+        .then(function () {
+            if (websocket.connection.isOpen) {
+                websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {
+                    acknowledge: false,
+                    exclude: [wampId]
+                });
+                websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {
+                    acknowledge: false,
+                    exclude: [wampId]
+                });
+            }
+
+            res.json(downloadModel);
+        });
+};
+
+
+utils.deleteDownload = function(res, wampId, downloadsIdList) {
+    var downloadIdResultList = [];
+    downloadsIdList.forEach(function(id) {
+        models.Download.destroy({where: {id: id}})
+            .then(function (ret) {
+                    if (websocket.connection.isOpen) {
+                        models.Download.findAll({
+                            include: [{model: models.DownloadPackage, as: 'download_package'}]
+                        }).then(function (downloadsModel) {
+                            if (websocket.connection.isOpen) {
+                                websocket.session.publish('plow.downloads.downloads', [downloadsModel], {}, {
+                                    acknowledge: false,
+                                    exclude: [wampId]
+                                });
+
+                                //websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
+                            }
+                        });
+                    }
+
+                    downloadIdResultList = {id: id, result: ret};
+                }
+            );
+    });
+
+    res.json({'return': downloadIdResultList});
+};
 
 utils.moveDownload2 = function (downloadId, action_id) {
     var command = 'ssh root@' + downloadServerConfig.address + ' ' + downloadServerConfig.move_command + ' ' + downloadId + ' ' + action_id;
@@ -74,70 +190,31 @@ utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) 
     return queryOptions;
 };
 
-var sequelizeParameterTreatment = function(prop, queryParameters, queryOptions) {
-    if (prop == "_limit") {
-        queryOptions['limit'] = parseInt(queryParameters[prop], 10);
-    } else if (prop == "_offset") {
-        queryOptions['offset'] = parseInt(queryParameters[prop], 10);
-    }
-};
-
-var queryParameterTreatment = function (prop, queryParameters, elValue, relationsList, tabQuery, params) {
-    var tabOperator = prop.split("$");
-    if (tabOperator.length > 1) {
-        var tabOperatorNum = tabOperator[1].split("µ");
-        if (tabOperatorNum[0] == "or") {
-            var p = {};
-            p[tabOperator[0]] = elValue;
-
-            if (Object.prototype.hasOwnProperty.call(tabQuery, tabOperatorNum[1])) {
-                tabQuery[tabOperatorNum[1]]['$or'].push(p);
+utils.executeActionAndUpdateDownloadStatus = function(res, downloadObject, status, action){
+    models.Download.findById(downloadObject.id,
+        {
+            include: [
+                {model: models.DownloadPackage, as: 'download_package'}
+            ]
+        })
+        .then(function (downloadModel) {
+            if (action != null) {
+                var command = 'ssh root@' + downloadServerConfig.address + ' ' + action + ' ' + downloadObject.id;
+                var execAction = exec(command);
+                execAction.stdout.on('data', function (data) {
+                    updateDownloadStatusModel(res, downloadModel, status, downloadObject.wampId);
+                });
+                execAction.stderr.on('data', function (data) {
+                    console.log('stdout: ' + data);
+                });
+                execAction.on('close', function (code) {
+                    console.log('closing code: ' + code);
+                });
             } else {
-                var op = {};
-                op['$or'] = [];
-                op['$or'].push(p);
-                tabQuery[tabOperatorNum[1]] = op;
+                updateDownloadStatusModel(res, downloadModel, status, downloadObject.wampId);
             }
-        }
-    } else {
-        if (prop.indexOf('.') > -1) {
-            includeTreatment(queryParameters, prop, elValue, relationsList);
-        } else {
-            params[prop] = elValue;
-        }
-    }
-};
 
-var includeTreatment = function (queryParameters, prop, elValue, relationsList) {
-    var found = false;
-    var i = 0;
-    while (i < relationsList.length && !found) {
-        var tabRelations = prop.split('.');
-
-        if (Array.isArray(relationsList[i])) {
-            return includeTreatment(queryParameters, prop, elValue, relationsList[i]);
-        } else {
-            if (relationsList[i].as == tabRelations[0]) {
-                found = true;
-                var whereObject = {};
-                whereObject[tabRelations[1]] = elValue;
-                relationsList[i].where = whereObject;
-            }
-        }
-        i++;
-    }
-};
-
-var parameterTypeTreatment = function (param) {
-    var ret = null;
-
-    if (param == 'true' || param == 'false') {
-        ret = (param === 'true');
-    } else {
-        ret = param;
-    }
-
-    return ret;
+        });
 };
 
 utils.stopCurrentDownloads = function() {

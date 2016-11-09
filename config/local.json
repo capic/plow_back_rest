@@ -1,7 +1,7 @@
 {
   "db": {
     "host": "localhost",
-    "database": "plowshare_dev",
+    "database": "plowshare",
     "user": "root",
     "password": "capic_20_04_1982"
   },
@@ -16,6 +16,7 @@
     "reset_command": "python3.2 /var/www/plow_solution_dev/plow_python/main/download_basic.py reset",
     "action_command": "python3.2 /var/www/plow_solution_dev/plow_python/main/download_basic.py action",
     "delete_package_files": "python3.2 /var/www/plow_solution_dev/plow_python/main/download_basic.py delete_package_files",
+    "start_download": "python3.2 /var/www/plow_solution_dev/plow_python/main/download_basic.py start",
     "stop_download": "python3.2 /var/www/plow_solution_dev/plow_python/main/download_basic.py stop",
     "stop_current_downloads": "python3.2 /var/www/plow_solution_dev/plow_python/main/download_basic.py stop_current_downloads"
   },
