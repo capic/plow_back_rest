@@ -2,6 +2,7 @@ var models = require('../models');
 var express = require('express');
 var router = express.Router();
 var config = require("../configuration");
+var utils = require("../common/utils");
 var downloadStatusConfig = config.get('download_status');
 var errorConfig = config.get('errors');
 
@@ -46,11 +47,18 @@ router.put('/:id',
             .then(function () {
                     models.ApplicationConfiguration.findById(req.params.id,
                         {})
-                        .then(function (applicationConfigurationdModel) {
+                        .then(
+                            function (applicationConfigurationdModel) {
                                 /*if (websocket.connection.isOpen) {
                                     websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
                                     websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
                                 }*/
+
+                                if (!applicationConfigurationdModel.download_activated) {
+                                    // stop current downloads
+                                    utils.stopCurrentDownloads();
+                                }
+
                                 res.json(applicationConfigurationdModel);
                             }
                         );
