@@ -2,7 +2,6 @@
  * Created by Vincent on 13/11/2015.
  */
 var models = require('../models');
-var websocket = require('../websocket');
 var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var config = require("../configuration");
@@ -82,14 +81,20 @@ var updateDownloadStatusModel = function(res, downloadModel, status, wampId) {
     })
         .then(function () {
             if (websocket.connection.isOpen) {
-                websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {
-                    acknowledge: false,
-                    exclude: [wampId]
-                });
-                websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {
-                    acknowledge: false,
-                    exclude: [wampId]
-                });
+                websocket.session.publish('plow.downloads.downloads', [],
+                    {target: 'download', action: 'update', downloads: [downloadModel]},
+                    {
+                        acknowledge: false,
+                        exclude: [wampId]
+                    }
+                );
+                websocket.session.publish('plow.downloads.download.' + downloadModel.id, [],
+                    {target: 'download', action: 'updateDownload', downloads: [downloadModel]},
+                    {
+                        acknowledge: false,
+                        exclude: [wampId]
+                    }
+                );
             }
 
             res.json(downloadModel);
@@ -97,25 +102,23 @@ var updateDownloadStatusModel = function(res, downloadModel, status, wampId) {
 };
 
 
-utils.deleteDownload = function(res, wampId, downloadsIdList) {
+utils.deleteDownload = function(res, websocket, wampId, downloadsIdList) {
     var downloadIdResultList = [];
     downloadsIdList.forEach(function(id) {
         models.Download.destroy({where: {id: id}})
             .then(function (ret) {
-                    if (websocket.connection.isOpen) {
-                        models.Download.findAll({
-                            include: [{model: models.DownloadPackage, as: 'download_package'}]
-                        }).then(function (downloadsModel) {
-                            if (websocket.connection.isOpen) {
-                                websocket.session.publish('plow.downloads.downloads', [downloadsModel], {}, {
-                                    acknowledge: false,
-                                    exclude: [wampId]
-                                });
+                    models.Download.findAll({
+                        include: [{model: models.DownloadPackage, as: 'download_package'}]
+                    }).then(function (downloadsModel) {
+                        console.log("websocket.connection.isOpen " + websocket.connection.isOpen);
+                        if (websocket.connection.isOpen) {
+                            websocket.session.publish('plow.downloads.downloads', [],
+                                {target: 'download', action: 'delete', data: [id]}
+                            );
 
-                                //websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
-                            }
-                        });
-                    }
+                            //websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
+                        }
+                    });
 
                     downloadIdResultList = {id: id, result: ret};
                 }
@@ -139,7 +142,7 @@ utils.moveDownload2 = function (downloadId, action_id) {
     );
 };
 
-utils.insertOrUpdateLog = function (id, downLogsObject, websocket, res) {
+utils.insertOrUpdateLog = function (id, downLogsObject, res) {
     models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
         'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
         {
@@ -152,7 +155,9 @@ utils.insertOrUpdateLog = function (id, downLogsObject, websocket, res) {
         models.DownloadLogs.findById(id)
             .then(function (downloadLogsModel) {
                     if (websocket.connection.isOpen) {
-                        websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [downloadLogsModel], {}, {acknowledge: false});
+                        websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [],
+                            {target: 'downloadLog', action: 'add', data: [downloadLogsModel]},
+                            {acknowledge: false});
                     }
 
                     if (res) {

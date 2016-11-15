@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 var config = require("../configuration");
 var utils = require("../common/utils");
+var websocket = require('../websocket');
 var downloadStatusConfig = config.get('download_status');
 var errorConfig = config.get('errors');
 
@@ -49,10 +50,9 @@ router.put('/:id',
                         {})
                         .then(
                             function (applicationConfigurationdModel) {
-                                /*if (websocket.connection.isOpen) {
-                                    websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                                    websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
-                                }*/
+                                if (websocket.connection.isOpen) {
+                                    websocket.session.publish('plow.application.configuration', [applicationConfigurationdModel], {}, {acknowledge: false});
+                                }
 
                                 if (!applicationConfigurationdModel.download_activated) {
                                     // stop current downloads

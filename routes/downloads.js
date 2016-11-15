@@ -149,7 +149,8 @@ router.post('/',
             models.Download.create(downloadObject)
                 .then(function (downloadModel) {
                         if (websocket.connection.isOpen) {
-                            websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
+                            websocket.session.publish('plow.downloads.downloads', [],
+                                {target: 'download', action: 'add', data: [downloadModel]}, {acknowledge: false});
                         }
                         console.log(downloadModel);
                         res.json(downloadModel);
@@ -166,6 +167,7 @@ router.post('/',
 
 router.post('/remove',
     function (req, res, next) {
+        /*
         var listDownloadId = JSON.parse(JSON.stringify(req.body)).ListId;
 
         var listDownloadIdDeleted = [];
@@ -191,6 +193,8 @@ router.post('/remove',
                     );
             }
         );
+        */
+        utils.deleteDownload(res, websocket, req.params.wampId, JSON.parse(JSON.stringify(req.body)).ListId);
     }
 );
 
@@ -206,7 +210,7 @@ router.put('/:id',
             if (Object.prototype.hasOwnProperty.call(req.body, 'update')) {
                 update = JSON.parse(req.body.update);
             }
-            console.log("UPDATE ============> " + update);
+
             if (!update) {
                 models.Download.findById(req.params.id,
                     {
@@ -222,8 +226,10 @@ router.put('/:id',
                         downloadObject.directory = downloadModel.directory;
                         downloadObject.progress_file = parseInt((downloadObject.size_file_downloaded * 100) / downloadObject.size_file);
 
-                        websocket.session.publish('plow.downloads.downloads', [downloadObject], {}, {acknowledge: false});
-                        websocket.session.publish('plow.downloads.download.' + downloadObject.id, [downloadObject], {}, {acknowledge: false});
+                        websocket.session.publish('plow.downloads.downloads', [],
+                            {target: 'download', action: 'update', data: [downloadObject]}, {acknowledge: false});
+                        websocket.session.publish('plow.downloads.download.' + downloadObject.id, [],
+                            {target: 'download', action: 'update', data: [downloadObject]}, {acknowledge: false});
 
                         res.json(downloadObject);
                     });
@@ -245,8 +251,10 @@ router.put('/:id',
                                 .then(function (downloadModel) {
                                         if (websocket.connection.isOpen) {
                                             if (downloadModel) {
-                                                websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                                                websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false});
+                                                websocket.session.publish('plow.downloads.downloads', [],
+                                                    {target: 'download', action: 'update', data: [downloadModel]}, {acknowledge: false});
+                                                websocket.session.publish('plow.downloads.download.' + downloadObject.id, [],
+                                                        {target: 'download', action: 'update', data: [downloadModel]}, {acknowledge: false});
                                             }
                                         }
                                         res.json(downloadModel);
@@ -270,8 +278,7 @@ router.put('/:id',
  */
 router.delete('/:id',
     function (req, res) {
-        console.log("*************************** "+ req.params.id);
-        utils.deleteDownload(res, req.params.wampId, [req.params.id]);
+        utils.deleteDownload(res, websocket, req.params.wampId, [req.params.id]);
     }
 );
 
@@ -289,7 +296,7 @@ router.post('/finished',
             downloadsModel.forEach(function(downloadModel) {
                 ids.push(downloadModel.id);
             });
-            utils.deleteDownload(res, req.params.wampId, ids);
+            utils.deleteDownload(res, websocket, req.params.wampId, ids);
         });
     }
 );
@@ -521,7 +528,7 @@ router.put('/logs/:id',
     function (req, res) {
         var dataObject = JSON.parse(JSON.stringify(req.body))
 
-        utils.insertOrUpdateLog(req.params.id, dataObject, websocket, res);
+        utils.insertOrUpdateLog(req.params.id, dataObject, res);
     }
 );
 
@@ -581,7 +588,8 @@ router.post('/package/unrarPercent',
                         .then(function () {
                                 if (websocket.connection.isOpen) {
                                     //websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {acknowledge: false});
-                                    websocket.session.publish('plow.downloads.download.unrar.' + downloadPackageModel.id, [downloadPackageModel], {}, {acknowledge: false});
+                                    websocket.session.publish('plow.downloads.download.unrar.' + downloadPackageModel.id, [],
+                                        {target: 'package', action: 'unrar', data: [downloadPackageModel]}, {acknowledge: false});
                                 }
                                 res.json(downloadPackageModel);
                             }
@@ -671,11 +679,13 @@ router.post('/reset',
                                 });
 
                                 if (websocket.connection.isOpen) {
-                                    websocket.session.publish('plow.downloads.downloads', [downloadModel], {}, {
+                                    websocket.session.publish('plow.downloads.downloads', [],
+                                        {target: 'dwonload', action: 'reset', data: [downloadModel]}, {
                                         acknowledge: false,
                                         exclude: [dataObject.wampId]
                                     });
-                                    websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {
+                                    websocket.session.publish('plow.downloads.download.' + downloadModel.id, [],
+                                        {target: 'download', action: 'reset', data: [downloadModel]}, {
                                         acknowledge: false,
                                         exclude: [dataObject.wampId]
                                     });
