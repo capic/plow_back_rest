@@ -1,7 +1,7 @@
 {
   "db": {
     "host": "localhost",
-    "database": "plowshare",
+    "database": "plowshare_dev",
     "user": "root",
     "password": "capic_20_04_1982"
   },
