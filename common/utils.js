@@ -111,19 +111,20 @@ var updateDownloadStatusModel = function(res, downloadModel, status, wampId) {
 utils.deleteDownload = function(websocket, wampId, downloadsIdList) {
     return new Promise(function(resolve, reject) {
         var downloadIdResultList = [];
-        var cpt = 0;
+
         downloadsIdList.forEach(function (id) {
             models.Download.destroy({where: {id: id}})
                 .then(function (ret) {
-                    cpt++;
+                    console.log("then");
                         // models.Download.findAll({
                         //     include: [{model: models.DownloadPackage, as: 'download_package'}]
                         // }).then(function (downloadsModel) {
 
                     if (websocket.connection.isOpen) {
+                        console.log("wampId " + wampId);
                         websocket.session.publish('plow.downloads.downloads', [],
                             {target: 'download', action: 'delete', data: [id]},
-                            {acknowledge: false, exclude: [req.params.wampId]}
+                            {acknowledge: false, exclude: [wampId]}
                         );
 
                                 //websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
@@ -131,17 +132,18 @@ utils.deleteDownload = function(websocket, wampId, downloadsIdList) {
 
                         // });
 
-                    downloadIdResultList = {id: id, result: ret};
-                    if (cpt == downloadsIdList.length) {
-                        resolve(downloadsIdList);
+                    downloadIdResultList.push({id: id, result: true});
+
+                    if (downloadIdResultList.length == downloadsIdList.length) {
+                        resolve(downloadIdResultList);
                     }
                 })
                 .catch(function (err) {
-                    cpt++;
-                    downloadIdResultList = {id: id, result: false};
+                    console.log("catch " + err);
+                    downloadIdResultList.push({id: id, result: false});
 
-                    if (cpt == downloadsIdList.length) {
-                        resolve(downloadsIdList);
+                    if (downloadIdResultList.length == downloadsIdList.length) {
+                        resolve(downloadIdResultList);
                     }
                 });
         });
