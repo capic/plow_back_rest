@@ -34,6 +34,7 @@ module.exports = function (sequelize, DataTypes) {
             pid_python: DataTypes.INTEGER,
             file_path: DataTypes.STRING(2048),
             priority: DataTypes.INTEGER,
+            application_configuration_id: DataTypes.INTEGER,
             theorical_start_datetime: DataTypes.DATE,
             lifecycle_insert_date: DataTypes.DATE,
             lifecycle_update_date: DataTypes.DATE
