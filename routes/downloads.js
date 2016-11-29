@@ -170,7 +170,9 @@ router.post('/',
 
 router.post('/remove',
     function (req, res, next) {
-        utils.deleteDownload(websocket, req.params.wampId, JSON.parse(JSON.stringify(req.body)).ListId)
+        var body = JSON.parse(JSON.stringify(req.body))
+
+        utils.deleteDownload(websocket, body.wampId, body.listId)
             .then(function(downloadIdResultList) {
                 res.json({'return': downloadIdResultList});
             });
@@ -257,6 +259,8 @@ router.put('/:id',
  */
 router.delete('/:id',
     function (req, res) {
+        console.log(req.params);
+        console.log(req.body);
         utils.deleteDownload(websocket, req.params.wampId, [req.params.id])
             .then(function(downloadIdResultList) {
                 res.json({'return': downloadIdResultList});
@@ -278,7 +282,7 @@ router.post('/finished',
             downloadsModel.forEach(function(downloadModel) {
                 ids.push(downloadModel.id);
             });
-            utils.deleteDownload(websocket, req.params.wampId, ids)
+            utils.deleteDownload(websocket, JSON.parse(JSON.stringify(req.body)).wampId, ids)
                 .then(function(downloadIdResultList) {
                     res.json({'return': downloadIdResultList});
                 });
