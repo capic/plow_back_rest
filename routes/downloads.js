@@ -1,15 +1,19 @@
 var models = require('../models');
 var express = require('express');
 var router = express.Router();
+var fs = require('fs');
 var websocket = require('../websocket');
 var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
+var lineReader = require('line-reader');
 var utils = require("../common/utils");
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
 var downloadStatusConfig = config.get('download_status');
 var fromConfig = config.get('from');
 var errorConfig = config.get('errors');
+
+
 
 /**
  * get the list of download status
@@ -152,7 +156,6 @@ router.post('/',
                             websocket.session.publish('plow.downloads.downloads', [],
                                 {target: 'download', action: 'add', data: [downloadModel]}, {acknowledge: false});
                         }
-                        console.log(downloadModel);
                         res.json(downloadModel);
                     }
                 );
@@ -167,34 +170,10 @@ router.post('/',
 
 router.post('/remove',
     function (req, res, next) {
-        /*
-        var listDownloadId = JSON.parse(JSON.stringify(req.body)).ListId;
-
-        var listDownloadIdDeleted = [];
-        var i = 0;
-        listDownloadId.forEach(
-            function (downloadId) {
-                models.Download.destroy({where: {id: downloadId}})
-                    .then(function (ret) {
-                            if (ret != 1) {
-                                var error = new Error(res.__(errorConfig.downloads.deleteDownload.message, downloadId));
-                                error.status = errorConfig.downloads.deleteDownload.code;
-
-                                return next(error);
-                            } else {
-                                listDownloadIdDeleted.push(downloadId);
-                            }
-                            if (i == listDownloadId.length - 1) {
-                                res.json({'listDownloadIdDeleted': listDownloadIdDeleted});
-                            }
-
-                            i++;
-                        }
-                    );
-            }
-        );
-        */
-        utils.deleteDownload(res, websocket, req.params.wampId, JSON.parse(JSON.stringify(req.body)).ListId);
+        utils.deleteDownload(websocket, req.params.wampId, JSON.parse(JSON.stringify(req.body)).ListId)
+            .then(function(downloadIdResultList) {
+                res.json({'return': downloadIdResultList});
+            });
     }
 );
 
@@ -278,7 +257,10 @@ router.put('/:id',
  */
 router.delete('/:id',
     function (req, res) {
-        utils.deleteDownload(res, websocket, req.params.wampId, [req.params.id]);
+        utils.deleteDownload(websocket, req.params.wampId, [req.params.id])
+            .then(function(downloadIdResultList) {
+                res.json({'return': downloadIdResultList});
+            });
     }
 );
 
@@ -296,7 +278,10 @@ router.post('/finished',
             downloadsModel.forEach(function(downloadModel) {
                 ids.push(downloadModel.id);
             });
-            utils.deleteDownload(res, websocket, req.params.wampId, ids);
+            utils.deleteDownload(websocket, req.params.wampId, ids)
+                .then(function(downloadIdResultList) {
+                    res.json({'return': downloadIdResultList});
+                });
         });
     }
 );
@@ -498,20 +483,60 @@ router.post('/unrar',
 /**
  * get download logs by id
  */
-router.get('/logs/:id',
+router.get('/logs/:id/:idApplication',
     function (req, res) {
+    /*
         models.DownloadLogs.findById(req.params.id)
             .then(function (downloadLogsModel) {
                     res.json(downloadLogsModel);
                 }
             );
+     */
+    models.ApplicationConfiguration.findById(req.params.idApplication,
+        {
+            include: [
+                { model: models.Directory, as: 'python_log_directory' },
+                { model: models.Directory, as: 'python_directory_download_temp' },
+                { model: models.Directory, as: 'python_directory_download' }
+            ]
+        })
+        .then(function(applicationConfigurationModel) {
+            var tabLogs = [];
+
+            utils.getPatternLog(req.params.idApplication)
+                .then(function(pattern) {
+                    if (typeof pattern != 'undefined' && pattern != null) {
+                        lineReader.eachLine('/media/nas/USB_squeeze/squeeze' + applicationConfigurationModel.python_log_directory.path + 'log_download_id_' + req.params.id +'.log', function(line, isLast) {
+                            var lineObject = pattern.parseSync(line);
+
+                            if (lineObject != null) {
+                                lineObject['levelname'] = lineObject['levelname'].trim();
+
+                                if (lineObject['to_ihm'] == 'true') {
+                                    tabLogs.push({id: req.params.id, logs: lineObject['message']});
+                                }
+                            }
+
+                            //console.log(line);
+                            //console.log(pattern.parseSync(line));
+                            if (isLast) {
+                                res.json(tabLogs);
+                            }
+                        });
+                    }
+                })
+                .catch(function(err) {
+                    console.log(err);
+                    res.send();
+                });
+        });
     }
 );
 
 /**
  * add a new download logs
  */
-router.post('/',
+router.post('/logs',
     function (req, res) {
         models.DownloadLogs.create(JSON.parse(JSON.stringify(req.body)))
             .then(function (downloadLogsModel) {
@@ -526,9 +551,10 @@ router.post('/',
  */
 router.put('/logs/:id',
     function (req, res) {
-        var dataObject = JSON.parse(JSON.stringify(req.body))
+        var dataObject = JSON.parse(req.body.logs);
+        var applicationConfigurationId = JSON.parse(req.body.applicationConfigurationId);
 
-        utils.insertOrUpdateLog(req.params.id, dataObject, res);
+        utils.insertOrUpdateLog(req.params.id, dataObject, applicationConfigurationId, res, JSON.parse(req.body.insert));
     }
 );
 

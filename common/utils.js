@@ -6,8 +6,14 @@ var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var config = require("../configuration");
 var downloadServerConfig = config.get('download_server');
+var websocket = require('../websocket');
+var HashMap = require('hashmap');
+var grok = require('node-grok');
+var XRegExp = require('xregexp');
+var promise = require('promise');
 
 var utils = {};
+utils.applicationConfigurationTab = new HashMap();
 
 var sequelizeParameterTreatment = function(prop, queryParameters, queryOptions) {
     if (prop == "_limit") {
@@ -102,30 +108,44 @@ var updateDownloadStatusModel = function(res, downloadModel, status, wampId) {
 };
 
 
-utils.deleteDownload = function(res, websocket, wampId, downloadsIdList) {
-    var downloadIdResultList = [];
-    downloadsIdList.forEach(function(id) {
-        models.Download.destroy({where: {id: id}})
-            .then(function (ret) {
-                    models.Download.findAll({
-                        include: [{model: models.DownloadPackage, as: 'download_package'}]
-                    }).then(function (downloadsModel) {
-                        console.log("websocket.connection.isOpen " + websocket.connection.isOpen);
-                        if (websocket.connection.isOpen) {
-                            websocket.session.publish('plow.downloads.downloads', [],
-                                {target: 'download', action: 'delete', data: [id]}
-                            );
+utils.deleteDownload = function(websocket, wampId, downloadsIdList) {
+    return new Promise(function(resolve, reject) {
+        var downloadIdResultList = [];
+        var cpt = 0;
+        downloadsIdList.forEach(function (id) {
+            models.Download.destroy({where: {id: id}})
+                .then(function (ret) {
+                    cpt++;
+                        // models.Download.findAll({
+                        //     include: [{model: models.DownloadPackage, as: 'download_package'}]
+                        // }).then(function (downloadsModel) {
 
-                            //websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
-                        }
-                    });
+                    if (websocket.connection.isOpen) {
+                        websocket.session.publish('plow.downloads.downloads', [],
+                            {target: 'download', action: 'delete', data: [id]},
+                            {acknowledge: false, exclude: [req.params.wampId]}
+                        );
+
+                                //websocket.session.publish('plow.downloads.download.' + downloadModel.id, [downloadModel], {}, {acknowledge: false, exclude: [req.params.wampId]});
+                    }
+
+                        // });
 
                     downloadIdResultList = {id: id, result: ret};
-                }
-            );
-    });
+                    if (cpt == downloadsIdList.length) {
+                        resolve(downloadsIdList);
+                    }
+                })
+                .catch(function (err) {
+                    cpt++;
+                    downloadIdResultList = {id: id, result: false};
 
-    res.json({'return': downloadIdResultList});
+                    if (cpt == downloadsIdList.length) {
+                        resolve(downloadsIdList);
+                    }
+                });
+        });
+    });
 };
 
 utils.moveDownload2 = function (downloadId, action_id) {
@@ -142,30 +162,48 @@ utils.moveDownload2 = function (downloadId, action_id) {
     );
 };
 
-utils.insertOrUpdateLog = function (id, downLogsObject, res) {
-    models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
-        'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
-        {
-            replacements: {
-                id: id,
-                logs: downLogsObject.logs
-            },
-            type: models.sequelize.QueryTypes.UPSERT
-        }).then(function () {
-        models.DownloadLogs.findById(id)
-            .then(function (downloadLogsModel) {
-                    if (websocket.connection.isOpen) {
-                        websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [],
-                            {target: 'downloadLog', action: 'add', data: [downloadLogsModel]},
-                            {acknowledge: false});
-                    }
+utils.insertOrUpdateLog = function (id, downLogsObject, applicationConfigurationId, res, insert) {
+    if (insert) {
+        models.sequelize.query('INSERT INTO download_logs (id, logs) ' +
+            'VALUES (:id, :logs) ON DUPLICATE KEY UPDATE id=:id, logs=concat(ifnull(logs,""), :logs)',
+            {
+                replacements: {
+                    id: id,
+                    logs: downLogsObject.logs
+                },
+                type: models.sequelize.QueryTypes.UPSERT
+            }).then(function () {
+            models.DownloadLogs.findById(id)
+                .then(function (downloadLogsModel) {
+                        if (websocket.connection.isOpen) {
+                            websocket.session.publish('plow.downloads.logs.' + downloadLogsModel.id, [],
+                                {target: 'downloadLog', action: 'add', data: [downloadLogsModel]},
+                                {acknowledge: false});
+                        }
 
-                    if (res) {
-                        res.json(downloadLogsModel)
+                        if (res) {
+                            res.json(downloadLogsModel);
+                        }
                     }
+                );
+        });
+    } else {
+        utils.getPatternLog(applicationConfigurationId)
+            .then(function(pattern) {
+                var log = pattern.parseSync(downLogsObject.logs);
+
+                if (websocket.connection.isOpen && log != null) {
+                    websocket.session.publish('plow.downloads.logs.' + downLogsObject.id, [],
+                        {target: 'downloadLog', action: 'add', data: [{id: downLogsObject.id, logs: log['message']}]},
+                        {acknowledge: false});
                 }
-            );
-    });
+
+                res.json(log);
+            })
+            .catch(function(err) {
+               console.log(err);
+            });
+    }
 };
 
 utils.urlFiltersParametersTreatment = function (queryParameters, relationsList) {
@@ -273,6 +311,56 @@ utils.executeActions = function (actionsList) {
     } catch (ex) {
         console.log(ex);
     }
+};
+
+utils.getPatternLog = function(applicationConfigurationId) {
+    return new Promise(function(resolve, reject) {
+        models.ApplicationConfiguration.findById(applicationConfigurationId)
+            .then(function(applicationConfigurationModel) {
+                var conf = utils.applicationConfigurationTab.get(applicationConfigurationId);
+                if (typeof conf == 'undefined' || conf == null || conf.lifecycle_update_date < applicationConfigurationModel.lifecycle_update_date) {
+                    var grokPattern = applicationConfigurationModel.python_log_format;
+
+                    grokPattern = XRegExp.replace(grokPattern, /\[|]|\((?=%)|\)(?![0-9]*s)|<|>|\{|}/g, function (match) {
+                        return '\\' + match;
+                    });
+
+                    grokPattern = XRegExp.replace(grokPattern, /%\(/g, '%{');
+                    grokPattern = XRegExp.replace(grokPattern, /\)([0-9])*s/g, '}');
+                    grokPattern = XRegExp.replace(grokPattern, /[a-z0-9_]+(?!%\{)(?=})/g, function (match) {
+                        var ret = 'DATA:' + match;
+
+                        switch (match) {
+                            case 'asctime':
+                                ret = 'DATA:' + match;
+                                break;
+                            case 'to_ihm':
+                                ret = 'DATA:' + match;
+                                break;
+                            default:
+                                ret = 'DATA:' + match;
+                        }
+
+                        return ret;
+                    });
+
+                    var patterns = grok.loadDefaultSync();
+                    var pattern = patterns.createPattern(grokPattern);
+
+                    utils.applicationConfigurationTab.set(applicationConfigurationId, {
+                        pattern: pattern,
+                        lifecycle_update_date: applicationConfigurationModel.lifecycle_update_date
+                    });
+
+                    conf = utils.applicationConfigurationTab.get(applicationConfigurationId);
+                }
+
+                resolve(conf.pattern) ;
+            })
+            .catch(function(err) {
+                reject(err);
+            });
+    });
 };
 
 module.exports = utils;

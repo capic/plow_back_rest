@@ -14,24 +14,27 @@ router.get('/',
             res.json(applicationConfigurations);
         };
 
-        var params = {};
-        for (prop in req.query) {
-            params[prop] = req.query[prop];
-        }
+        var relationsList = [
+            { model: models.Directory, as: 'python_log_directory' },
+            { model: models.Directory, as: 'python_directory_download_temp' },
+            { model: models.Directory, as: 'python_directory_download' }
+        ];
 
-        if (Object.keys(params).length !== 0) {
-            models.ApplicationConfiguration.findAll({
-                where: params
-            }).then(callback);
-        } else {
-            models.ApplicationConfiguration.findAll().then(callback);
-        }
+        var queryOptions = utils.urlFiltersParametersTreatment(req.query, relationsList);
+
+        models.ApplicationConfiguration.findAll(queryOptions).then(callback);
     }
 );
 
 router.get('/:id',
     function (req, res, next) {
-        models.ApplicationConfiguration.findById(req.params.id)
+        models.ApplicationConfiguration.findById(req.params.id,{
+            include: [
+                { model: models.Directory, as: 'python_log_directory' },
+                { model: models.Directory, as: 'python_directory_download_temp' },
+                { model: models.Directory, as: 'python_directory_download' }
+            ]
+        })
             .then(function (applicationConfigurationModel) {
                     res.json(applicationConfigurationModel);
                 }
