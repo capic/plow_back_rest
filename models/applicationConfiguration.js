@@ -13,6 +13,7 @@ module.exports = function(sequelize, DataTypes) {
       python_log_format: DataTypes.STRING,
       python_log_console_level: DataTypes.INTEGER,
       notification_address: DataTypes.STRING,
+      periodic_check_minutes: DataTypes.INTEGER,
       lifecycle_insert_date: DataTypes.DATE,
       lifecycle_update_date: DataTypes.DATE
   }, {
