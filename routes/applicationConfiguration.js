@@ -17,6 +17,7 @@ router.get('/',
         var relationsList = [
             { model: models.Directory, as: 'python_log_directory' },
             { model: models.Directory, as: 'python_directory_download_temp' },
+            { model: models.Directory, as: 'python_directory_download_text' },
             { model: models.Directory, as: 'python_directory_download' }
         ];
 
@@ -32,6 +33,7 @@ router.get('/:id',
             include: [
                 { model: models.Directory, as: 'python_log_directory' },
                 { model: models.Directory, as: 'python_directory_download_temp' },
+                { model: models.Directory, as: 'python_directory_download_text' },
                 { model: models.Directory, as: 'python_directory_download' }
             ]
         })
