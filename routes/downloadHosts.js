@@ -60,4 +60,21 @@ router.post('/',
   }
 );
 
+router.put('/:id',
+    function (req, res) {
+        var host = JSON.parse(JSON.stringify(req.body));
+
+        models.DownloadHost.update(host,
+            {
+                where: {id: req.params.id}
+            }
+        ).then(
+            function (modified) {
+                res.json(modified);
+            }
+        );
+
+    }
+);
+
 module.exports = router;

@@ -31,6 +31,10 @@ module.exports = function(sequelize, DataTypes) {
                 as: 'python_directory_download_temp'
             });
             ApplicationConfiguration.belongsTo(models.Directory, {
+                foreignKey: 'python_directory_download_text_id',
+                as: 'python_directory_download_text'
+            });
+            ApplicationConfiguration.belongsTo(models.Directory, {
                 foreignKey: 'python_directory_download_id',
                 as: 'python_directory_download'
             });

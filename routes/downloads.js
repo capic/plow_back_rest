@@ -48,8 +48,58 @@ router.get('/',
 
         models.Download.findAll(queryOptions).then(callback);
     }
-)
-;
+);
+
+router.get('/next2', function(req, res) {
+    // on recupere la liste des hebergeur pour savoir combien on accepte de telechargements simultanes
+    models.DownloadHost.findAll().then(function(downloadHostModelList) {
+        var downloadToStartList = [];
+        var cpt = 0;
+
+        downloadHostModelList.forEach(function(downloadHostModel) {
+            //on verifie le nombre de telechargement en cours pour l'hebergeur
+            models.Download.count({where: {status: 2, host_id: downloadHostModel.id} })
+                .then(function(c) {
+                    var nbre = downloadHostModel.simultaneous_downloads - c;
+
+                    if (nbre > 0) {
+                        models.Download.findAll(
+                            {
+                                where: {status: 1, host_id: downloadHostModel.id},
+                                limit: nbre,
+                                include: [
+                                    {
+                                        model: models.DownloadPackage, as: 'download_package'
+                                    }, {
+                                        model: models.DownloadHost, as: 'download_host'
+                                    },
+                                    {
+                                        model: models.Directory,
+                                        as: 'directory'
+                                    }]
+                            }).then(function (downloadModelList) {
+                            if (downloadModelList.length > 0) {
+                                downloadToStartList = downloadToStartList.concat(downloadModelList);
+                            }
+
+                            if (cpt == downloadHostModelList.length - 1) {
+                                res.json(downloadToStartList);
+                            }
+                            cpt++
+                        });
+                    } else {
+                        cpt++;
+                    }
+
+                }
+            );
+
+
+
+
+        });
+    });
+});
 
 /**
  * get the next download
@@ -150,8 +200,8 @@ router.post('/',
     function (req, res) {
         if (Object.prototype.hasOwnProperty.call(req.body, 'download')) {
             var downloadObject = JSON.parse(req.body.download);
-            models.Download.create(downloadObject)
-                .then(function (downloadModel) {
+            models.Download.findOrCreate({where: downloadObject})
+                .spread(function (downloadModel) {
                         if (websocket.connection.isOpen) {
                             websocket.session.publish('plow.downloads.downloads', [],
                                 {target: 'download', action: 'add', data: [downloadModel]}, {acknowledge: false});
@@ -509,7 +559,7 @@ router.get('/logs/:id/:idApplication',
 
             utils.getPatternLog(req.params.idApplication)
                 .then(function(pattern) {
-                    if (typeof pattern != 'undefined' && pattern != null) {
+                    if (typeof pattern != 'undefined' && pattern != null && fs.existsSync('/media/nas/USB_squeeze/squeeze' + applicationConfigurationModel.python_log_directory.path + 'log_download_id_' + req.params.id +'.log')) {
                         lineReader.eachLine('/media/nas/USB_squeeze/squeeze' + applicationConfigurationModel.python_log_directory.path + 'log_download_id_' + req.params.id +'.log', function(line, isLast) {
                             var lineObject = pattern.parseSync(line);
 
@@ -521,12 +571,14 @@ router.get('/logs/:id/:idApplication',
                                 }
                             }
 
-                            //console.log(line);
+                            // console.log(line);
                             //console.log(pattern.parseSync(line));
                             if (isLast) {
                                 res.json(tabLogs);
                             }
                         });
+                    } else {
+                        res.send();
                     }
                 })
                 .catch(function(err) {
