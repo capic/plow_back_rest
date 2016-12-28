@@ -67,6 +67,10 @@ module.exports = function (sequelize, DataTypes) {
                         foreignKey: 'host_id',
                         as: 'download_host'
                     });
+                    Download.belongsTo(models.DownloadPriority, {
+                        foreignKey: 'priority',
+                        as: 'download_priority'
+                    });
                     Download.hasMany(models.Action, {foreignKey: 'download_id'});
                 }
             }

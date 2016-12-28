@@ -48,7 +48,7 @@ router.put('/:id',
     function (req, res) {
         var applicationConfigurationObject = JSON.parse(JSON.stringify(req.body));
         models.ApplicationConfiguration.update(applicationConfigurationObject, {
-                where: {id: req.params.id}
+                where: {id_application: req.params.id}
             })
             .then(function () {
                     models.ApplicationConfiguration.findById(req.params.id,
