@@ -251,7 +251,7 @@ router.put('/:id',
                             {model: models.DownloadPackage, as: 'download_package'},
                             {model: models.DownloadHost, as: 'download_host'},
                             {model: models.Directory, as: 'directory'},
-                            {model: models.DownloadPriority, as: 'download_priority'},
+                            {model: models.DownloadPriority, as: 'download_priority'}
                         ]
                     })
                     .then(function (downloadModel) {
@@ -259,6 +259,7 @@ router.put('/:id',
                         downloadObject.download_host = downloadModel.download_host;
                         downloadObject.directory = downloadModel.directory;
                         downloadObject.progress_file = parseInt((downloadObject.size_file_downloaded * 100) / downloadObject.size_file);
+                        downloadObject.download_priority = downloadModel.download_priority;
 
                         websocket.session.publish('plow.downloads.downloads', [],
                             {target: 'download', action: 'update', data: [downloadObject]}, {acknowledge: false});
