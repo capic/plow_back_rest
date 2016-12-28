@@ -241,10 +241,12 @@ router.put('/:id',
             var update = true;
 
             if (Object.prototype.hasOwnProperty.call(req.body, 'update')) {
+                console.log("update from python: " + JSON.parse(req.body.update));
                 update = JSON.parse(req.body.update);
             }
 
             if (!update) {
+                console.log("No update !!!!");
                 models.Download.findById(req.params.id,
                     {
                         include: [
@@ -270,6 +272,7 @@ router.put('/:id',
                     });
 
             } else {
+                console.log("update !!!!");
                 models.Download.update(downloadObject, {
                         where: {id: req.params.id}
                     }
@@ -280,7 +283,8 @@ router.put('/:id',
                                     include: [
                                         {model: models.DownloadPackage, as: 'download_package'},
                                         {model: models.DownloadHost, as: 'download_host'},
-                                        {model: models.Directory, as: 'directory'}
+                                        {model: models.Directory, as: 'directory'},
+                                        {model: models.DownloadPriority, as: 'download_priority'}
                                     ]
                                 })
                                 .then(function (downloadModel) {
