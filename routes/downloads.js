@@ -41,6 +41,7 @@ router.get('/',
             //{ model: models.DownloadStatus, as: 'download_status' },
             { model: models.DownloadPackage, as: 'download_package' },
             { model: models.DownloadHost, as: 'download_host' },
+            {model: models.DownloadPriority, as: 'download_priority'},
             { model: models.Directory, as: 'directory' }
         ];
 
@@ -156,6 +157,7 @@ router.get('/:id',
                 include: [
                     {model: models.DownloadPackage, as: 'download_package'},
                     {model: models.DownloadHost, as: 'download_host'},
+                    {model: models.DownloadPriority, as: 'download_priority'},
                     {model: models.Directory, as: 'directory'}
                 ]
             })
@@ -248,7 +250,8 @@ router.put('/:id',
                         include: [
                             {model: models.DownloadPackage, as: 'download_package'},
                             {model: models.DownloadHost, as: 'download_host'},
-                            {model: models.Directory, as: 'directory'}
+                            {model: models.Directory, as: 'directory'},
+                            {model: models.DownloadPriority, as: 'download_priority'},
                         ]
                     })
                     .then(function (downloadModel) {
@@ -328,14 +331,18 @@ router.post('/finished',
             ],
             where: {status: downloadStatusConfig.FINISHED}})
         .then(function (downloadsModel) {
-            var ids =[];
-            downloadsModel.forEach(function(downloadModel) {
-                ids.push(downloadModel.id);
-            });
-            utils.deleteDownload(websocket, JSON.parse(JSON.stringify(req.body)).wampId, ids)
-                .then(function(downloadIdResultList) {
-                    res.json({'return': downloadIdResultList});
+            if (downloadsModel.length > 0) {
+                var ids =[];
+                downloadsModel.forEach(function(downloadModel) {
+                    ids.push(downloadModel.id);
                 });
+                utils.deleteDownload(websocket, JSON.parse(JSON.stringify(req.body)).wampId, ids)
+                    .then(function(downloadIdResultList) {
+                        res.json({'return': downloadIdResultList});
+                    });
+            } else {
+                res.json({'return': []});
+            }
         });
     }
 );
