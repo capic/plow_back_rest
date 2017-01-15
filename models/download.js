@@ -55,6 +55,10 @@ module.exports = function (sequelize, DataTypes) {
             },
             classMethods: {
                 associate: function (models) {
+                    Download.belongsTo(models.DownloadStatus, {
+                        foreignKey: 'status',
+                        as: 'download_status'
+                    });
                     Download.belongsTo(models.DownloadPackage, {
                         foreignKey: 'package_id',
                         as: 'download_package'

@@ -38,7 +38,7 @@ router.get('/',
         };
 
         var relationsList = [
-            //{ model: models.DownloadStatus, as: 'download_status' },
+            { model: models.DownloadStatus, as: 'download_status' },
             { model: models.DownloadPackage, as: 'download_package' },
             { model: models.DownloadHost, as: 'download_host' },
             {model: models.DownloadPriority, as: 'download_priority'},
@@ -69,6 +69,7 @@ router.get('/next2', function(req, res) {
                                 where: {status: 1, host_id: downloadHostModel.id},
                                 limit: nbre,
                                 include: [
+                                    { model: models.DownloadStatus, as: 'download_status' },
                                     {
                                         model: models.DownloadPackage, as: 'download_package'
                                     }, {
@@ -123,6 +124,7 @@ router.get('/next',
                                     models.Download.find({
                                             where: {id: download_id},
                                             include: [
+                                                { model: models.DownloadStatus, as: 'download_status' },
                                                 {
                                                     model: models.DownloadPackage, as: 'download_package'
                                                 }, {
@@ -155,6 +157,7 @@ router.get('/:id',
     function (req, res, next) {
         models.Download.findById(req.params.id, {
                 include: [
+                    { model: models.DownloadStatus, as: 'download_status' },
                     {model: models.DownloadPackage, as: 'download_package'},
                     {model: models.DownloadHost, as: 'download_host'},
                     {model: models.DownloadPriority, as: 'download_priority'},
@@ -250,6 +253,7 @@ router.put('/:id',
                 models.Download.findById(req.params.id,
                     {
                         include: [
+                            { model: models.DownloadStatus, as: 'download_status' },
                             {model: models.DownloadPackage, as: 'download_package'},
                             {model: models.DownloadHost, as: 'download_host'},
                             {model: models.Directory, as: 'directory'},
@@ -281,6 +285,7 @@ router.put('/:id',
                             models.Download.findById(req.params.id,
                                 {
                                     include: [
+                                        { model: models.DownloadStatus, as: 'download_status' },
                                         {model: models.DownloadPackage, as: 'download_package'},
                                         {model: models.DownloadHost, as: 'download_host'},
                                         {model: models.Directory, as: 'directory'},
@@ -330,6 +335,7 @@ router.post('/finished',
     function(req, res) {
         models.Download.findAll({
             include: [
+                { model: models.DownloadStatus, as: 'download_status' },
                 {model: models.DownloadPackage, as: 'download_package'},
                 {model: models.DownloadHost, as: 'download_host'},
                 {model: models.Directory, as: 'directory'}
